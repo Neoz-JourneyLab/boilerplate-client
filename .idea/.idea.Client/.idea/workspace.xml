@@ -1,0 +1,431 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="2853d336-8757-4e6b-9daf-8fdfc9c59b43" name="Default Changelist" comment="">
+      <change afterPath="$PROJECT_DIR$/.idea/.idea.Client/.idea/encodings.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/.idea/.idea.AuthFR/.idea/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/.idea/.idea.AuthFR/.idea/encodings.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/.idea/.idea.AuthFR/.idea/indexLayout.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/.idea/.idea.AuthFR/.idea/vcs.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assembly-CSharp.csproj.DotSettings" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/Img.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/Img/background.psd" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/Img/background.psd.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/Img/pc_wpp.jpeg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/Img/pc_wpp.jpeg.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/Prefabs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/Prefabs/GroupPrefab.prefab" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/Prefabs/GroupPrefab.prefab.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/Prefabs/InfoPrefab.prefab" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/Prefabs/InfoPrefab.prefab.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/Prefabs/ScrollList.prefab" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/Prefabs/ScrollList.prefab.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/RestClient.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/RestClient/Packages.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/RestClient/Packages/Proyecto26.RestClient.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/RestClient/Packages/Proyecto26.RestClient/Helpers.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/RestClient/Packages/Proyecto26.RestClient/Helpers/Common.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/RestClient/Packages/Proyecto26.RestClient/Helpers/Common.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/RestClient/Packages/Proyecto26.RestClient/Helpers/Extensions.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/RestClient/Packages/Proyecto26.RestClient/Helpers/Extensions.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/RestClient/Packages/Proyecto26.RestClient/Helpers/HttpBase.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/RestClient/Packages/Proyecto26.RestClient/Helpers/HttpBase.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/RestClient/Packages/Proyecto26.RestClient/Helpers/JsonHelper.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/RestClient/Packages/Proyecto26.RestClient/Helpers/JsonHelper.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/RestClient/Packages/Proyecto26.RestClient/Helpers/RequestException.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/RestClient/Packages/Proyecto26.RestClient/Helpers/RequestException.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/RestClient/Packages/Proyecto26.RestClient/Helpers/RequestHelper.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/RestClient/Packages/Proyecto26.RestClient/Helpers/RequestHelper.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/RestClient/Packages/Proyecto26.RestClient/Helpers/RequestHelperExtension.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/RestClient/Packages/Proyecto26.RestClient/Helpers/RequestHelperExtension.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/RestClient/Packages/Proyecto26.RestClient/Helpers/ResponseHelper.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/RestClient/Packages/Proyecto26.RestClient/Helpers/ResponseHelper.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/RestClient/Packages/Proyecto26.RestClient/Helpers/StaticCoroutine.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/RestClient/Packages/Proyecto26.RestClient/Helpers/StaticCoroutine.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/RestClient/Packages/Proyecto26.RestClient/RestClient.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/RestClient/Packages/Proyecto26.RestClient/RestClient.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/RestClient/Packages/Proyecto26.RestClient/RestClientPromise.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/RestClient/Packages/Proyecto26.RestClient/RestClientPromise.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/RestClient/Packages/RSG.Promise.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/RestClient/Packages/RSG.Promise/EnumerableExt.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/RestClient/Packages/RSG.Promise/EnumerableExt.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/RestClient/Packages/RSG.Promise/Exceptions.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/RestClient/Packages/RSG.Promise/Exceptions/PromiseException.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/RestClient/Packages/RSG.Promise/Exceptions/PromiseException.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/RestClient/Packages/RSG.Promise/Exceptions/PromiseStateException.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/RestClient/Packages/RSG.Promise/Exceptions/PromiseStateException.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/RestClient/Packages/RSG.Promise/Promise.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/RestClient/Packages/RSG.Promise/Promise.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/RestClient/Packages/RSG.Promise/PromiseHelpers.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/RestClient/Packages/RSG.Promise/PromiseHelpers.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/RestClient/Packages/RSG.Promise/PromiseTimer.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/RestClient/Packages/RSG.Promise/PromiseTimer.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/RestClient/Packages/RSG.Promise/Promise_NonGeneric.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/RestClient/Packages/RSG.Promise/Promise_NonGeneric.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/RestClient/Packages/RSG.Promise/Tuple.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/RestClient/Packages/RSG.Promise/Tuple.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/Scenes.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/Scenes/Android.unity" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/Scenes/Android.unity.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/Scenes/PC.unity" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/Scenes/PC.unity.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/Scripts.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/Scripts/ColorPalette.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/Scripts/ColorPalette.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/Scripts/Console.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/Scripts/Console.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/Scripts/GroupCreator.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/Scripts/GroupCreator.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/Scripts/InfoManager.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/Scripts/InfoManager.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/Scripts/MainClass.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/Scripts/MainClass.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/Scripts/Panel.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/Scripts/Panel.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/Scripts/PrefabGroup.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/Scripts/PrefabGroup.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/Scripts/PrefabInfo.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/Scripts/PrefabInfo.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Fonts.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Fonts/Anton OFL.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Fonts/Anton OFL.txt.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Fonts/Anton.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Fonts/Anton.ttf.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Fonts/Bangers - OFL.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Fonts/Bangers - OFL.txt.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Fonts/Bangers.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Fonts/Bangers.ttf.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Fonts/Electronic Highway Sign.TTF" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Fonts/Electronic Highway Sign.TTF.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Fonts/Oswald-Bold - OFL.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Fonts/Oswald-Bold - OFL.txt.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Fonts/Oswald-Bold.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Fonts/Oswald-Bold.ttf.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Fonts/Roboto-Bold.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Fonts/Roboto-Bold.ttf.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Resources.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Color Gradient Presets.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Color Gradient Presets/Blue to Purple - Vertical.asset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Color Gradient Presets/Blue to Purple - Vertical.asset.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Color Gradient Presets/Dark to Light Green - Vertical.asset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Color Gradient Presets/Dark to Light Green - Vertical.asset.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Color Gradient Presets/Light to Dark Green - Vertical.asset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Color Gradient Presets/Light to Dark Green - Vertical.asset.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Color Gradient Presets/Yellow to Orange - Vertical.asset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Color Gradient Presets/Yellow to Orange - Vertical.asset.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Fonts &amp; Materials.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Fonts &amp; Materials/Anton SDF - Drop Shadow.mat" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Fonts &amp; Materials/Anton SDF - Drop Shadow.mat.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Fonts &amp; Materials/Anton SDF - Outline.mat" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Fonts &amp; Materials/Anton SDF - Outline.mat.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Fonts &amp; Materials/Anton SDF - Sunny Days.mat" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Fonts &amp; Materials/Anton SDF - Sunny Days.mat.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Fonts &amp; Materials/Anton SDF.asset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Fonts &amp; Materials/Anton SDF.asset.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Fonts &amp; Materials/Bangers SDF - Drop Shadow.mat" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Fonts &amp; Materials/Bangers SDF - Drop Shadow.mat.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Fonts &amp; Materials/Bangers SDF - Outline.mat" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Fonts &amp; Materials/Bangers SDF - Outline.mat.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Fonts &amp; Materials/Bangers SDF Glow.mat" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Fonts &amp; Materials/Bangers SDF Glow.mat.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Fonts &amp; Materials/Bangers SDF Logo.mat" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Fonts &amp; Materials/Bangers SDF Logo.mat.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Fonts &amp; Materials/Bangers SDF.asset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Fonts &amp; Materials/Bangers SDF.asset.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Fonts &amp; Materials/Consolas SDF.asset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Fonts &amp; Materials/Consolas SDF.asset.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Fonts &amp; Materials/Consolas.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Fonts &amp; Materials/Consolas.ttf.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Fonts &amp; Materials/Electronic Highway Sign SDF.asset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Fonts &amp; Materials/Electronic Highway Sign SDF.asset.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Fonts &amp; Materials/LiberationSans SDF - Metalic Green.mat" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Fonts &amp; Materials/LiberationSans SDF - Metalic Green.mat.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Fonts &amp; Materials/LiberationSans SDF - Overlay.mat" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Fonts &amp; Materials/LiberationSans SDF - Overlay.mat.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Fonts &amp; Materials/LiberationSans SDF - Soft Mask.mat" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Fonts &amp; Materials/LiberationSans SDF - Soft Mask.mat.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Fonts &amp; Materials/Oswald Bold SDF.asset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Fonts &amp; Materials/Oswald Bold SDF.asset.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Fonts &amp; Materials/Roboto-Bold SDF - Drop Shadow.mat" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Fonts &amp; Materials/Roboto-Bold SDF - Drop Shadow.mat.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Fonts &amp; Materials/Roboto-Bold SDF - Surface.mat" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Fonts &amp; Materials/Roboto-Bold SDF - Surface.mat.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Fonts &amp; Materials/Roboto-Bold SDF.asset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Fonts &amp; Materials/Roboto-Bold SDF.asset.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Sprite Assets.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Sprite Assets/Default Sprite Asset.asset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Sprite Assets/Default Sprite Asset.asset.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Sprite Assets/DropCap Numbers.asset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Examples &amp; Extras/Resources/Sprite Assets/DropCap Numbers.asset.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Fonts.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Fonts/LiberationSans - OFL.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Fonts/LiberationSans - OFL.txt.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Fonts/LiberationSans.ttf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Fonts/LiberationSans.ttf.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Resources.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Resources/Fonts &amp; Materials.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Resources/Fonts &amp; Materials/LiberationSans SDF - Drop Shadow.mat" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Resources/Fonts &amp; Materials/LiberationSans SDF - Drop Shadow.mat.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Resources/Fonts &amp; Materials/LiberationSans SDF - Fallback.asset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Resources/Fonts &amp; Materials/LiberationSans SDF - Fallback.asset.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Resources/Fonts &amp; Materials/LiberationSans SDF - Outline.mat" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Resources/Fonts &amp; Materials/LiberationSans SDF - Outline.mat.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Resources/Fonts &amp; Materials/LiberationSans SDF.asset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Resources/Fonts &amp; Materials/LiberationSans SDF.asset.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Resources/LineBreaking Following Characters.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Resources/LineBreaking Following Characters.txt.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Resources/LineBreaking Leading Characters.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Resources/LineBreaking Leading Characters.txt.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Resources/Sprite Assets.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Resources/Sprite Assets/EmojiOne.asset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Resources/Sprite Assets/EmojiOne.asset.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Resources/Style Sheets.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Resources/Style Sheets/Default Style Sheet.asset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Resources/Style Sheets/Default Style Sheet.asset.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Resources/TMP Settings.asset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Resources/TMP Settings.asset.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Shaders.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Shaders/TMP_Bitmap-Custom-Atlas.shader" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Shaders/TMP_Bitmap-Custom-Atlas.shader.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Shaders/TMP_Bitmap-Mobile.shader" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Shaders/TMP_Bitmap-Mobile.shader.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Shaders/TMP_Bitmap.shader" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Shaders/TMP_Bitmap.shader.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Shaders/TMP_SDF Overlay.shader" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Shaders/TMP_SDF Overlay.shader.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Shaders/TMP_SDF SSD.shader" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Shaders/TMP_SDF SSD.shader.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Shaders/TMP_SDF-Mobile Masking.shader" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Shaders/TMP_SDF-Mobile Masking.shader.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Shaders/TMP_SDF-Mobile Overlay.shader" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Shaders/TMP_SDF-Mobile Overlay.shader.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Shaders/TMP_SDF-Mobile SSD.shader" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Shaders/TMP_SDF-Mobile SSD.shader.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Shaders/TMP_SDF-Mobile.shader" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Shaders/TMP_SDF-Mobile.shader.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Shaders/TMP_SDF-Surface-Mobile.shader" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Shaders/TMP_SDF-Surface-Mobile.shader.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Shaders/TMP_SDF-Surface.shader" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Shaders/TMP_SDF-Surface.shader.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Shaders/TMP_SDF.shader" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Shaders/TMP_SDF.shader.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Shaders/TMP_Sprite.shader" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Shaders/TMP_Sprite.shader.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Shaders/TMPro.cginc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Shaders/TMPro.cginc.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Shaders/TMPro_Mobile.cginc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Shaders/TMPro_Mobile.cginc.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Shaders/TMPro_Properties.cginc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Shaders/TMPro_Properties.cginc.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Shaders/TMPro_Surface.cginc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Shaders/TMPro_Surface.cginc.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Sprites.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Sprites/EmojiOne Attribution.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Sprites/EmojiOne Attribution.txt.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Sprites/EmojiOne.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Sprites/EmojiOne.json.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Sprites/EmojiOne.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/TextMesh Pro/Sprites/EmojiOne.png.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/UniClipboard.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/UniClipboard/Plugins.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/UniClipboard/Plugins/Android.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/UniClipboard/Plugins/Android/uniClipboard.jar" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/UniClipboard/Plugins/Android/uniClipboard.jar.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/UniClipboard/UniClipboard.cs" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Assets/UniClipboard/UniClipboard.cs.meta" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Logs/ApiUpdaterCheck.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Logs/AssetImportWorker0-prev.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Logs/AssetImportWorker0.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Logs/AssetImportWorker1.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Logs/AssetImportWorker10.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Logs/AssetImportWorker11.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Logs/AssetImportWorker12.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Logs/AssetImportWorker13.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Logs/AssetImportWorker14.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Logs/AssetImportWorker15.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Logs/AssetImportWorker16.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Logs/AssetImportWorker17.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Logs/AssetImportWorker18.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Logs/AssetImportWorker19.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Logs/AssetImportWorker2.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Logs/AssetImportWorker20.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Logs/AssetImportWorker21.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Logs/AssetImportWorker22.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Logs/AssetImportWorker23.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Logs/AssetImportWorker24.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Logs/AssetImportWorker25.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Logs/AssetImportWorker26.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Logs/AssetImportWorker27.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Logs/AssetImportWorker28.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Logs/AssetImportWorker29.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Logs/AssetImportWorker3.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Logs/AssetImportWorker30.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Logs/AssetImportWorker31.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Logs/AssetImportWorker32.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Logs/AssetImportWorker33.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Logs/AssetImportWorker34.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Logs/AssetImportWorker35.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Logs/AssetImportWorker36.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Logs/AssetImportWorker37.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Logs/AssetImportWorker38.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Logs/AssetImportWorker39.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Logs/AssetImportWorker4.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Logs/AssetImportWorker40.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Logs/AssetImportWorker41.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Logs/AssetImportWorker42.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Logs/AssetImportWorker43.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Logs/AssetImportWorker44.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Logs/AssetImportWorker45.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Logs/AssetImportWorker5.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Logs/AssetImportWorker6.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Logs/AssetImportWorker7.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Logs/AssetImportWorker8.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Logs/AssetImportWorker9.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Logs/Packages-Update.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Logs/shadercompiler-AssetImportWorker0.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Logs/shadercompiler-UnityShaderCompiler.exe0.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Logs/shadercompiler-UnityShaderCompiler.exe1.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Logs/shadercompiler-UnityShaderCompiler.exe2.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Logs/shadercompiler-UnityShaderCompiler.exe3.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Logs/shadercompiler-UnityShaderCompiler.exe4.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Logs/shadercompiler-UnityShaderCompiler.exe5.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Logs/shadercompiler-UnityShaderCompiler.exe6.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Logs/shadercompiler-UnityShaderCompiler.exe7.log" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Packages/manifest.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/Packages/packages-lock.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/ProjectSettings/AudioManager.asset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/ProjectSettings/ClusterInputManager.asset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/ProjectSettings/DynamicsManager.asset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/ProjectSettings/EditorBuildSettings.asset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/ProjectSettings/EditorSettings.asset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/ProjectSettings/GraphicsSettings.asset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/ProjectSettings/InputManager.asset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/ProjectSettings/NavMeshAreas.asset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/ProjectSettings/NetworkManager.asset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/ProjectSettings/PackageManagerSettings.asset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/ProjectSettings/Physics2DSettings.asset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/ProjectSettings/PresetManager.asset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/ProjectSettings/ProjectSettings.asset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/ProjectSettings/ProjectVersion.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/ProjectSettings/QualitySettings.asset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/ProjectSettings/TagManager.asset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/ProjectSettings/TimeManager.asset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/ProjectSettings/UnityConnectSettings.asset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/ProjectSettings/VFXManager.asset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/ProjectSettings/VersionControlSettings.asset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/ProjectSettings/XRSettings.asset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/UserSettings/EditorUserSettings.asset" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/csv.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/documentation_auth_fr.odp" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/documentation_auth_fr.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/security.drawio" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/security.jpg" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/security.pdf" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/AuthFR/security.svg" beforeDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/Assets/Scripts/uWebSocketManager.cs" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/Library/PackageCache/com.unity.mathematics@1.1.0/Tests/Tests/Shared/TestFloat2x2.gen.cs" root0="SKIP_HIGHLIGHTING" />
+  </component>
+  <component name="IdeDocumentHistory">
+    <changedPaths>
+      <option value="$PROJECT_DIR$/Assets/Scripts/PrefabGroup.cs" />
+      <option value="$PROJECT_DIR$/Assets/Scripts/MainClass.cs" />
+      <option value="$PROJECT_DIR$/Assets/Scripts/ColorPalette.cs" />
+      <option value="$PROJECT_DIR$/Assets/SocketIO/SocketIOComponent.cs" />
+      <option value="$PROJECT_DIR$/Assets/WebsocketSharp/Logger.cs" />
+      <option value="$PROJECT_DIR$/Assets/WebsocketSharp/WebSocketFrame.cs" />
+      <option value="$PROJECT_DIR$/Assets/Scripts/AuthRequest.cs" />
+      <option value="$PROJECT_DIR$/Assets/Scripts/Tools.cs" />
+      <option value="$PROJECT_DIR$/Assets/Scripts/WsEvents.cs" />
+      <option value="$PROJECT_DIR$/Assets/Scripts/uWebSocketManager.cs" />
+      <option value="$PROJECT_DIR$/Assets/Scripts/TestHttp.cs" />
+    </changedPaths>
+  </component>
+  <component name="ProjectId" id="1ydmeEjrTnxS3Wncef58SdLv9ab" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">
+    <property name="ASKED_SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="Discover.Launch.Via.Unity" value="true" />
+    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
+    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
+    <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="vue.rearranger.settings.migration" value="true" />
+  </component>
+  <component name="RunManager" selected="Attach to Unity Editor.Attach to Unity Editor">
+    <configuration name="Attach to Unity Editor &amp; Play" type="UNITY_DEBUG_RUN_CONFIGURATION" factoryName="UNITY_ATTACH_AND_PLAY" show_console_on_std_err="false" show_console_on_std_out="false" port="50000" address="localhost">
+      <option name="allowRunningInParallel" value="false" />
+      <option name="listenPortForConnections" value="false" />
+      <option name="pid" />
+      <option name="projectPathOnTarget" />
+      <option name="selectedOptions">
+        <list />
+      </option>
+      <method v="2" />
+    </configuration>
+    <configuration name="Attach to Unity Editor" type="UNITY_DEBUG_RUN_CONFIGURATION" factoryName="Unity Debug" show_console_on_std_err="false" show_console_on_std_out="false" port="50000" address="localhost">
+      <option name="allowRunningInParallel" value="false" />
+      <option name="listenPortForConnections" value="false" />
+      <option name="pid" />
+      <option name="projectPathOnTarget" />
+      <option name="selectedOptions">
+        <list />
+      </option>
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="2853d336-8757-4e6b-9daf-8fdfc9c59b43" name="Default Changelist" comment="" />
+      <created>1632589932887</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1632589932887</updated>
+      <workItem from="1632589935795" duration="358000" />
+      <workItem from="1632590381262" duration="636000" />
+      <workItem from="1632661596982" duration="1770000" />
+      <workItem from="1632663417427" duration="1767000" />
+      <workItem from="1632665317200" duration="1762000" />
+      <workItem from="1632667187755" duration="988000" />
+      <workItem from="1632673055681" duration="1797000" />
+      <workItem from="1632674910737" duration="540000" />
+      <workItem from="1632722338872" duration="2793000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="UnityProjectConfiguration" hasMinimizedUI="true" />
+  <component name="UnityUnitTestConfiguration" currentTestLauncher="EditMode" />
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+    <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <option name="CLEAR_INITIAL_COMMIT_MESSAGE" value="true" />
+  </component>
+</project>
