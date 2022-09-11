@@ -69,7 +69,6 @@ public class WsEvents : MonoBehaviour {
 		var js = JObject.Parse(json);
 		string zid = js["zid"].ToString();
 		int damages = (int)js["damages"];
-
 		GameObject.Find(zid).GetComponent<Zombie>().TakeDamages(damages);
 	}
 	public static void Zombie(string json) {
@@ -81,6 +80,7 @@ public class WsEvents : MonoBehaviour {
 		if (GameObject.Find(zid) == null) {
 			if (zombiePrefab == null) zombiePrefab = GameObject.Find("ZombieSpawner").GetComponent<ZombieSpawner>().zombiePrefab;
 			GameObject zombie = Instantiate(zombiePrefab, new Vector3(x, 0, z), new Quaternion());
+			zombie.GetComponent<Zombie>().id = zid;
 			zombie.name = zid;
 		}
 		GameObject.Find(zid).GetComponent<Zombie>().SetFromServer(x, z, speed);
