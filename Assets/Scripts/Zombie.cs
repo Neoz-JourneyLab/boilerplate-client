@@ -31,6 +31,8 @@ public class Zombie : MonoBehaviour {
 		agent.destination = target.transform.position;
 		agent.speed = (Mathf.Pow((int)(DateTime.UtcNow - start).TotalSeconds, 0.3f) + 2) / 2;
 		uWebSocketManager.EmitEv("send:zombie:target", new {
+			spawnX = transform.parent.position.x,
+			spawnZ = transform.parent.position.z,
 			agent.destination.x,
 			agent.destination.z,
 			agent.speed,
