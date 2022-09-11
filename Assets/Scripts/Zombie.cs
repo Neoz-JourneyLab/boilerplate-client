@@ -42,7 +42,7 @@ public class Zombie : MonoBehaviour {
 		life -= dmg;
 		if (life <= 0) {
 			uWebSocketManager.EmitEv("zombie:dead", new {
-				id
+				zid = id
 			});
 		}
 	}
