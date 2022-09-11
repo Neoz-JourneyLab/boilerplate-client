@@ -15,9 +15,18 @@
                     "initialStateCheck": true
                 },
                 {
-                    "name": "Fire",
+                    "name": "Shoot",
                     "type": "Button",
                     "id": "c1e60024-4be3-4fac-bd5d-5aa74bd4979d",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Reload",
+                    "type": "Button",
+                    "id": "49a1ce04-e617-4f9c-8efd-683731f6dde1",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -116,7 +125,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Gamepad",
-                    "action": "Fire",
+                    "action": "Shoot",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -127,7 +136,7 @@
                     "interactions": "",
                     "processors": "",
                     "groups": ";Keyboard&Mouse",
-                    "action": "Fire",
+                    "action": "Shoot",
                     "isComposite": false,
                     "isPartOfComposite": false
                 },
@@ -150,6 +159,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "Flashlight",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "9b6c11cf-e36f-415d-94b8-bf1878b1959c",
+                    "path": "<Keyboard>/r",
+                    "interactions": "Press",
+                    "processors": "",
+                    "groups": "Keyboard&Mouse",
+                    "action": "Reload",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }

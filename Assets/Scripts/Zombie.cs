@@ -7,7 +7,7 @@ using UnityEngine.AI;
 public class Zombie : MonoBehaviour {
 	NavMeshAgent agent;
 	DateTime start = DateTime.UtcNow;
-	string id = Guid.NewGuid().ToString();
+	public string id = Guid.NewGuid().ToString();
 
 	private void Awake() {
 		agent = GetComponent<NavMeshAgent>();
