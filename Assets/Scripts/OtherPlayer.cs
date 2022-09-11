@@ -24,7 +24,6 @@ public class OtherPlayer : MonoBehaviour {
 	}
 
 	public void Refresh(PlayerPos newPos) {
-		Debug.Log(DateTime.UtcNow.ToLongTimeString() + "." + DateTime.UtcNow.Millisecond + " REFRESH");
 		if (newPos.x == null || newPos.z == null || newPos.ry == null) return;
 
 		pos.x = pos.nx;

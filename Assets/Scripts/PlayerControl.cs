@@ -10,6 +10,7 @@ public class PlayerControl : MonoBehaviour {
 	[Range(0, 1)]
 	public float cameraOffset;
 	public float cameraHeight;
+	public bool host = false;
 
 	Vector2 moveDirection = Vector2.zero;
 	Vector2 mousePosition = Vector2.zero;
