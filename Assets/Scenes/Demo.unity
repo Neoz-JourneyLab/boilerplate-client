@@ -366,11 +366,6 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1.0000002, y: 1.6970307, z: 0.5957184}
   m_Center: {x: 0.0000019073486, y: 0.34851536, z: -0.05759634}
---- !u!1 &329160027 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1080041481, guid: 72070e92f7db31547b001d3bf4b9a024, type: 3}
-  m_PrefabInstance: {fileID: 2044227925}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &332116925 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8560921390098184963, guid: c894e4244a2db1c4a9d3f4207927e78a, type: 3}
@@ -1619,22 +1614,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 1080041483, guid: 72070e92f7db31547b001d3bf4b9a024, type: 3}
-      propertyPath: m_Shadows.m_Bias
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1080041483, guid: 72070e92f7db31547b001d3bf4b9a024, type: 3}
-      propertyPath: m_Shadows.m_Type
-      value: 2
-      objectReference: {fileID: 0}
     - target: {fileID: 1859943174674225297, guid: 72070e92f7db31547b001d3bf4b9a024, type: 3}
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
-    - target: {fileID: 1859943174674225305, guid: 72070e92f7db31547b001d3bf4b9a024, type: 3}
-      propertyPath: flashlight
-      value: 
-      objectReference: {fileID: 329160027}
     - target: {fileID: 1859943174674225309, guid: 72070e92f7db31547b001d3bf4b9a024, type: 3}
       propertyPath: m_RootOrder
       value: 5
