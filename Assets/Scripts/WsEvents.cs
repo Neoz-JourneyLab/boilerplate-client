@@ -93,7 +93,7 @@ public class WsEvents : MonoBehaviour {
 	public static void ChangeFlashlightState(string json) {
 		string uuid = JObject.Parse(json)["uuid"].ToString();
 		bool flashlightState = (bool)JObject.Parse(json)["state"];
-		GameObject.Find(uuid).transform.Find("Flashlight").gameObject.SetActive(flashlightState);
+		GameObject.Find(uuid).transform.Find("GunControl").transform.Find("Pistol").transform.Find("Flashlight").gameObject.SetActive(flashlightState);
 	}
 	#endregion
 }
