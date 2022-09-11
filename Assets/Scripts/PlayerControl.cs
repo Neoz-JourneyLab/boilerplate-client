@@ -11,6 +11,7 @@ public class PlayerControl : MonoBehaviour {
 	public float cameraOffset;
 	public float cameraHeight;
 	public bool host = false;
+	public GameObject zombiePrefab;
 
 	Vector2 moveDirection = Vector2.zero;
 	Vector2 mousePosition = Vector2.zero;
