@@ -13,6 +13,9 @@ public class Gun : MonoBehaviour {
 
    public Transform muzzle;
 
+   public ParticleSystem particles;
+   public Light muzzleFlash;
+
    float nextShot;
    // Start is called before the first frame update
    void Start() {
@@ -26,16 +29,15 @@ public class Gun : MonoBehaviour {
    }
 
    public Transform Shoot() {
-      print(1);
       if (capacity <= 0)
          return null;
-      print(2);
       if (nextShot > Time.time)
          return null;
-      print(3);
 
       nextShot = Time.time + fireRate;
       capacity--;
+
+      ShotAnim();
 
       Ray ray = new Ray(muzzle.transform.position, muzzle.transform.forward);
       RaycastHit hit;
@@ -44,9 +46,18 @@ public class Gun : MonoBehaviour {
 
       if (!Physics.Raycast(ray, out hit))
          return null;
-      print(4);
 
       return hit.collider.transform;
+   }
+
+   public void ShotAnim() {
+      muzzleFlash.gameObject.SetActive(true);
+      Invoke(nameof(DisableLight), 0.05f);
+      particles.Play();
+   }
+
+   void DisableLight() {
+      muzzleFlash.gameObject.SetActive(false);
    }
 
    public void Reload() {

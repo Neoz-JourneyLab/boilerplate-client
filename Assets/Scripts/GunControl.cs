@@ -23,7 +23,7 @@ public class GunControl : MonoBehaviour {
          return;
 
       //Notify server we hit a zombie
-      uWebSocketManager.EmitEv("hitzombie", new { id = transform.GetComponent<Zombie>().id });
+      uWebSocketManager.EmitEv("hit:zombie", new { zid = hit.GetComponent<Zombie>().id, damages = equipedGun.damages });
    }
 
    void OnReload() {
