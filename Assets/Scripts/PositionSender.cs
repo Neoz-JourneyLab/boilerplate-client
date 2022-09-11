@@ -17,7 +17,7 @@ public class PositionSender : MonoBehaviour {
 		uWebSocketManager.EmitEv("send:position", new {
 			player.position.x,
 			player.position.z,
-			ry = player.localEulerAngles.y,
+			ry = player.localEulerAngles.y
 		});
 	}
 

@@ -16,7 +16,7 @@ public class OtherPlayer : MonoBehaviour {
 		pos.x = Mathf.Lerp(pos.x, pos.nx, percentUntilNextRefresh);
 		pos.z = Mathf.Lerp(pos.z, pos.nz, percentUntilNextRefresh);
 		pos.ry = Mathf.Lerp(pos.ry, pos.nry, percentUntilNextRefresh);
-		transform.position = new Vector3(pos.x, 0, pos.z);
+		transform.position = new Vector3(pos.x, transform.position.y, pos.z);
 		transform.localEulerAngles = new Vector3(0, pos.ry, 0);
 	}
 
