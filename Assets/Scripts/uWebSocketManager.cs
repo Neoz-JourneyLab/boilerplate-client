@@ -21,7 +21,7 @@ public class uWebSocketManager : MonoBehaviour {
 	static uWebSocketManager uws;
 
 	private void Start() {
-		InvokeRepeating(nameof(Ping), 1, 1);
+		InvokeRepeating(nameof(Ping), 1, 1f);
 		InitSocket("ws://" + uri + "/");
 		uws = GameObject.Find("AppManager").GetComponent<uWebSocketManager>();
 	}
@@ -38,7 +38,6 @@ public class uWebSocketManager : MonoBehaviour {
 			Payload payload = JsonUtility.FromJson<Payload>(e.Data.ToString());
 			if (payload.id != null && payload.id != socketId) {
 				socketId = payload.id;
-				//Debug.Log("Socket ID " + socketId);
 			}
 			if (events.ContainsKey(payload.ev)) {
 				//routage de l'event serveur
@@ -46,14 +45,16 @@ public class uWebSocketManager : MonoBehaviour {
 			}
 		};
 		ws.OnClose += (sender, e) => {
+			Debug.Log("SOCKET CLOSED");
 		};
+		ws.ConnectAsync();
 	}
 
 	int tries = 1;
 	DateTime nextTry = DateTime.UtcNow;
 	void Ping() {
 		if (ws == null) return;
-		if (!ws.IsConnected || !ws.IsAlive || WsEvents.pings.Count > 5) {
+		if (WsEvents.pings.Count > 5) {
 			if (nextTry > DateTime.UtcNow) {
 				return;
 			}
@@ -65,7 +66,6 @@ public class uWebSocketManager : MonoBehaviour {
 			WsEvents.pings.Clear();
 			return;
 		}
-		return;
 		tries = 1;
 		nextTry = DateTime.UtcNow;
 		string ping_id = Guid.NewGuid().ToString();
@@ -79,12 +79,12 @@ public class uWebSocketManager : MonoBehaviour {
 	/// <param name="ev">Le nom de l'évenement pour le routage</param>
 	/// <param name="data">un objet a passer au serveur</param>
 	public void Emit(string ev, object data) {
-		if (!ws.IsAlive) {
+		/*if (!ws.IsAlive) {
 			Debug.Log("socket is not alive !");
 			return;
-		}
+		}*/
 		string json = JsonConvert.SerializeObject(new Payload() { ev = ev, id = socketId, data = JsonConvert.SerializeObject(data) });
-		ws.SendAsync(json, null);
+		ws.Send(json);
 	}
 
 	public static void EmitEv(string ev, object data = null) {
