@@ -20,6 +20,7 @@ public class ZombieSpawner : MonoBehaviour {
 			return;
 		}
 		if (transform.childCount >= max) return;
-		Instantiate(zombiePrefab, transform);
+		GameObject go = Instantiate(zombiePrefab, transform.position, new Quaternion());
+		go.transform.parent = transform;
 	}
 }
