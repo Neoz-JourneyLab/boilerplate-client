@@ -18,6 +18,8 @@ public class WsEvents : MonoBehaviour {
 	static int latency;
 	public static readonly Dictionary<string, DateTime> pings = new Dictionary<string, DateTime>();
 	static TMP_Text serverStatus;
+	static GameObject zombiePrefab = null;
+	static PlayerControl player = null;
 
 	#endregion
 
@@ -40,12 +42,26 @@ public class WsEvents : MonoBehaviour {
 		PositionSender.Get().PlotOther(pos);
 	}
 
+	public static void ZombieDead(string json) {
+		string zid = JObject.Parse(json)["zid"].ToString();
+		Destroy(GameObject.Find(zid));
+	}
+
 	public static void Err(string json) {
 		string code = JObject.Parse(json)["code"].ToString();
 		string message = JObject.Parse(json)["message"].ToString();
 		Debug.Log("Error : " + code + " > " + message);
 	}
+	public static void HitZombie(string json) {
+		if (player == null) player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerControl>();
+		if (!player.host) return;
 
+		var js = JObject.Parse(json);
+		string zid = js["zid"].ToString();
+		int damages = (int) js["damages"];
+
+		GameObject.Find(zid).GetComponent<Zombie>().TakeDamages(damages);
+	}
 	public static void Zombie(string json) {
 		var js = JObject.Parse(json);
 		string zid = js["zid"].ToString();
@@ -53,7 +69,8 @@ public class WsEvents : MonoBehaviour {
 		float z = (float) js["z"];
 		float speed = (float) js["speed"];
 		if (GameObject.Find(zid) == null) {
-			GameObject zombie = Instantiate(GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerControl>().zombiePrefab, new Vector3(x, 0, z), new Quaternion());
+			if(zombiePrefab == null) zombiePrefab = GameObject.Find("ZombieSpawner").GetComponent<ZombieSpawner>().zombiePrefab;
+			GameObject zombie = Instantiate(zombiePrefab, new Vector3(x, 0, z), new Quaternion());
 			zombie.name = zid;
 		}
 		GameObject.Find(zid).GetComponent<Zombie>().SetFromServer(x, z, speed);
