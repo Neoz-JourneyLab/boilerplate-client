@@ -337,7 +337,7 @@ GameObject:
   - component: {fileID: 4689820536447022327}
   - component: {fileID: 2842360379348435648}
   m_Layer: 0
-  m_Name: Spot Light
+  m_Name: Flashlight
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

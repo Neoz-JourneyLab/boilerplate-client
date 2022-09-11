@@ -13,6 +13,8 @@ public class uWebSocketManager : MonoBehaviour {
 	Dictionary<string, EventDelegation> events = new() {
 		{ "pong", WsEvents.Pong },
 		{ "plot", WsEvents.Plot },
+		{ "flashlight:receive", WsEvents.ChangeFlashlightState },
+
 	};
 	public static string socketId;
 	public WebSocket ws;
