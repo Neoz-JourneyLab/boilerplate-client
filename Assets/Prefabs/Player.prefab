@@ -165,7 +165,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4002f10b467cf224398a55c632b3979e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  flashlight: {fileID: 0}
+  flashlight: {fileID: 1080041481}
 --- !u!114 &1859943174674225304
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -438,6 +438,14 @@ PrefabInstance:
       propertyPath: playOnAwake
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 586688395322337390, guid: de0f87115f106ab4ca01f053cbb9c62e, type: 3}
+      propertyPath: m_Shadows.m_Bias
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 586688395322337390, guid: de0f87115f106ab4ca01f053cbb9c62e, type: 3}
+      propertyPath: m_Shadows.m_Type
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 586688396572152806, guid: de0f87115f106ab4ca01f053cbb9c62e, type: 3}
       propertyPath: m_RootOrder
       value: 0
@@ -491,5 +499,10 @@ PrefabInstance:
 --- !u!4 &183425923 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 586688396572152806, guid: de0f87115f106ab4ca01f053cbb9c62e, type: 3}
+  m_PrefabInstance: {fileID: 586688396402362469}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1080041481 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 586688395322337388, guid: de0f87115f106ab4ca01f053cbb9c62e, type: 3}
   m_PrefabInstance: {fileID: 586688396402362469}
   m_PrefabAsset: {fileID: 0}

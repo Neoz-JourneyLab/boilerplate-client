@@ -37,6 +37,7 @@ public class WsEvents : MonoBehaviour {
 	}
 
 	public static void PlayerShot(string json) {
+		Debug.Log("Shot : " + json);
 		if (player == null) player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerControl>();
 		string id = JObject.Parse(json)["id"].ToString();
 		if(id == uWebSocketManager.socketId) {
@@ -69,7 +70,6 @@ public class WsEvents : MonoBehaviour {
 		var js = JObject.Parse(json);
 		string zid = js["zid"].ToString();
 		int damages = (int)js["damages"];
-		Debug.Log("zombie " + zid + " take " + damages + " dmg");
 		GameObject.Find(zid).GetComponent<Zombie>().TakeDamages(damages);
 	}
 	public static void Zombie(string json) {

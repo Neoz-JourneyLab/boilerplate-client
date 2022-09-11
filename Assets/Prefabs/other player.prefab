@@ -369,6 +369,18 @@ PrefabInstance:
       propertyPath: playOnAwake
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 586688395322337388, guid: de0f87115f106ab4ca01f053cbb9c62e, type: 3}
+      propertyPath: m_Name
+      value: Flashlight
+      objectReference: {fileID: 0}
+    - target: {fileID: 586688395322337390, guid: de0f87115f106ab4ca01f053cbb9c62e, type: 3}
+      propertyPath: m_Shadows.m_Bias
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 586688395322337390, guid: de0f87115f106ab4ca01f053cbb9c62e, type: 3}
+      propertyPath: m_Shadows.m_Type
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 586688396572152806, guid: de0f87115f106ab4ca01f053cbb9c62e, type: 3}
       propertyPath: m_RootOrder
       value: 0
