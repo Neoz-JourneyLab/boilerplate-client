@@ -16,6 +16,7 @@ public class uWebSocketManager : MonoBehaviour {
 		{ "flashlight:receive", WsEvents.ChangeFlashlightState },
 		{ "zombie", WsEvents.Zombie },
 		{ "zombie:dead", WsEvents.ZombieDead },
+		{ "player:shot", WsEvents.PlayerShot },
 		{ "hit:zombie", WsEvents.HitZombie },
 	};
 	public static string socketId;
