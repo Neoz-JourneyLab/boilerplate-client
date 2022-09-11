@@ -10,7 +10,7 @@ public class PositionSender : MonoBehaviour {
 	
 	private void Start() {
 		player = transform;
-		InvokeRepeating(nameof(SendPlot), 1, 0.5f);
+		InvokeRepeating(nameof(SendPlot), 1, 0.1f);
 	}
 
 	void SendPlot() {
@@ -27,6 +27,7 @@ public class PositionSender : MonoBehaviour {
 			newPlayer = otherPlayers[pos.id];
 		} else {
 			newPlayer = Instantiate(otherPlayerPrefab);
+			newPlayer.transform.localPosition = new Vector3(0, transform.localPosition.y, 0);
 			OtherPlayer op = newPlayer.GetComponent<OtherPlayer>();
 			op.pos.nry = pos.ry;
 			op.pos.nz = pos.z;

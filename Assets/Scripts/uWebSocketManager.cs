@@ -18,10 +18,12 @@ public class uWebSocketManager : MonoBehaviour {
 	public WebSocket ws;
 	[SerializeField] GameObject serverStatus;
 	public string uri;
+	static uWebSocketManager uws;
 
 	private void Start() {
 		InvokeRepeating(nameof(Ping), 1, 1);
 		InitSocket("ws://" + uri + "/");
+		uws = GameObject.Find("AppManager").GetComponent<uWebSocketManager>();
 	}
 
 	/// <summary>
@@ -57,12 +59,13 @@ public class uWebSocketManager : MonoBehaviour {
 			}
 			tries++;
 			nextTry = DateTime.UtcNow.AddSeconds(Math.Pow(2, tries));
-			//Debug.Log("Next try in " + Math.Pow(2, tries) + "s");
+			Debug.Log("Next try in " + Math.Pow(2, tries) + "s");
 			socketId = "";
 			ws.ConnectAsync();
 			WsEvents.pings.Clear();
 			return;
 		}
+		return;
 		tries = 1;
 		nextTry = DateTime.UtcNow;
 		string ping_id = Guid.NewGuid().ToString();
@@ -85,7 +88,7 @@ public class uWebSocketManager : MonoBehaviour {
 	}
 
 	public static void EmitEv(string ev, object data = null) {
-		GameObject.Find("AppManager").GetComponent<uWebSocketManager>().Emit(ev, data);
+		uws.Emit(ev, data);
 	}
 
 	public void Close(string reason) {
