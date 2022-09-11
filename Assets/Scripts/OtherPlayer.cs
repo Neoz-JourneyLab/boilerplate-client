@@ -7,26 +7,30 @@ public class OtherPlayer : MonoBehaviour {
 	public readonly PlayerPos pos = new PlayerPos();
 	DateTime lastRefresh = DateTime.UtcNow;
 	public float deltaMs = 100;
-
 	private void Update() {
-		if (pos.x == pos.nx && pos.z == pos.nz) return;
+		//if (pos.x == pos.nx && pos.z == pos.nz) return;
 		try {
 			//si on a pas refresh depuis 50ms, on est à 50% sur les 100ms attendues
 			float timeSinceLastRefresh = (float)(DateTime.UtcNow - lastRefresh).TotalMilliseconds;
 			float percentUntilNextRefresh = timeSinceLastRefresh / deltaMs; //50 / 100 = 0.5
-
-			pos.x = Mathf.Lerp(pos.x, pos.nx, percentUntilNextRefresh);
-			pos.z = Mathf.Lerp(pos.z, pos.nz, percentUntilNextRefresh);
-			pos.ry = Mathf.Lerp(pos.ry, pos.nry, percentUntilNextRefresh);
-			transform.position = new Vector3(pos.x, transform.position.y, pos.z);
-			transform.localEulerAngles = new Vector3(0, pos.ry, 0);
+			float x = Mathf.Lerp(pos.x, pos.nx, percentUntilNextRefresh);
+			float z = Mathf.Lerp(pos.z, pos.nz, percentUntilNextRefresh);
+			float y = Mathf.Lerp(pos.ry, pos.nry, percentUntilNextRefresh);
+			transform.position = new Vector3(x, transform.position.y, z);
+			transform.localEulerAngles = new Vector3(0, y, 0);
 		} catch(Exception) {
 			Debug.LogError("Err : " + pos.ry + " ; " + pos.nry);
 		}
 	}
 
 	public void Refresh(PlayerPos newPos) {
+		Debug.Log(DateTime.UtcNow.ToLongTimeString() + "." + DateTime.UtcNow.Millisecond + " REFRESH");
 		if (newPos.x == null || newPos.z == null || newPos.ry == null) return;
+
+		pos.x = pos.nx;
+		pos.z = pos.nz;
+		pos.ry = pos.nry;
+
 		pos.nx = newPos.x;
 		pos.nz = newPos.z;
 		pos.nry = newPos.ry;
