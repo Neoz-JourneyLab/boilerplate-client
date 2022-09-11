@@ -17,10 +17,11 @@ public class uWebSocketManager : MonoBehaviour {
 	public static string socketId;
 	public WebSocket ws;
 	[SerializeField] GameObject serverStatus;
+	public string uri;
 
 	private void Start() {
 		InvokeRepeating(nameof(Ping), 1, 1);
-		InitSocket("ws://localhost:9997/");
+		InitSocket("ws://" + uri + "/");
 	}
 
 	/// <summary>
