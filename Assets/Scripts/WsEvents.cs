@@ -24,7 +24,7 @@ public class WsEvents : MonoBehaviour {
 	#endregion
 
 	#region listeners
-	 public static void Pong(string json) {
+	public static void Pong(string json) {
 		string pong = JObject.Parse(json)["ping_id"].ToString();
 		string serverTime = JObject.Parse(json)["server_time"].ToString();
 		if (!pings.ContainsKey(pong)) throw new Exception("ping ID not found: " + pong);
@@ -34,6 +34,16 @@ public class WsEvents : MonoBehaviour {
 			serverStatus = GameObject.Find("server infos").GetComponent<TMP_Text>();
 		}
 		serverStatus.text = $"server : {GetDateFromStr(serverTime).ToShortDateString() + " " + GetDateFromStr(serverTime).ToLongTimeString()}, {latency}ms";
+	}
+
+	public static void PlayerShot(string json) {
+		if (player == null) player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerControl>();
+		string id = JObject.Parse(json)["id"].ToString();
+		if(id == uWebSocketManager.socketId) {
+			//player.transform.Find("")
+		} else {
+			GameObject.Find(id).transform.Find("GunControl").transform.Find("Pistol").GetComponent<Gun>().ShotAnim();
+		}
 	}
 
 	public static void Plot(string json) {
@@ -58,18 +68,18 @@ public class WsEvents : MonoBehaviour {
 
 		var js = JObject.Parse(json);
 		string zid = js["zid"].ToString();
-		int damages = (int) js["damages"];
+		int damages = (int)js["damages"];
 
 		GameObject.Find(zid).GetComponent<Zombie>().TakeDamages(damages);
 	}
 	public static void Zombie(string json) {
 		var js = JObject.Parse(json);
 		string zid = js["zid"].ToString();
-		float x = (float) js["x"];
-		float z = (float) js["z"];
-		float speed = (float) js["speed"];
+		float x = (float)js["x"];
+		float z = (float)js["z"];
+		float speed = (float)js["speed"];
 		if (GameObject.Find(zid) == null) {
-			if(zombiePrefab == null) zombiePrefab = GameObject.Find("ZombieSpawner").GetComponent<ZombieSpawner>().zombiePrefab;
+			if (zombiePrefab == null) zombiePrefab = GameObject.Find("ZombieSpawner").GetComponent<ZombieSpawner>().zombiePrefab;
 			GameObject zombie = Instantiate(zombiePrefab, new Vector3(x, 0, z), new Quaternion());
 			zombie.name = zid;
 		}
