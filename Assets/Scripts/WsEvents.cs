@@ -18,7 +18,6 @@ public class WsEvents : MonoBehaviour {
 	static int latency;
 	public static readonly Dictionary<string, DateTime> pings = new Dictionary<string, DateTime>();
 	static TMP_Text serverStatus;
-	static GameObject zombiePrefab;
 
 	#endregion
 
@@ -54,7 +53,7 @@ public class WsEvents : MonoBehaviour {
 		float z = (float) js["z"];
 		float speed = (float) js["speed"];
 		if (GameObject.Find(zid) == null) {
-			GameObject zombie = Instantiate(zombiePrefab, new Vector3(x, 0, z), new Quaternion());
+			GameObject zombie = Instantiate(GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerControl>().zombiePrefab, new Vector3(x, 0, z), new Quaternion());
 			zombie.name = zid;
 		}
 		GameObject.Find(zid).GetComponent<Zombie>().SetFromServer(x, z, speed);
