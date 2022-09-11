@@ -274,7 +274,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6edfdf301a5f51044a49cc828953ea63, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  socketId: 
   serverStatus: {fileID: 0}
 --- !u!1 &251437077
 GameObject:
@@ -1052,6 +1051,7 @@ GameObject:
   - component: {fileID: 1031451306}
   - component: {fileID: 1031451307}
   - component: {fileID: 1031451308}
+  - component: {fileID: 1031451309}
   m_Layer: 3
   m_Name: Player
   m_TagString: Untagged
@@ -1153,9 +1153,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6f377da033efe834ea8b68ecaad250d5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 5
-  cameraOffset: 0.1
-  cameraHeight: 40
 --- !u!54 &1031451306
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -1215,6 +1212,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   flashlight: {fileID: 0}
+--- !u!114 &1031451309
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1031451300}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1e954f4bf44dbc44fb5546635ffd16be, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  otherPlayerPrefab: {fileID: 2567975861406665739, guid: 1dc0a05f92bcb2b4981dd20eddce6770, type: 3}
 --- !u!1 &1255108650
 GameObject:
   m_ObjectHideFlags: 0
@@ -1996,7 +2006,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 01614664b831546d2ae94a42149d80ac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_SendPointerHoverToParent: 1
   m_MoveRepeatDelay: 0.5
   m_MoveRepeatRate: 0.1
   m_XRTrackingOrigin: {fileID: 0}

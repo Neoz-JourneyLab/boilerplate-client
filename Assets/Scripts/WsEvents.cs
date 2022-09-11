@@ -34,9 +34,11 @@ public class WsEvents : MonoBehaviour {
 		serverStatus.text = $"server : {GetDateFromStr(serverTime).ToShortDateString() + " " + GetDateFromStr(serverTime).ToLongTimeString()}, {latency}ms";
 	}
 
-	public static void NewMessage(string json) {
-		string message = JObject.Parse(json)["message"].ToString();
-		GameObject.Find("console").GetComponent<TMP_Text>().text = json + "\n" + message;	}
+	public static void Plot(string json) {
+		PlayerPos pos = JsonConvert.DeserializeObject<PlayerPos>(json);
+		if (pos.id == uWebSocketManager.socketId) return;
+		PositionSender.Get().PlotOther(pos);
+	}
 
 	public static void Err(string json) {
 		string code = JObject.Parse(json)["code"].ToString();
@@ -46,3 +48,16 @@ public class WsEvents : MonoBehaviour {
 	#endregion
 }
 
+#region class
+public class PlayerPos {
+	public float x;
+	public float ry;
+	public float z;
+
+	public float nx;
+	public float nry;
+	public float nz;
+
+	public string id;
+}
+#endregion

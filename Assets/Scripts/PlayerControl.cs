@@ -39,12 +39,12 @@ public class PlayerControl : MonoBehaviour {
    // Update is called once per frame
    void FixedUpdate() {
       rb.MovePosition(rb.position + movement * speed * Time.fixedDeltaTime);
-
       // On envoie les données de position au serveur
    }
 
    private void OnMove(InputValue value) {
-      moveDirection = value.Get() != null ? (Vector2)value.Get() : Vector2.zero;
+		print("batard");
+		moveDirection = value.Get() != null ? (Vector2)value.Get() : Vector2.zero;
    }
 
    private void OnMousePosition(InputValue value) {

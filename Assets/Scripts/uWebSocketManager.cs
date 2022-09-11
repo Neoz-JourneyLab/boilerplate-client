@@ -12,9 +12,9 @@ public class uWebSocketManager : MonoBehaviour {
 	delegate void EventDelegation(string e);
 	Dictionary<string, EventDelegation> events = new() {
 		{ "pong", WsEvents.Pong },
-		{ "new:message", WsEvents.NewMessage },
+		{ "plot", WsEvents.Plot },
 	};
-	[SerializeField] string socketId;
+	public static string socketId;
 	public WebSocket ws;
 	[SerializeField] GameObject serverStatus;
 
@@ -39,8 +39,8 @@ public class uWebSocketManager : MonoBehaviour {
 			}
 			if (events.ContainsKey(payload.ev)) {
 				//routage de l'event serveur
+				UnityMainThread.wkr.AddJob(() => { events[payload.ev](payload.data); });
 			}
-			UnityMainThread.wkr.AddJob(() => { events[payload.ev](payload.data); });
 		};
 		ws.OnClose += (sender, e) => {
 		};
