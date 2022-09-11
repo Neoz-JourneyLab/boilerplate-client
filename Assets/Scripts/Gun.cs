@@ -38,6 +38,7 @@ public class Gun : MonoBehaviour {
 		capacity--;
 
 		ShotAnim();
+		uWebSocketManager.EmitEv("shot");
 
 		Ray ray = new Ray(muzzle.transform.position, muzzle.transform.forward);
 		RaycastHit hit;
@@ -54,7 +55,6 @@ public class Gun : MonoBehaviour {
 		muzzleFlash.gameObject.SetActive(true);
 		Invoke(nameof(DisableLight), 0.05f);
 		particles.Play();
-		uWebSocketManager.EmitEv("shot");
 	}
 
 	void DisableLight() {

@@ -41,6 +41,7 @@ public class WsEvents : MonoBehaviour {
 		if (player == null) player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerControl>();
 		string id = JObject.Parse(json)["id"].ToString();
 		if(id == uWebSocketManager.socketId) {
+			return;
 			//player.transform.Find("")
 		} else {
 			GameObject.Find(id).transform.Find("GunControl").transform.Find("Pistol").GetComponent<Gun>().ShotAnim();
