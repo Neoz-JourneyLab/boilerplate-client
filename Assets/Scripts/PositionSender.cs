@@ -10,7 +10,7 @@ public class PositionSender : MonoBehaviour {
 	
 	private void Start() {
 		player = transform;
-		InvokeRepeating(nameof(SendPlot), 1, 0.1f);
+		InvokeRepeating(nameof(SendPlot), 1, 0.2f);
 	}
 
 	void SendPlot() {
