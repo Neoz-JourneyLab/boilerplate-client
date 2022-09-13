@@ -1,21 +1,50 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class GunControl : MonoBehaviour {
+   public Gun startingGun;
+   public Transform gunHolder;
+
+   public TextMeshProUGUI gunNameText;
+   public TextMeshProUGUI ammoText;
+   public Transform batteryBar;
+
+   public AudioSource lightAudio;
+
    Gun equipedGun;
    // Start is called before the first frame update
    void Start() {
-      equipedGun = transform.GetComponentInChildren<Gun>();
+      ChangeGun(startingGun);
    }
 
    // Update is called once per frame
    void Update() {
+      if (equipedGun == null)
+         return;
 
+      batteryBar.localScale = new Vector3(equipedGun.GetComponent<FlashLight>().batteryPercent, 1, 1);
+   }
+
+   void ChangeGun(Gun newGun) {
+      if (equipedGun != null)
+         Destroy(equipedGun);
+
+      equipedGun = Instantiate(newGun, gunHolder.transform.position, gunHolder.transform.rotation);
+      equipedGun.name = newGun.name;
+      equipedGun.transform.parent = gunHolder;
+      UpdateText();
+   }
+
+   public void UpdateText() {
+      gunNameText.text = equipedGun.name.ToUpper();
+      ammoText.text = equipedGun.capacity + "/" + equipedGun.maxCapacity;
    }
 
    void OnShoot() {
       Transform hit = equipedGun.Shoot();
+      ammoText.text = equipedGun.capacity + "/" + equipedGun.maxCapacity;
       //Notify server we shot 
       if (hit == null)
          return;
@@ -26,7 +55,16 @@ public class GunControl : MonoBehaviour {
       uWebSocketManager.EmitEv("hit:zombie", new { zid = hit.GetComponent<Zombie>().id, damages = equipedGun.damages });
    }
 
+   void OnFlashlight() {
+      equipedGun.GetComponent<FlashLight>().ChangeFlashlight();
+      GameObject.FindObjectOfType<AudioManager>().PlaySound(lightAudio);
+   }
+
    void OnReload() {
       equipedGun.Reload();
+   }
+
+   void OnCheatFL() {
+      equipedGun.GetComponent<FlashLight>().RefillLight();
    }
 }
