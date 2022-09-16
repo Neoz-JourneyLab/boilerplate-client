@@ -10,8 +10,25 @@ public class ItemGrid : MonoBehaviour {
    Vector2 positionOnGrid = new Vector2();
    Vector2Int tileGridPos = new Vector2Int();
 
+   InventoryItem[,] inventoryItemSlot;
+
+   [SerializeField] int gridSizeWidth;
+   [SerializeField] int gridSizeHeight;
+
+   [SerializeField] GameObject inventoryItemPrefab;
+
    public void Start() {
       rt = GetComponent<RectTransform>();
+      Init(gridSizeWidth, gridSizeHeight);
+
+      InventoryItem ie = Instantiate(inventoryItemPrefab.GetComponent<InventoryItem>());
+      PlaceItem(ie, 3, 6);
+   }
+
+   private void Init(int width, int height) {
+      inventoryItemSlot = new InventoryItem[width, height];
+      Vector2 size = new Vector2(width * tileSize, height * tileSize);
+      rt.sizeDelta = size;
    }
 
 
@@ -23,6 +40,18 @@ public class ItemGrid : MonoBehaviour {
       tileGridPos.y = (int)(positionOnGrid.y / tileSize);
 
       return tileGridPos;
+   }
+
+   public void PlaceItem(InventoryItem item, int x, int y) {
+      RectTransform itemRt = item.GetComponent<RectTransform>();
+      itemRt.SetParent(rt);
+      inventoryItemSlot[x, y] = item;
+
+      Vector2 position = new Vector2();
+      position.x = x * tileSize + tileSize / 2;
+      position.y = -(y * tileSize + tileSize / 2);
+
+      itemRt.localPosition = position;
    }
 
 }

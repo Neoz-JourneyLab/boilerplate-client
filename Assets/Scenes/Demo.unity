@@ -304,6 +304,7 @@ GameObject:
   m_Component:
   - component: {fileID: 105832672}
   - component: {fileID: 105832673}
+  - component: {fileID: 105832674}
   m_Layer: 5
   m_Name: Inventory
   m_TagString: Untagged
@@ -345,7 +346,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee5ec3c491ae3c04db18a97268151866, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  tileSize: 400
+  gridSizeWidth: 7
+  gridSizeHeight: 7
+  inventoryItemPrefab: {fileID: 7372440487716406612, guid: 6fa358b6b1124b341a273a426e968af6, type: 3}
+--- !u!114 &105832674
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 105832671}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68c92ea33f8284746b4b2a231b490269, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &135096054 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -3945632042813043136, guid: c894e4244a2db1c4a9d3f4207927e78a, type: 3}
@@ -534,7 +549,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e60802ab2bd4ac4cba6726fb3d3de1b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  selectedItemGrid: {fileID: 105832673}
+  selectedItemGrid: {fileID: 0}
 --- !u!1 &234842832 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -835639477625459358, guid: c894e4244a2db1c4a9d3f4207927e78a, type: 3}
