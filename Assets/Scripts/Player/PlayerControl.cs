@@ -20,6 +20,7 @@ public class PlayerControl : MonoBehaviour {
    Vector3 movement;
 
    Transform camera;
+   Transform gunHolder;
 
    Rigidbody rb;
 
@@ -27,6 +28,7 @@ public class PlayerControl : MonoBehaviour {
    void Start() {
       rb = GetComponent<Rigidbody>();
       camera = Camera.main.transform;
+      gunHolder = transform.Find("GunHolder");
    }
 
    public void Update() {
@@ -37,7 +39,13 @@ public class PlayerControl : MonoBehaviour {
       camera.position = Vector3.Lerp(new Vector3(transform.position.x, transform.position.y + cameraHeight, transform.position.z), new Vector3(worldPos.x, cameraHeight, worldPos.z), cameraOffset);
 
       Vector3 pointToLookAt = new Vector3(worldPos.x, transform.position.y, worldPos.z);
+      Vector3 pointToLookAtGunHold = new Vector3(worldPos.x, gunHolder.transform.position.y, worldPos.z);
       transform.LookAt(pointToLookAt);
+
+      if (Vector3.Distance(gunHolder.transform.position, pointToLookAtGunHold) < 0.8f)
+         gunHolder.transform.localRotation = Quaternion.identity;
+      else
+         gunHolder.LookAt(pointToLookAtGunHold);
 
       if (movement == Vector3.zero)
          return;

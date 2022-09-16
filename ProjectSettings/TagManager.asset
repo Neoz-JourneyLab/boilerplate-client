@@ -8,6 +8,7 @@ TagManager:
   - AppManager
   - Info
   - OtherPlayer
+  - Interactable
   layers:
   - Default
   - TransparentFX

@@ -30,10 +30,8 @@ public class GunControl : MonoBehaviour {
    void ChangeGun(Gun newGun) {
       if (equipedGun != null)
          Destroy(equipedGun);
-
-      equipedGun = Instantiate(newGun, gunHolder.transform.position, gunHolder.transform.rotation);
+      equipedGun = Instantiate(newGun, gunHolder);
       equipedGun.name = newGun.name;
-      equipedGun.transform.parent = gunHolder;
       UpdateText();
    }
 

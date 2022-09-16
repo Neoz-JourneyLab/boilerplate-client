@@ -51,9 +51,27 @@
                     "initialStateCheck": false
                 },
                 {
+                    "name": "Interact",
+                    "type": "Button",
+                    "id": "45d47911-afc9-44a6-a889-d331652474d8",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "CheatFL",
                     "type": "Button",
                     "id": "1c0edd98-c02d-4350-9ea9-9fb54b4e8a25",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Inventory",
+                    "type": "Button",
+                    "id": "ea364e7e-3868-486f-96f1-ed09a799957a",
                     "expectedControlType": "Button",
                     "processors": "",
                     "interactions": "",
@@ -190,6 +208,28 @@
                     "processors": "",
                     "groups": "",
                     "action": "CheatFL",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "1e8a92e3-0b64-4dd9-b93b-4e0b0c354686",
+                    "path": "<Keyboard>/e",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Interact",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "53c84351-58b8-4c20-b4c0-9bb1f35304e6",
+                    "path": "<Keyboard>/tab",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Inventory",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
