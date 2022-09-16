@@ -9,6 +9,7 @@ TagManager:
   - Info
   - OtherPlayer
   - Interactable
+  - spawner
   layers:
   - Default
   - TransparentFX

@@ -17,6 +17,8 @@ GameObject:
   - component: {fileID: 1859943174674225304}
   - component: {fileID: 1859943174674225307}
   - component: {fileID: 1543497952}
+  - component: {fileID: 228428554}
+  - component: {fileID: 3602271459594992362}
   m_Layer: 3
   m_Name: Player
   m_TagString: Player
@@ -177,10 +179,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd1b070e459279c4191f6ddc83c99806, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 5
-  cameraOffset: 0.13
+  speed: 2.5
+  cameraOffset: 0.25
   cameraHeight: 40
+  footstepDelay: 1.5
   host: 1
+  footstepAudio: {fileID: 8343806101301991555, guid: e54c6382cf497c0488d327cf8721408b, type: 3}
 --- !u!114 &1543497952
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -193,10 +197,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 20defc94ce8c1904ea27e17011a859c0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  startingGun: {fileID: 0}
-  gunHolder: {fileID: 0}
+  startingGun: {fileID: 586688396572152801, guid: de0f87115f106ab4ca01f053cbb9c62e, type: 3}
+  gunHolder: {fileID: 1859943176274796929}
   gunNameText: {fileID: 0}
   ammoText: {fileID: 0}
+  batteryBar: {fileID: 0}
+  lightAudio: {fileID: 1512722499998127859, guid: 1d0b8e6e0fa1750468a93fa5cf9c182a, type: 3}
+--- !u!114 &228428554
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1859943174674225297}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4e60802ab2bd4ac4cba6726fb3d3de1b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  selectedItemGrid: {fileID: 0}
+--- !u!81 &3602271459594992362
+AudioListener:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1859943174674225297}
+  m_Enabled: 1
 --- !u!1 &1859943175190318810
 GameObject:
   m_ObjectHideFlags: 0
@@ -241,7 +268,7 @@ Light:
   m_Type: 2
   m_Shape: 0
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 2.5
+  m_Intensity: 1
   m_Range: 5
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -366,7 +393,7 @@ Light:
   m_Type: 2
   m_Shape: 0
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 2.5
+  m_Intensity: 1
   m_Range: 5
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208

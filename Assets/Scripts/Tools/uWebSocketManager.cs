@@ -18,14 +18,15 @@ public class uWebSocketManager : MonoBehaviour {
 		{ "zombie:dead", WsEvents.ZombieDead },
 		{ "player:shot", WsEvents.PlayerShot },
 		{ "hit:zombie", WsEvents.HitZombie },
+		{ "socket:connected", WsEvents.SocketConnected },
 	};
 	public static string socketId;
 	public WebSocket ws;
-	[SerializeField] GameObject serverStatus;
 	public string uri;
 	static uWebSocketManager uws;
 
 	private void Start() {
+		DontDestroyOnLoad(this);
 		InvokeRepeating(nameof(Ping), 1, 1f);
 		InitSocket("ws://" + uri + "/");
 		uws = GameObject.Find("AppManager").GetComponent<uWebSocketManager>();

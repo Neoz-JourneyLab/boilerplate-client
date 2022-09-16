@@ -8,8 +8,8 @@ public class ZombieSpawner : MonoBehaviour {
 	public GameObject zombiePrefab;
 	[SerializeField] float spawnPerMinute = 10; //10 par minute
 	[SerializeField] int max = 10; //10 par minute
-	private void Start() {
-		if (!GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerControl>().host) return;
+
+	public void StartSpawn() {
 		InvokeRepeating(nameof(Spawn), 0, 1f);
 	}
 

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -16,6 +17,10 @@ public class InventoryController : MonoBehaviour {
    }
 
    void OnMousePosition(InputValue value) {
+    try {
       mousePos = (Vector2)value.Get();
+    } catch (Exception) {
+      //ignored
+    }
    }
 }

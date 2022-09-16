@@ -43,14 +43,14 @@ public class GunControl : MonoBehaviour {
    void OnShoot() {
       Transform hit = equipedGun.Shoot();
       ammoText.text = equipedGun.capacity + "/" + equipedGun.maxCapacity;
-      //Notify server we shot 
+    //Notify server we shot 
       if (hit == null)
          return;
       if (hit.GetComponent<Zombie>() == null)
          return;
 
       //Notify server we hit a zombie
-      uWebSocketManager.EmitEv("hit:zombie", new { zid = hit.GetComponent<Zombie>().id, damages = equipedGun.damages });
+      uWebSocketManager.EmitEv("hit:zombie", new { zid = hit.GetComponent<Zombie>().id, equipedGun.damages });
    }
 
    void OnFlashlight() {

@@ -24,6 +24,24 @@ public class WsEvents : MonoBehaviour {
 	#endregion
 
 	#region listeners
+
+	public static void SocketConnected(string json) {
+		int players = int.Parse(JObject.Parse(json)["players"].ToString());
+		Debug.Log("Join game with " + players + " players !");
+		GetPlayer().host = players == 1;
+		if (GetPlayer().host) {
+			GetPlayer().gameObject.transform.position = GameObject.Find("PLAYER_1").transform.position;
+			foreach (var item in GameObject.FindGameObjectsWithTag("spawner")) {
+				item.GetComponent<ZombieSpawner>().StartSpawn();
+			}
+		} else {
+			GetPlayer().gameObject.transform.position = GameObject.Find("PLAYER_2").transform.position;
+			foreach (var item in GameObject.FindGameObjectsWithTag("spawner")) {
+				Destroy(item);
+			}
+		}
+	}
+
 	public static void Pong(string json) {
 		string pong = JObject.Parse(json)["ping_id"].ToString();
 		string serverTime = JObject.Parse(json)["server_time"].ToString();
@@ -37,15 +55,18 @@ public class WsEvents : MonoBehaviour {
 	}
 
 	public static void PlayerShot(string json) {
-		Debug.Log("Shot : " + json);
-		if (player == null) player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerControl>();
 		string id = JObject.Parse(json)["id"].ToString();
-		if(id == uWebSocketManager.socketId) {
+		if (id == uWebSocketManager.socketId) {
 			return;
 			//player.transform.Find("")
 		} else {
 			GameObject.Find(id).transform.Find("GunControl").transform.Find("Pistol").GetComponent<Gun>().ShotAnim();
 		}
+	}
+
+	public static PlayerControl GetPlayer() {
+		if (player == null) player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerControl>();
+		return player;
 	}
 
 	public static void Plot(string json) {
@@ -65,8 +86,7 @@ public class WsEvents : MonoBehaviour {
 		Debug.Log("Error : " + code + " > " + message);
 	}
 	public static void HitZombie(string json) {
-		if (player == null) player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerControl>();
-		if (!player.host) return;
+		if (!GetPlayer().host) return;
 
 		var js = JObject.Parse(json);
 		string zid = js["zid"].ToString();
