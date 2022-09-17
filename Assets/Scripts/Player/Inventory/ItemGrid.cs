@@ -38,12 +38,17 @@ public class ItemGrid : MonoBehaviour {
       return tileGridPos;
    }
 
+   internal InventoryItem GetItem(int x, int y) {
+      if (!CheckInGrid(x, y))
+         return null;
+
+      return inventoryItemSlot[x, y];
+   }
+
    public bool PlaceItem(InventoryItem item, int x, int y, ref InventoryItem overlapItem) {
       // On check si l'item sortira de la grille si on le place ici, si c'est le cas, on ne fait rien
       // (donc on renvoie false)
-      if (!CheckInGrid(x, y))
-         return false;
-      if (!CheckInGrid(x + item.itemData.width - 1, y + item.itemData.height - 1))
+      if (!CheckBoundaries(x, y, item.itemData.width, item.itemData.height))
          return false;
 
       if (!OverlapCheck(x, y, item.itemData.width, item.itemData.height, ref overlapItem)) {
@@ -66,14 +71,19 @@ public class ItemGrid : MonoBehaviour {
          }
       }
 
-      Vector2 position = new Vector2();
-      position.x = x * tileSizeWidth + tileSizeWidth * item.itemData.width / 2;
-      position.y = -(y * tileSizeHeight + tileSizeHeight * item.itemData.height / 2);
+      Vector2 position = CalculatePositionOnGrid(item, x, y);
 
       itemRt.localPosition = position;
 
       ViewGrid();
       return true;
+   }
+
+   public Vector2 CalculatePositionOnGrid(InventoryItem item, int x, int y) {
+      Vector2 position = new Vector2();
+      position.x = x * tileSizeWidth + tileSizeWidth * item.itemData.width / 2;
+      position.y = -(y * tileSizeHeight + tileSizeHeight * item.itemData.height / 2);
+      return position;
    }
 
    public InventoryItem PickUpItem(int x, int y) {
@@ -108,8 +118,17 @@ public class ItemGrid : MonoBehaviour {
       print("Now removed");
    }
 
-   bool CheckInGrid(int x, int y) {
+   public bool CheckInGrid(int x, int y) {
       return !(x >= gridSizeWidth || x < 0 || y < 0 || y >= gridSizeHeight);
+   }
+
+   public bool CheckBoundaries(int x, int y, int width, int height) {
+      if (!CheckInGrid(x, y))
+         return false;
+      if (!CheckInGrid(x + width - 1, y + height - 1))
+         return false;
+
+      return true;
    }
 
    private bool OverlapCheck(int x, int y, int width, int height, ref InventoryItem overlapItem) {

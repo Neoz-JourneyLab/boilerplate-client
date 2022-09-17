@@ -12,6 +12,7 @@ public class InventoryController : MonoBehaviour {
    Vector2 mousePos;
 
    [SerializeField] InventoryItem selectedItem;
+   [SerializeField] InventoryItem highlightedItem;
    [SerializeField] InventoryItem overlapItem;
    [SerializeField] RectTransform itemRt;
 
@@ -19,9 +20,42 @@ public class InventoryController : MonoBehaviour {
    [SerializeField] GameObject itemPrefab;
    [SerializeField] Transform canvasTransform;
 
+   InventoryHighlight inventoryHighlight;
+
+   private void Awake() {
+      inventoryHighlight = FindObjectOfType<InventoryHighlight>();
+   }
    private void Update() {
       ItemDrag();
+
+      if (selectedItemGrid == null) {
+         inventoryHighlight.Show(false);
+         return;
+      }
+
+      HandleHighlight();
    }
+
+   private void HandleHighlight() {
+      Vector2Int posOnGrid = selectedItemGrid.GetTileGridPosition(mousePos);
+
+      if (selectedItem == null) {
+         highlightedItem = selectedItemGrid.GetItem(posOnGrid.x, posOnGrid.y);
+
+         if (highlightedItem != null) {
+            inventoryHighlight.Show(true);
+            inventoryHighlight.SetPosition(selectedItemGrid, highlightedItem);
+            inventoryHighlight.SetSize(highlightedItem);
+         } else {
+            inventoryHighlight.Show(false);
+         }
+      } else {
+         inventoryHighlight.Show(selectedItemGrid.CheckBoundaries(posOnGrid.x, posOnGrid.y, selectedItem.itemData.width, selectedItem.itemData.height));
+         inventoryHighlight.SetSize(highlightedItem);
+         inventoryHighlight.SetPosition(selectedItemGrid, selectedItem, posOnGrid.x, posOnGrid.y);
+      }
+   }
+
    void OnMousePosition(InputValue value) {
       if (value.Get() == null)
          return;
