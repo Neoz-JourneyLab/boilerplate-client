@@ -310,7 +310,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &105832672
 RectTransform:
   m_ObjectHideFlags: 0
@@ -345,6 +345,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ee5ec3c491ae3c04db18a97268151866, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  gridSizeWidth: 5
+  gridSizeHeight: 5
 --- !u!1 &135096054 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: -3945632042813043136, guid: c894e4244a2db1c4a9d3f4207927e78a, type: 3}
@@ -496,7 +498,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6edfdf301a5f51044a49cc828953ea63, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  serverStatus: {fileID: 0}
   uri: 7.tcp.eu.ngrok.io:14609
 --- !u!1 &225265682 stripped
 GameObject:
@@ -3193,13 +3194,45 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 228428554, guid: 72070e92f7db31547b001d3bf4b9a024, type: 3}
+      propertyPath: itemPrefab
+      value: 
+      objectReference: {fileID: 7372440487716406612, guid: 6fa358b6b1124b341a273a426e968af6, type: 3}
+    - target: {fileID: 228428554, guid: 72070e92f7db31547b001d3bf4b9a024, type: 3}
+      propertyPath: canvasTransform
+      value: 
+      objectReference: {fileID: 1255108654}
+    - target: {fileID: 228428554, guid: 72070e92f7db31547b001d3bf4b9a024, type: 3}
+      propertyPath: items.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 228428554, guid: 72070e92f7db31547b001d3bf4b9a024, type: 3}
       propertyPath: selectedItemGrid
       value: 
       objectReference: {fileID: 105832673}
+    - target: {fileID: 228428554, guid: 72070e92f7db31547b001d3bf4b9a024, type: 3}
+      propertyPath: items.Array.data[0]
+      value: 
+      objectReference: {fileID: 11400000, guid: 658677ca56378064eabfef25568abde7, type: 2}
+    - target: {fileID: 228428554, guid: 72070e92f7db31547b001d3bf4b9a024, type: 3}
+      propertyPath: items.Array.data[1]
+      value: 
+      objectReference: {fileID: 11400000, guid: deb99875c8c6f674eaad5b38eff1bf01, type: 2}
+    - target: {fileID: 228428554, guid: 72070e92f7db31547b001d3bf4b9a024, type: 3}
+      propertyPath: items.Array.data[2]
+      value: 
+      objectReference: {fileID: 11400000, guid: a1595441cd6f70841b503961c94afe69, type: 2}
+    - target: {fileID: 228428554, guid: 72070e92f7db31547b001d3bf4b9a024, type: 3}
+      propertyPath: items.Array.data[3]
+      value: 
+      objectReference: {fileID: 11400000, guid: deb99875c8c6f674eaad5b38eff1bf01, type: 2}
     - target: {fileID: 1543497952, guid: 72070e92f7db31547b001d3bf4b9a024, type: 3}
       propertyPath: ammoText
       value: 
       objectReference: {fileID: 931596037}
+    - target: {fileID: 1543497952, guid: 72070e92f7db31547b001d3bf4b9a024, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1543497952, guid: 72070e92f7db31547b001d3bf4b9a024, type: 3}
       propertyPath: batteryBar
       value: 
@@ -3211,6 +3244,10 @@ PrefabInstance:
     - target: {fileID: 1859943174674225297, guid: 72070e92f7db31547b001d3bf4b9a024, type: 3}
       propertyPath: m_Name
       value: Player
+      objectReference: {fileID: 0}
+    - target: {fileID: 1859943174674225304, guid: 72070e92f7db31547b001d3bf4b9a024, type: 3}
+      propertyPath: m_Enabled
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1859943174674225309, guid: 72070e92f7db31547b001d3bf4b9a024, type: 3}
       propertyPath: m_RootOrder

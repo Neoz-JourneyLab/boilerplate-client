@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.InputSystem;
+
 
 public class InventoryController : MonoBehaviour {
    [HideInInspector]
@@ -9,10 +11,16 @@ public class InventoryController : MonoBehaviour {
 
    Vector2 mousePos;
 
-   InventoryItem selectedItem;
+   [SerializeField] InventoryItem selectedItem;
+   [SerializeField] InventoryItem overlapItem;
+   [SerializeField] RectTransform itemRt;
+
+   [SerializeField] List<ItemData> items;
+   [SerializeField] GameObject itemPrefab;
+   [SerializeField] Transform canvasTransform;
 
    private void Update() {
-
+      ItemDrag();
    }
    void OnMousePosition(InputValue value) {
       if (value.Get() == null)
@@ -25,13 +33,71 @@ public class InventoryController : MonoBehaviour {
          return;
 
       Vector2Int tileGridPos = selectedItemGrid.GetTileGridPosition(mousePos);
-      if (selectedItem == null) {
-         selectedItem = selectedItemGrid.PickUpItem(tileGridPos.x, tileGridPos.y);
+
+      //if we have an item selected, we place it. Else we take the item on the grid.
+
+      if (selectedItem == null)
+         PickupItem(tileGridPos);
+      else
+         PlaceItem(tileGridPos);
+   }
+
+   private void PlaceItem(Vector2Int tileGridPos) {
+      if (!selectedItemGrid.PlaceItem(selectedItem, tileGridPos.x, tileGridPos.y, ref overlapItem))
+         return;
+      // change the item color back (white color)
+      selectedItem.GetComponent<Image>().color = new Color(1, 1, 1, 1);
+
+      if (overlapItem != null) {
+         print("Overlapped!");
+         selectedItem = overlapItem;
+         selectedItem.GetComponent<Image>().color = new Color(0.5f, 1, 1, 0.75f);
+         itemRt = selectedItem.GetComponent<RectTransform>();
+         selectedItem.transform.SetAsLastSibling();
+         overlapItem = null;
       } else {
-         selectedItemGrid.PlaceItem(selectedItem, tileGridPos.x, tileGridPos.y);
          selectedItem = null;
       }
    }
+
+   private void PickupItem(Vector2Int tileGridPos) {
+      selectedItem = selectedItemGrid.PickUpItem(tileGridPos.x, tileGridPos.y);
+      if (selectedItem == null)
+         return;
+
+      selectedItem.transform.SetAsLastSibling();
+      itemRt = selectedItem.GetComponent<RectTransform>();
+      // change item opacity when selected
+      selectedItem.GetComponent<Image>().color = new Color(0.5f, 1, 1, 0.75f);
+   }
+
+   void OnCheatItem() {
+      CreateRandomItem();
+   }
+
+   void ItemDrag() {
+      if (selectedItem != null) {
+         Vector2 itemOffset = new Vector2();
+         itemOffset.x = (selectedItem.itemData.width - 1) * ItemGrid.tileSizeWidth / 2;
+         itemOffset.y = -(selectedItem.itemData.height - 1) * ItemGrid.tileSizeHeight / 2;
+         itemRt.position = mousePos + itemOffset;
+      }
+
+   }
+
+   void CreateRandomItem() {
+      if (selectedItem != null)
+         return;
+      InventoryItem item = Instantiate(itemPrefab).GetComponent<InventoryItem>();
+      selectedItem = item;
+      itemRt = item.GetComponent<RectTransform>();
+      itemRt.SetParent(canvasTransform);
+
+      int selectedItemID = Random.Range(0, items.Count);
+      item.Set(items[selectedItemID]);
+      item.name = item.itemData.name;
+   }
+
 
 
 }
