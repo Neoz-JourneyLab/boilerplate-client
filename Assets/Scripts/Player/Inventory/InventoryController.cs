@@ -9,17 +9,18 @@ public class InventoryController : MonoBehaviour {
    [HideInInspector]
    public ItemGrid selectedItemGrid;
 
+   public GameObject inventoryHolder;
    public GameObject inventory;
    public GameObject obstruction;
 
    Vector2 mousePos;
 
-   InventoryItem selectedItem;
+   public InventoryItem selectedItem;
    InventoryItem highlightedItem;
-   InventoryItem overlapItem;
+   public InventoryItem overlapItem;
    RectTransform itemRt;
 
-   [SerializeField] List<ItemData> items;
+   //[SerializeField] List<ItemData> items;
    [SerializeField] GameObject itemPrefab;
    [SerializeField] Transform canvasTransform;
 
@@ -28,10 +29,14 @@ public class InventoryController : MonoBehaviour {
    private void Awake() {
       inventoryHighlight = FindObjectOfType<InventoryHighlight>(true);
       mousePos = Vector2.zero;
+
+      OnCheatPickupItem();
+      OnCheatPickupItem();
+      OnCheatPickupItem();
    }
 
    private void Update() {
-      if (!inventory.activeSelf)
+      if (!inventoryHolder.activeSelf)
          return;
 
       ItemDrag();
@@ -65,20 +70,34 @@ public class InventoryController : MonoBehaviour {
    }
 
    private void PlaceItem(Vector2Int tileGridPos) {
-      if (!selectedItemGrid.PlaceItem(selectedItem, tileGridPos.x, tileGridPos.y, ref overlapItem))
+      // si on ne peut pas placer l'item, alors on ne fait rien
+      bool canPlaceItem;
+      InventoryItem itemToStack;
+
+      (canPlaceItem, itemToStack) = selectedItemGrid.PlaceItem(selectedItem, tileGridPos.x, tileGridPos.y, ref overlapItem);
+
+      if (!canPlaceItem)
          return;
-      // change the item color back (white color)
+
       selectedItem.GetComponent<Image>().color = new Color(1, 1, 1, 1);
 
+      // Si on a overlap
       if (overlapItem != null) {
-         selectedItem = overlapItem;
-         selectedItem.GetComponent<Image>().color = new Color(0.5f, 1, 1, 0.75f);
-         itemRt = selectedItem.GetComponent<RectTransform>();
-         selectedItem.transform.SetAsLastSibling();
-         overlapItem = null;
-      } else {
+         // on regarde si l'overlap était avec un item de même acabit
+         if (itemToStack != null) {
+            selectedItem.GetComponent<Image>().color = new Color(0.5f, 1, 1, 0.75f);
+            itemRt = selectedItem.GetComponent<RectTransform>();
+            selectedItem.transform.SetAsLastSibling();
+            overlapItem = null;
+         } else {
+            selectedItem = overlapItem;
+            selectedItem.GetComponent<Image>().color = new Color(0.5f, 1, 1, 0.75f);
+            itemRt = selectedItem.GetComponent<RectTransform>();
+            selectedItem.transform.SetAsLastSibling();
+            overlapItem = null;
+         }
+      } else
          selectedItem = null;
-      }
    }
 
    private void PickupItem(Vector2Int tileGridPos) {
@@ -111,8 +130,9 @@ public class InventoryController : MonoBehaviour {
       itemRt.SetParent(canvasTransform);
       itemRt.SetAsLastSibling();
 
-      int selectedItemID = Random.Range(0, items.Count);
-      item.Set(items[selectedItemID]);
+      int selectedItemID = Random.Range(0, FindObjectOfType<ItemCollection>().items.Count);
+      //int selectedItemID = 0;
+      item.Set(FindObjectOfType<ItemCollection>().items[selectedItemID]);
       item.name = item.itemData.name;
    }
 
@@ -149,15 +169,43 @@ public class InventoryController : MonoBehaviour {
       selectedItem.Rotate();
    }
 
+   private void ClearItemAtPos(Vector2Int tileGridPos) {
+      InventoryToJson();
+      /*
+      InventoryItem itemToClear = selectedItemGrid.itemAtPos(tileGridPos.x, tileGridPos.y);
+      if (itemToClear == null)
+         return;
+
+      selectedItemGrid.CleanGridRef(itemToClear);
+      Destroy(itemToClear.gameObject);
+      */
+   }
+
    private void DrawInventory(bool inventoryShow) {
-      inventory.SetActive(inventoryShow);
-      obstruction.SetActive(inventoryShow);
+      inventoryHolder.SetActive(inventoryShow);
+      //obstruction.SetActive(inventoryShow);
 
       if (inventoryShow) {
          GetComponent<PlayerInput>().SwitchCurrentActionMap("Inventory");
       } else {
          GetComponent<PlayerInput>().SwitchCurrentActionMap("Player");
       }
+   }
+
+   private void InventoryToJson() {
+      List<InventoryItem> itemsInInventory = new List<InventoryItem>();
+      for (int i = 0; i < inventory.transform.childCount; i++) {
+         Transform currentChild = inventory.transform.GetChild(i);
+         if (currentChild.tag == "item")
+            itemsInInventory.Add(currentChild.GetComponent<InventoryItem>());
+      }
+
+      string json = "";
+      foreach (InventoryItem ie in itemsInInventory) {
+         json += (ie.itemData.category + " at pos : [" + ie.onGridPosX + ", " + ie.onGridPosY + "](" + ie.quantity + ") \n");
+      }
+      print(json);
+
    }
 
    #region Keybinds
@@ -191,7 +239,7 @@ public class InventoryController : MonoBehaviour {
    }
 
    void OnInventory() {
-      bool inventoryShow = inventory.activeSelf;
+      bool inventoryShow = inventoryHolder.activeSelf;
 
       DrawInventory(!inventoryShow);
    }
@@ -199,5 +247,14 @@ public class InventoryController : MonoBehaviour {
    void OnRotate() {
       RotateItem();
    }
+
+   void OnClear() {
+      if (selectedItemGrid == null)
+         return;
+
+      Vector2Int tileGridPos = selectedItemGrid.GetTileGridPosition(mousePos);
+      ClearItemAtPos(tileGridPos);
+   }
+
    #endregion
 }

@@ -35,21 +35,58 @@ public class ItemGrid : MonoBehaviour {
       return inventoryItemSlot[x, y];
    }
 
-   public bool PlaceItem(InventoryItem item, int x, int y, ref InventoryItem overlapItem) {
+   public (bool, InventoryItem) PlaceItem(InventoryItem item, int x, int y, ref InventoryItem overlapItem) {
       // On check si l'item sortira de la grille si on le place ici, si c'est le cas, on ne fait rien
       // (donc on renvoie false)
       if (!CheckBoundaries(x, y, item.WIDTH, item.HEIGHT))
-         return false;
+         return (false, null);
 
+      // trop d'overlap
       if (!OverlapCheck(x, y, item.WIDTH, item.HEIGHT, ref overlapItem)) {
          overlapItem = null;
-         return false;
+         return (false, null);
       }
 
-      if (overlapItem != null)
+      if (overlapItem != null) {
+         //si on overlap mais sur un objet qui est stackable :
+         InventoryItem itemToReturn = CheckOverlapQuantity(item, ref overlapItem);
+         if (itemToReturn != null)
+            return (true, itemToReturn);
          CleanGridRef(overlapItem);
+      }
 
-      return PlaceItem(item, x, y);
+      return (PlaceItem(item, x, y), null);
+   }
+
+
+   private InventoryItem CheckOverlapQuantity(InventoryItem item, ref InventoryItem overlapItem) {
+      // On regarde toutes les conditions qui rendent le stack impossible
+      if (item.itemData.category != overlapItem.itemData.category) // meme item
+         return null;
+      if (overlapItem.itemData.maxStack < 1)
+         return null;
+      if (overlapItem.quantity == overlapItem.itemData.maxStack) // trop plein
+         return null;
+
+      ItemData oldata = overlapItem.itemData;
+
+      // si on met le maximum sur le slot "overlap"
+      overlapItem.quantity += item.quantity;
+      if (overlapItem.quantity > oldata.maxStack) {
+         item.quantity = overlapItem.quantity - oldata.maxStack;
+         overlapItem.quantity = oldata.maxStack;
+         overlapItem.UpdateQuantity();
+         item.UpdateQuantity();
+      } else {
+         // if you stacked all item :
+         print("item : " + item.onGridPosX + " " + item.onGridPosY);
+         print("overlap : " + overlapItem.onGridPosX + " " + overlapItem.onGridPosY);
+         Destroy(item.gameObject);
+         overlapItem.UpdateQuantity();
+         overlapItem = null;
+      }
+
+      return item;
    }
 
    public bool PlaceItem(InventoryItem item, int x, int y) {
@@ -88,13 +125,16 @@ public class ItemGrid : MonoBehaviour {
       return toReturn;
    }
 
-   private void CleanGridRef(InventoryItem item) {
+   public void CleanGridRef(InventoryItem item) {
       for (int i = 0; i < item.WIDTH; i++) {
          for (int j = 0; j < item.HEIGHT; j++) {
             inventoryItemSlot[item.onGridPosX + i, item.onGridPosY + j] = null;
          }
       }
+   }
 
+   public InventoryItem itemAtPos(int x, int y) {
+      return inventoryItemSlot[x, y];
    }
 
    #endregion
@@ -159,12 +199,12 @@ public class ItemGrid : MonoBehaviour {
       return true;
    }
 
-   private void ViewGrid() {
+   public void ViewGrid() {
       String toPrint = "";
       for (int i = 0; i < gridSizeWidth; i++) {
          for (int j = 0; j < gridSizeHeight; j++) {
             if (inventoryItemSlot[i, j] != null)
-               toPrint += ("[" + i + "," + j + "] = " + inventoryItemSlot[i, j] + ".");
+               toPrint += ("[" + i + "," + j + "] = " + inventoryItemSlot[i, j].itemData.category + ".");
          }
          toPrint += "\n";
       }

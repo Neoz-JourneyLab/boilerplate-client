@@ -1,11 +1,13 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class InventoryItem : MonoBehaviour {
    public ItemData itemData;
+   public int quantity;
 
    public int HEIGHT {
       get {
@@ -29,9 +31,12 @@ public class InventoryItem : MonoBehaviour {
    public bool rotated = false;
 
    RectTransform rt;
+   TextMeshProUGUI quantityText;
 
    internal void Set(ItemData itemData) {
       this.itemData = itemData;
+      this.quantity = itemData.initialQuantity;
+      this.quantityText = GetComponentInChildren<TextMeshProUGUI>();
 
       GetComponent<Image>().sprite = itemData.icon;
 
@@ -41,11 +46,17 @@ public class InventoryItem : MonoBehaviour {
 
       GetComponent<RectTransform>().sizeDelta = size;
       rt = GetComponent<RectTransform>();
+
+      UpdateQuantity();
    }
 
    internal void Rotate() {
       rotated = !rotated;
 
       rt.rotation = Quaternion.Euler(0, 0, rotated ? 90f : 0f);
+   }
+
+   public void UpdateQuantity() {
+      quantityText.text = quantity.ToString();
    }
 }
