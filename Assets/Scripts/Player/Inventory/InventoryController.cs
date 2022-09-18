@@ -23,12 +23,17 @@ public class InventoryController : MonoBehaviour {
    [SerializeField] GameObject itemPrefab;
    [SerializeField] Transform canvasTransform;
 
-   InventoryHighlight inventoryHighlight;
+   public InventoryHighlight inventoryHighlight;
 
    private void Awake() {
-      inventoryHighlight = FindObjectOfType<InventoryHighlight>();
+      inventoryHighlight = FindObjectOfType<InventoryHighlight>(true);
+      mousePos = Vector2.zero;
    }
+
    private void Update() {
+      if (!inventory.activeSelf)
+         return;
+
       ItemDrag();
 
       if (selectedItemGrid == null) {
@@ -144,6 +149,17 @@ public class InventoryController : MonoBehaviour {
       selectedItem.Rotate();
    }
 
+   private void DrawInventory(bool inventoryShow) {
+      inventory.SetActive(inventoryShow);
+      obstruction.SetActive(inventoryShow);
+
+      if (inventoryShow) {
+         GetComponent<PlayerInput>().SwitchCurrentActionMap("Inventory");
+      } else {
+         GetComponent<PlayerInput>().SwitchCurrentActionMap("Player");
+      }
+   }
+
    #region Keybinds
    void OnMousePositionInventory(InputValue value) {
       if (value.Get() == null)
@@ -175,16 +191,9 @@ public class InventoryController : MonoBehaviour {
    }
 
    void OnInventory() {
-      inventory.SetActive(!inventory.activeSelf);
       bool inventoryShow = inventory.activeSelf;
 
-      obstruction.SetActive(inventoryShow);
-
-      if (inventoryShow) {
-         GetComponent<PlayerInput>().SwitchCurrentActionMap("Inventory");
-      } else {
-         GetComponent<PlayerInput>().SwitchCurrentActionMap("Player");
-      }
+      DrawInventory(!inventoryShow);
    }
 
    void OnRotate() {

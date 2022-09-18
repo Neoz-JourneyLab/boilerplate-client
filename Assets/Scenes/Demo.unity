@@ -304,7 +304,6 @@ GameObject:
   m_Component:
   - component: {fileID: 105832672}
   - component: {fileID: 105832673}
-  - component: {fileID: 105832674}
   - component: {fileID: 105832675}
   m_Layer: 5
   m_Name: PlayerInventory
@@ -349,19 +348,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   gridSizeWidth: 5
   gridSizeHeight: 5
---- !u!114 &105832674
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 105832671}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4102915c08d7e87498326e1586acfd12, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  highlighter: {fileID: 1221312220}
 --- !u!114 &105832675
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -485,7 +471,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &163785102
 RectTransform:
   m_ObjectHideFlags: 0
@@ -688,13 +674,14 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 269949628}
+  - component: {fileID: 269949629}
   m_Layer: 5
   m_Name: Inventory
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &269949628
 RectTransform:
   m_ObjectHideFlags: 0
@@ -718,6 +705,19 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &269949629
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 269949627}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4102915c08d7e87498326e1586acfd12, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  highlighter: {fileID: 1221312220}
 --- !u!1 &281415658
 GameObject:
   m_ObjectHideFlags: 0
@@ -880,7 +880,6 @@ GameObject:
   m_Component:
   - component: {fileID: 314280785}
   - component: {fileID: 314280788}
-  - component: {fileID: 314280787}
   - component: {fileID: 314280786}
   m_Layer: 5
   m_Name: ContainerInventory
@@ -923,19 +922,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 68c92ea33f8284746b4b2a231b490269, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!114 &314280787
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 314280784}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4102915c08d7e87498326e1586acfd12, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  highlighter: {fileID: 1221312220}
 --- !u!114 &314280788
 MonoBehaviour:
   m_ObjectHideFlags: 0
