@@ -27,17 +27,7 @@ public class ItemGrid : MonoBehaviour {
       rt.sizeDelta = size;
    }
 
-
-   public Vector2Int GetTileGridPosition(Vector2 mousePos) {
-      positionOnGrid.x = mousePos.x - rt.position.x;
-      positionOnGrid.y = rt.position.y - mousePos.y;
-
-      tileGridPos.x = (int)(positionOnGrid.x / tileSizeWidth);
-      tileGridPos.y = (int)(positionOnGrid.y / tileSizeHeight);
-
-      return tileGridPos;
-   }
-
+   #region ItemMethods 
    internal InventoryItem GetItem(int x, int y) {
       if (!CheckInGrid(x, y))
          return null;
@@ -48,10 +38,10 @@ public class ItemGrid : MonoBehaviour {
    public bool PlaceItem(InventoryItem item, int x, int y, ref InventoryItem overlapItem) {
       // On check si l'item sortira de la grille si on le place ici, si c'est le cas, on ne fait rien
       // (donc on renvoie false)
-      if (!CheckBoundaries(x, y, item.itemData.width, item.itemData.height))
+      if (!CheckBoundaries(x, y, item.WIDTH, item.HEIGHT))
          return false;
 
-      if (!OverlapCheck(x, y, item.itemData.width, item.itemData.height, ref overlapItem)) {
+      if (!OverlapCheck(x, y, item.WIDTH, item.HEIGHT, ref overlapItem)) {
          overlapItem = null;
          return false;
       }
@@ -59,14 +49,18 @@ public class ItemGrid : MonoBehaviour {
       if (overlapItem != null)
          CleanGridRef(overlapItem);
 
+      return PlaceItem(item, x, y);
+   }
+
+   public bool PlaceItem(InventoryItem item, int x, int y) {
       RectTransform itemRt = item.GetComponent<RectTransform>();
       itemRt.SetParent(rt);
 
       item.onGridPosX = x;
       item.onGridPosY = y;
 
-      for (int i = 0; i < item.itemData.width; i++) {
-         for (int j = 0; j < item.itemData.height; j++) {
+      for (int i = 0; i < item.WIDTH; i++) {
+         for (int j = 0; j < item.HEIGHT; j++) {
             inventoryItemSlot[x + i, y + j] = item;
          }
       }
@@ -74,16 +68,7 @@ public class ItemGrid : MonoBehaviour {
       Vector2 position = CalculatePositionOnGrid(item, x, y);
 
       itemRt.localPosition = position;
-
-      ViewGrid();
       return true;
-   }
-
-   public Vector2 CalculatePositionOnGrid(InventoryItem item, int x, int y) {
-      Vector2 position = new Vector2();
-      position.x = x * tileSizeWidth + tileSizeWidth * item.itemData.width / 2;
-      position.y = -(y * tileSizeHeight + tileSizeHeight * item.itemData.height / 2);
-      return position;
    }
 
    public InventoryItem PickUpItem(int x, int y) {
@@ -100,22 +85,36 @@ public class ItemGrid : MonoBehaviour {
       CleanGridRef(toReturn);
 
       // et on le return
-      ViewGrid();
       return toReturn;
    }
 
    private void CleanGridRef(InventoryItem item) {
-      string str = "";
-      print("Item on grid was : " + item.onGridPosX + ", " + item.onGridPosY);
-      for (int i = 0; i < item.itemData.width; i++) {
-         for (int j = 0; j < item.itemData.height; j++) {
-            str += ("Cleaned " + (item.onGridPosX + i) + ", " + (item.onGridPosY + j));
+      for (int i = 0; i < item.WIDTH; i++) {
+         for (int j = 0; j < item.HEIGHT; j++) {
             inventoryItemSlot[item.onGridPosX + i, item.onGridPosY + j] = null;
          }
       }
 
-      print(str);
-      print("Now removed");
+   }
+
+   #endregion
+
+   #region Calculus Tools
+   public Vector2Int GetTileGridPosition(Vector2 mousePos) {
+      positionOnGrid.x = mousePos.x - rt.position.x;
+      positionOnGrid.y = rt.position.y - mousePos.y;
+
+      tileGridPos.x = (int)(positionOnGrid.x / tileSizeWidth);
+      tileGridPos.y = (int)(positionOnGrid.y / tileSizeHeight);
+
+      return tileGridPos;
+   }
+
+   public Vector2 CalculatePositionOnGrid(InventoryItem item, int x, int y) {
+      Vector2 position = new Vector2();
+      position.x = x * tileSizeWidth + tileSizeWidth * item.WIDTH / 2;
+      position.y = -(y * tileSizeHeight + tileSizeHeight * item.HEIGHT / 2);
+      return position;
    }
 
    public bool CheckInGrid(int x, int y) {
@@ -149,6 +148,17 @@ public class ItemGrid : MonoBehaviour {
       return true;
    }
 
+   private bool CheckAvailableSpace(int x, int y, int width, int height) {
+      for (int i = 0; i < width; i++) {
+         for (int j = 0; j < height; j++) {
+            if (inventoryItemSlot[x + i, y + j] == null)
+               continue;
+            return false;
+         }
+      }
+      return true;
+   }
+
    private void ViewGrid() {
       String toPrint = "";
       for (int i = 0; i < gridSizeWidth; i++) {
@@ -162,4 +172,18 @@ public class ItemGrid : MonoBehaviour {
       print(toPrint);
    }
 
+   internal Vector2Int? FindSpaceForObject(InventoryItem item) {
+      int width = gridSizeWidth - (item.WIDTH - 1);
+      int height = gridSizeHeight - (item.HEIGHT - 1);
+      for (int i = 0; i < width; i++) {
+         for (int j = 0; j < height; j++) {
+            if (CheckAvailableSpace(i, j, item.WIDTH, item.HEIGHT)) {
+               return new Vector2Int(i, j);
+            }
+         }
+      }
+
+      return null;
+   }
+   #endregion
 }

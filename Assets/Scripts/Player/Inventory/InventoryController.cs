@@ -9,12 +9,15 @@ public class InventoryController : MonoBehaviour {
    [HideInInspector]
    public ItemGrid selectedItemGrid;
 
+   public GameObject inventory;
+   public GameObject obstruction;
+
    Vector2 mousePos;
 
-   [SerializeField] InventoryItem selectedItem;
-   [SerializeField] InventoryItem highlightedItem;
-   [SerializeField] InventoryItem overlapItem;
-   [SerializeField] RectTransform itemRt;
+   InventoryItem selectedItem;
+   InventoryItem highlightedItem;
+   InventoryItem overlapItem;
+   RectTransform itemRt;
 
    [SerializeField] List<ItemData> items;
    [SerializeField] GameObject itemPrefab;
@@ -50,30 +53,10 @@ public class InventoryController : MonoBehaviour {
             inventoryHighlight.Show(false);
          }
       } else {
-         inventoryHighlight.Show(selectedItemGrid.CheckBoundaries(posOnGrid.x, posOnGrid.y, selectedItem.itemData.width, selectedItem.itemData.height));
-         inventoryHighlight.SetSize(highlightedItem);
+         inventoryHighlight.Show(selectedItemGrid.CheckBoundaries(posOnGrid.x, posOnGrid.y, selectedItem.WIDTH, selectedItem.HEIGHT));
+         inventoryHighlight.SetSize(selectedItem);
          inventoryHighlight.SetPosition(selectedItemGrid, selectedItem, posOnGrid.x, posOnGrid.y);
       }
-   }
-
-   void OnMousePosition(InputValue value) {
-      if (value.Get() == null)
-         return;
-      mousePos = (Vector2)value.Get();
-   }
-
-   void OnShoot() {
-      if (selectedItemGrid == null)
-         return;
-
-      Vector2Int tileGridPos = selectedItemGrid.GetTileGridPosition(mousePos);
-
-      //if we have an item selected, we place it. Else we take the item on the grid.
-
-      if (selectedItem == null)
-         PickupItem(tileGridPos);
-      else
-         PlaceItem(tileGridPos);
    }
 
    private void PlaceItem(Vector2Int tileGridPos) {
@@ -83,7 +66,6 @@ public class InventoryController : MonoBehaviour {
       selectedItem.GetComponent<Image>().color = new Color(1, 1, 1, 1);
 
       if (overlapItem != null) {
-         print("Overlapped!");
          selectedItem = overlapItem;
          selectedItem.GetComponent<Image>().color = new Color(0.5f, 1, 1, 0.75f);
          itemRt = selectedItem.GetComponent<RectTransform>();
@@ -105,15 +87,11 @@ public class InventoryController : MonoBehaviour {
       selectedItem.GetComponent<Image>().color = new Color(0.5f, 1, 1, 0.75f);
    }
 
-   void OnCheatItem() {
-      CreateRandomItem();
-   }
-
    void ItemDrag() {
       if (selectedItem != null) {
          Vector2 itemOffset = new Vector2();
-         itemOffset.x = (selectedItem.itemData.width - 1) * ItemGrid.tileSizeWidth / 2;
-         itemOffset.y = -(selectedItem.itemData.height - 1) * ItemGrid.tileSizeHeight / 2;
+         itemOffset.x = (selectedItem.WIDTH - 1) * ItemGrid.tileSizeWidth / 2;
+         itemOffset.y = -(selectedItem.HEIGHT - 1) * ItemGrid.tileSizeHeight / 2;
          itemRt.position = mousePos + itemOffset;
       }
 
@@ -126,12 +104,91 @@ public class InventoryController : MonoBehaviour {
       selectedItem = item;
       itemRt = item.GetComponent<RectTransform>();
       itemRt.SetParent(canvasTransform);
+      itemRt.SetAsLastSibling();
 
       int selectedItemID = Random.Range(0, items.Count);
       item.Set(items[selectedItemID]);
       item.name = item.itemData.name;
    }
 
+   public void Sibling(ItemGrid grid) {
+      if (!selectedItem)
+         return;
+      selectedItem.GetComponent<RectTransform>().parent = grid.GetComponent<RectTransform>();
+      selectedItem.GetComponent<RectTransform>().SetAsLastSibling();
+   }
 
+   void InsertRandomItem() {
+      if (selectedItemGrid == null)
+         return;
+      CreateRandomItem();
+      InventoryItem itemToInsert = selectedItem;
+      InsertItem(itemToInsert);
+      selectedItem = null;
+   }
 
+   void InsertItem(InventoryItem itemToInsert) {
+      Vector2Int? posOnGrid = selectedItemGrid.FindSpaceForObject(itemToInsert);
+      if (posOnGrid == null) {
+         Destroy(selectedItem.gameObject);
+         return;
+      }
+
+      selectedItemGrid.PlaceItem(itemToInsert, posOnGrid.Value.x, posOnGrid.Value.y);
+   }
+
+   void RotateItem() {
+      if (selectedItem == null)
+         return;
+
+      selectedItem.Rotate();
+   }
+
+   #region Keybinds
+   void OnMousePositionInventory(InputValue value) {
+      if (value.Get() == null)
+         return;
+      mousePos = (Vector2)value.Get();
+   }
+
+   void OnClick() {
+      if (selectedItemGrid == null)
+         return;
+
+      Vector2Int tileGridPos = selectedItemGrid.GetTileGridPosition(mousePos);
+
+      //if we have an item selected, we place it. Else we take the item on the grid.
+
+      if (selectedItem == null)
+         PickupItem(tileGridPos);
+      else
+         PlaceItem(tileGridPos);
+   }
+
+   void OnCheatItem() {
+      if (selectedItem == null)
+         CreateRandomItem();
+   }
+
+   void OnCheatPickupItem() {
+      InsertRandomItem();
+   }
+
+   void OnInventory() {
+      inventory.SetActive(!inventory.activeSelf);
+      bool inventoryShow = inventory.activeSelf;
+
+      obstruction.SetActive(inventoryShow);
+
+      if (inventoryShow) {
+         GetComponent<PlayerInput>().SwitchCurrentActionMap("Inventory");
+      } else {
+         GetComponent<PlayerInput>().SwitchCurrentActionMap("Player");
+      }
+   }
+
+   void OnRotate() {
+      RotateItem();
+   }
+   #endregion
 }

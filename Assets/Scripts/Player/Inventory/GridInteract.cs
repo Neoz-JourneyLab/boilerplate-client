@@ -15,6 +15,7 @@ public class GridInteract : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
 
    public void OnPointerEnter(PointerEventData eventData) {
       ic.selectedItemGrid = itemGrid;
+      ic.Sibling(itemGrid);
    }
 
    public void OnPointerExit(PointerEventData eventData) {

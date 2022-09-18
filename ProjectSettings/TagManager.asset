@@ -10,6 +10,7 @@ TagManager:
   - OtherPlayer
   - Interactable
   - spawner
+  - Obstruction
   layers:
   - Default
   - TransparentFX

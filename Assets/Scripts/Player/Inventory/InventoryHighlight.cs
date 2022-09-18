@@ -7,8 +7,8 @@ public class InventoryHighlight : MonoBehaviour {
 
    public void SetSize(InventoryItem item) {
       Vector2 size = new Vector2();
-      size.x = item.itemData.width * ItemGrid.tileSizeWidth;
-      size.y = item.itemData.height * ItemGrid.tileSizeHeight;
+      size.x = item.WIDTH * ItemGrid.tileSizeWidth;
+      size.y = item.HEIGHT * ItemGrid.tileSizeHeight;
 
       highlighter.sizeDelta = size;
    }
@@ -35,7 +35,6 @@ public class InventoryHighlight : MonoBehaviour {
    }
 
    public void Show(bool b) {
-      print(b);
       highlighter.gameObject.SetActive(b);
    }
 }
