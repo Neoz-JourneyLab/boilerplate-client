@@ -30,8 +30,8 @@ public class Lobby : MonoBehaviour {
 	IEnumerator RequestGames() {
 		while (string.IsNullOrWhiteSpace(uWebSocketManager.socketId)) yield return new WaitForSeconds(0.2f);
 		uWebSocketManager.EmitEv("request:games");
-		if(nicknameIF.text != "") {
-			uWebSocketManager.EmitEv("nickname", new { nicknameIF.text });
+		if(PlayerPrefs.HasKey("nickname")) {
+			uWebSocketManager.EmitEv("nickname", new { nickname = PlayerPrefs.GetString("nickname") });
 		}
 	}
 
