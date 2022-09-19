@@ -17,7 +17,7 @@ public class GunControl : MonoBehaviour {
    // Start is called before the first frame update
    void Start() {
       if (startingGun != null)
-         ChangeGun(startingGun);
+         EquipGun(startingGun);
    }
 
    // Update is called once per frame
@@ -28,12 +28,17 @@ public class GunControl : MonoBehaviour {
       batteryBar.localScale = new Vector3(equipedGun.GetComponent<FlashLight>().batteryPercent, 1, 1);
    }
 
-   void ChangeGun(Gun newGun) {
+   public void EquipGun(Gun newGun) {
       if (equipedGun != null)
          Destroy(equipedGun);
       equipedGun = Instantiate(newGun, gunHolder);
       equipedGun.name = newGun.name;
       UpdateText();
+   }
+
+   public void UnequipGun() {
+      Destroy(equipedGun.gameObject);
+      equipedGun = null;
    }
 
    public void UpdateText() {

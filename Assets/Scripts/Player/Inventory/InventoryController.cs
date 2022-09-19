@@ -13,6 +13,8 @@ public class InventoryController : MonoBehaviour {
    public GameObject inventory;
    public GameObject obstruction;
 
+   public InventorySlot selectedSlot;
+
    Vector2 mousePos;
 
    public InventoryItem selectedItem;
@@ -216,17 +218,31 @@ public class InventoryController : MonoBehaviour {
    }
 
    void OnClick() {
-      if (selectedItemGrid == null)
+      if (selectedItemGrid == null && selectedSlot == null)
          return;
 
-      Vector2Int tileGridPos = selectedItemGrid.GetTileGridPosition(mousePos);
+      // on place/prends un objet sur une grille
+      if (selectedItemGrid != null) {
+         Vector2Int tileGridPos = selectedItemGrid.GetTileGridPosition(mousePos);
 
-      //if we have an item selected, we place it. Else we take the item on the grid.
+         //if we have an item selected, we place it. Else we take the item on the grid.
 
-      if (selectedItem == null)
-         PickupItem(tileGridPos);
-      else
-         PlaceItem(tileGridPos);
+         if (selectedItem == null)
+            PickupItem(tileGridPos);
+         else
+            PlaceItem(tileGridPos);
+      }
+      // On place/prends un objet sur un slot
+      else {
+         if (selectedSlot.itemInSlot == null && selectedItem == null)
+            return;
+         if (selectedItem == null) {
+            selectedItem = selectedSlot.UnequipSlot(); ;
+         } else if (selectedSlot.itemInSlot == null) {
+            selectedSlot.EquipSlot(selectedItem);
+            selectedItem = null;
+         }
+      }
    }
 
    void OnCheatItem() {
