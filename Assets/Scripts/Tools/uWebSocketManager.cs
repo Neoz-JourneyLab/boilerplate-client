@@ -9,28 +9,33 @@ using WebSocket = WebSocketSharp.WebSocket;
 
 // ReSharper disable once InconsistentNaming
 public class uWebSocketManager : MonoBehaviour {
-   delegate void EventDelegation(string e);
-   Dictionary<string, EventDelegation> events = new() {
-      { "pong", WsEvents.Pong },
-      { "plot", WsEvents.Plot },
-      { "flashlight:receive", WsEvents.ChangeFlashlightState },
-      { "zombie", WsEvents.Zombie },
-      { "zombie:dead", WsEvents.ZombieDead },
-      { "player:shot", WsEvents.PlayerShot },
-      { "hit:zombie", WsEvents.HitZombie },
-      { "socket:connected", WsEvents.SocketConnected },
-   };
-   public static string socketId;
-   public WebSocket ws;
-   public string uri;
-   static uWebSocketManager uws;
+	delegate void EventDelegation(string e);
+	Dictionary<string, EventDelegation> events = new() {
+		{ "pong", WsEvents.Pong },
+		{ "plot", WsEvents.Plot },
+		{ "flashlight:receive", WsEvents.ChangeFlashlightState },
+		{ "zombie", WsEvents.Zombie },
+		{ "zombie:dead", WsEvents.ZombieDead },
+		{ "player:shot", WsEvents.PlayerShot },
+		{ "hit:zombie", WsEvents.HitZombie },
+		{ "new:game:available", WsEvents.NewGameAvailable },
+		{ "cancel:game", WsEvents.CancelGame},
+		{ "joined:game", WsEvents.JoinedGame},
+	};
+	public static string socketId;
+	public WebSocket ws;
+	public string uri; 
+	static uWebSocketManager uws;
 
-   private void Start() {
-      DontDestroyOnLoad(this);
-      InvokeRepeating(nameof(Ping), 1, 1f);
-      InitSocket("ws://" + uri + "/");
-      uws = GameObject.Find("AppManager").GetComponent<uWebSocketManager>();
-   }
+	private void Awake() {
+		DontDestroyOnLoad(this.gameObject);
+	}
+
+	private void Start() {
+		InvokeRepeating(nameof(Ping), 1, 1f);
+		InitSocket("ws://" + uri + "/");
+		uws = GameObject.Find("AppManager").GetComponent<uWebSocketManager>();
+	}
 
    /// <summary>
    /// Ajoute tous les listeners pour les events émis par le serveur
