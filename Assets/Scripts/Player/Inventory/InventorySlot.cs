@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
+/**
+ * Ce script sert a choisir le slot sur lequel on travaille dans inventory controller.
+ * Le même systeme est utilisé pour les grilles.
+ */
 public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler {
    public InventoryController ic;
 
