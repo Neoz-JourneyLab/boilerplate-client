@@ -5,7 +5,10 @@ EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
   m_Scenes:
-  - enabled: 0
-    path: 
-    guid: 00000000000000000000000000000000
+  - enabled: 1
+    path: Assets/Scenes/Lobby.unity
+    guid: d2f899e376c728a418ae48eebb5796fe
+  - enabled: 1
+    path: Assets/Scenes/Les catacombes de Markus.unity
+    guid: b67b4d1bb3060054d8543b1923ed241d
   m_configObjects: {}

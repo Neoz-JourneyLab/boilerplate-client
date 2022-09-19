@@ -9,6 +9,7 @@ using WebSocket = WebSocketSharp.WebSocket;
 
 // ReSharper disable once InconsistentNaming
 public class uWebSocketManager : MonoBehaviour {
+<<<<<<< Updated upstream
    delegate void EventDelegation(string e);
    Dictionary<string, EventDelegation> events = new() {
       { "pong", WsEvents.Pong },
@@ -31,6 +32,35 @@ public class uWebSocketManager : MonoBehaviour {
       InitSocket("ws://" + uri + "/");
       uws = GameObject.Find("AppManager").GetComponent<uWebSocketManager>();
    }
+=======
+	delegate void EventDelegation(string e);
+	Dictionary<string, EventDelegation> events = new() {
+		{ "pong", WsEvents.Pong },
+		{ "plot", WsEvents.Plot },
+		{ "flashlight:receive", WsEvents.ChangeFlashlightState },
+		{ "zombie", WsEvents.Zombie },
+		{ "zombie:dead", WsEvents.ZombieDead },
+		{ "player:shot", WsEvents.PlayerShot },
+		{ "hit:zombie", WsEvents.HitZombie },
+		{ "new:game:available", WsEvents.NewGameAvailable },
+		{ "cancel:game", WsEvents.CancelGame},
+		{ "joined:game", WsEvents.JoinedGame},
+	};
+	public static string socketId;
+	public WebSocket ws;
+	public string uri; 
+	static uWebSocketManager uws;
+
+	private void Awake() {
+		DontDestroyOnLoad(this.gameObject);
+	}
+
+	private void Start() {
+		InvokeRepeating(nameof(Ping), 1, 1f);
+		InitSocket("ws://" + uri + "/");
+		uws = GameObject.Find("AppManager").GetComponent<uWebSocketManager>();
+	}
+>>>>>>> Stashed changes
 
    /// <summary>
    /// Ajoute tous les listeners pour les events émis par le serveur

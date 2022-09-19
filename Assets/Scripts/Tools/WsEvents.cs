@@ -20,26 +20,29 @@ public class WsEvents : MonoBehaviour {
 	static TMP_Text serverStatus;
 	static GameObject zombiePrefab = null;
 	static PlayerControl player = null;
+	public static bool host = false;
 
 	#endregion
 
 	#region listeners
+	public static void NewGameAvailable(string json) {
+		string nickname = JObject.Parse(json)["nickname"].ToString();
+		string id = JObject.Parse(json)["id"].ToString();
+		string name = JObject.Parse(json)["name"].ToString();
+		string level = JObject.Parse(json)["level"].ToString();
+		GameObject.Find("Canvas").GetComponent<Lobby>().NewGame(name, nickname, id, level);
+	}
 
-	public static void SocketConnected(string json) {
-		int players = int.Parse(JObject.Parse(json)["players"].ToString());
-		Debug.Log("Join game with " + players + " players !");
-		GetPlayer().host = players == 1;
-		if (GetPlayer().host) {
-			GetPlayer().gameObject.transform.position = GameObject.Find("PLAYER_1").transform.position;
-			foreach (var item in GameObject.FindGameObjectsWithTag("spawner")) {
-				item.GetComponent<ZombieSpawner>().StartSpawn();
-			}
-		} else {
-			GetPlayer().gameObject.transform.position = GameObject.Find("PLAYER_2").transform.position;
-			foreach (var item in GameObject.FindGameObjectsWithTag("spawner")) {
-				Destroy(item);
-			}
-		}
+	public static void JoinedGame(string json) {
+		print(json);
+		string id = JObject.Parse(json)["id"].ToString();
+		host = JObject.Parse(json)["host"].ToString().ToLower() == "true";
+		GameObject.Find("Canvas").GetComponent<Lobby>().LoadGame(id);
+	}
+
+	public static void CancelGame(string json) {
+		string id = JObject.Parse(json)["id"].ToString();
+		GameObject.Find("Canvas").GetComponent<Lobby>().CancelGame(id);
 	}
 
 	public static void Pong(string json) {
