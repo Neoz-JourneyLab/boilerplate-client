@@ -19,7 +19,7 @@ public class Lobby : MonoBehaviour {
 			nicknameIF.text = PlayerPrefs.GetString("nickname");
 		}
 		StartCoroutine(nameof(RequestGames));
-		SceneManager.LoadScene("Les catacombes de Markus");
+		//SceneManager.LoadScene("Les catacombes de Markus");
 	}
 	
 	public void LoadGame(string id) {
