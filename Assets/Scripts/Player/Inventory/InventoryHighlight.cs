@@ -2,6 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/**
+ * Classe servant a surligner les objets quand le curseur passes dessus, ou surligner la case que prendra l'objet
+ */
 public class InventoryHighlight : MonoBehaviour {
    [SerializeField] RectTransform highlighter;
 
@@ -13,6 +16,9 @@ public class InventoryHighlight : MonoBehaviour {
       highlighter.sizeDelta = size;
    }
 
+   /**
+    * se met sur un objet pour le surligner (sur la grille)
+    */
    public void SetPosition(ItemGrid grid, InventoryItem item) {
       SetParent(grid);
 
@@ -21,6 +27,9 @@ public class InventoryHighlight : MonoBehaviour {
       highlighter.localPosition = pos;
    }
 
+   /**
+    * se met sur un la grille et surligne la place que prendra l'objet à la pose
+    */
    public void SetPosition(ItemGrid grid, InventoryItem item, int x, int y) {
       SetParent(grid);
 

@@ -5,6 +5,9 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
+/**
+ * Contient les données propres aux objets a leur creation.
+ */
 public class InventoryItem : MonoBehaviour {
    public ItemData itemData;
    public int quantity;

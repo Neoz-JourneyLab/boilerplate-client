@@ -4,7 +4,9 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.InputSystem;
 
-
+/**
+ * Cette classe reagit aux inputs et faits des actions dans la grille en conséquence
+ */
 public class InventoryController : MonoBehaviour {
    [HideInInspector]
    public ItemGrid selectedItemGrid;
@@ -31,10 +33,6 @@ public class InventoryController : MonoBehaviour {
    private void Awake() {
       inventoryHighlight = FindObjectOfType<InventoryHighlight>(true);
       mousePos = Vector2.zero;
-
-      OnCheatPickupItem();
-      OnCheatPickupItem();
-      OnCheatPickupItem();
    }
 
    private void Update() {
@@ -51,6 +49,9 @@ public class InventoryController : MonoBehaviour {
       HandleHighlight();
    }
 
+   /**
+    * Gère l'affichage de la surbrillance
+    */
    private void HandleHighlight() {
       Vector2Int posOnGrid = selectedItemGrid.GetTileGridPosition(mousePos);
 
@@ -71,6 +72,9 @@ public class InventoryController : MonoBehaviour {
       }
    }
 
+   /**
+    * Pose un objet a la case désignée
+    */
    private void PlaceItem(Vector2Int tileGridPos) {
       // si on ne peut pas placer l'item, alors on ne fait rien
       bool canPlaceItem;
@@ -102,6 +106,9 @@ public class InventoryController : MonoBehaviour {
          selectedItem = null;
    }
 
+   /**
+    * Prends un objet a la case désignée
+    */
    private void PickupItem(Vector2Int tileGridPos) {
       selectedItem = selectedItemGrid.PickUpItem(tileGridPos.x, tileGridPos.y);
       if (selectedItem == null)
@@ -113,16 +120,21 @@ public class InventoryController : MonoBehaviour {
       selectedItem.GetComponent<Image>().color = new Color(0.5f, 1, 1, 0.75f);
    }
 
+   /**
+    * Fait suivre notre curseur a l'objet selectionné
+    */
    void ItemDrag() {
-      if (selectedItem != null) {
-         Vector2 itemOffset = new Vector2();
-         itemOffset.x = (selectedItem.WIDTH - 1) * ItemGrid.tileSizeWidth / 2;
-         itemOffset.y = -(selectedItem.HEIGHT - 1) * ItemGrid.tileSizeHeight / 2;
-         itemRt.position = mousePos + itemOffset;
-      }
-
+      if (selectedItem == null)
+         return;
+      Vector2 itemOffset = new Vector2();
+      itemOffset.x = (selectedItem.WIDTH - 1) * ItemGrid.tileSizeWidth / 2;
+      itemOffset.y = -(selectedItem.HEIGHT - 1) * ItemGrid.tileSizeHeight / 2;
+      itemRt.position = mousePos + itemOffset;
    }
 
+   /**
+    * Creer un objet aléatoire et l'assigne en tant qu'objet selectionné
+    */
    void CreateRandomItem() {
       if (selectedItem != null)
          return;
@@ -138,6 +150,9 @@ public class InventoryController : MonoBehaviour {
       item.name = item.itemData.name;
    }
 
+   /**
+    * fonction utilisé pour l'affichage (change l'ordre dans la hierarchie)
+    */
    public void Sibling(ItemGrid grid) {
       if (!selectedItem)
          return;
@@ -145,6 +160,9 @@ public class InventoryController : MonoBehaviour {
       selectedItem.GetComponent<RectTransform>().SetAsLastSibling();
    }
 
+   /**
+    * Met un objet aléatoire dans l'inventaire
+    */
    void InsertRandomItem() {
       if (selectedItemGrid == null)
          return;
@@ -154,6 +172,9 @@ public class InventoryController : MonoBehaviour {
       selectedItem = null;
    }
 
+   /**
+    * Met un objet dans l'inventaire
+    */
    void InsertItem(InventoryItem itemToInsert) {
       Vector2Int? posOnGrid = selectedItemGrid.FindSpaceForObject(itemToInsert);
       if (posOnGrid == null) {
@@ -164,6 +185,9 @@ public class InventoryController : MonoBehaviour {
       selectedItemGrid.PlaceItem(itemToInsert, posOnGrid.Value.x, posOnGrid.Value.y);
    }
 
+   /**
+    * Tourne un objet
+    */
    void RotateItem() {
       if (selectedItem == null)
          return;
@@ -171,6 +195,9 @@ public class InventoryController : MonoBehaviour {
       selectedItem.Rotate();
    }
 
+   /**
+    * Supprimes un objet de l'inventaire
+    */
    private void ClearItemAtPos(Vector2Int tileGridPos) {
       InventoryToJson();
       /*
@@ -183,6 +210,9 @@ public class InventoryController : MonoBehaviour {
       */
    }
 
+   /**
+    * Affiche ou masque l'inventaire
+    */
    private void DrawInventory(bool inventoryShow) {
       inventoryHolder.SetActive(inventoryShow);
       //obstruction.SetActive(inventoryShow);
@@ -194,6 +224,9 @@ public class InventoryController : MonoBehaviour {
       }
    }
 
+   /**
+    * Envoies un json de l'inventaire
+    */
    private void InventoryToJson() {
       List<InventoryItem> itemsInInventory = new List<InventoryItem>();
       for (int i = 0; i < inventory.transform.childCount; i++) {
@@ -217,6 +250,9 @@ public class InventoryController : MonoBehaviour {
       mousePos = (Vector2)value.Get();
    }
 
+   /**
+    * Prends ou place un objet, dans une  grille ou dans un slot
+    */
    void OnClick() {
       if (selectedItemGrid == null && selectedSlot == null)
          return;
@@ -225,8 +261,7 @@ public class InventoryController : MonoBehaviour {
       if (selectedItemGrid != null) {
          Vector2Int tileGridPos = selectedItemGrid.GetTileGridPosition(mousePos);
 
-         //if we have an item selected, we place it. Else we take the item on the grid.
-
+         //si un objet est selectionné alors on le place, sinon on le prends
          if (selectedItem == null)
             PickupItem(tileGridPos);
          else
@@ -237,12 +272,23 @@ public class InventoryController : MonoBehaviour {
          if (selectedSlot.itemInSlot == null && selectedItem == null)
             return;
          if (selectedItem == null) {
-            selectedItem = selectedSlot.UnequipSlot(); ;
+            PickupSlot();
          } else if (selectedSlot.itemInSlot == null) {
-            selectedSlot.EquipSlot(selectedItem);
-            selectedItem = null;
+            PlaceSlot();
          }
       }
+   }
+
+   void PickupSlot() {
+      selectedItem = selectedSlot.UnequipSlot(); ;
+   }
+
+   void PlaceSlot() {
+      if (!selectedItem.itemData.equipable)
+         return;
+
+      selectedSlot.EquipSlot(selectedItem);
+      selectedItem = null;
    }
 
    void OnCheatItem() {

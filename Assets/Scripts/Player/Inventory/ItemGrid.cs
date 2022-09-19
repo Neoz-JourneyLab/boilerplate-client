@@ -3,6 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/**
+ * Placement les objets dans la grille d'inventaire
+ */
 public class ItemGrid : MonoBehaviour {
    public const float tileSizeHeight = 100;
    public const float tileSizeWidth = 100;
@@ -21,6 +24,9 @@ public class ItemGrid : MonoBehaviour {
       Init(gridSizeWidth, gridSizeHeight);
    }
 
+   /**
+    * Init crée un nouvelle grille de taille width, length
+    */
    private void Init(int width, int height) {
       inventoryItemSlot = new InventoryItem[width, height];
       Vector2 size = new Vector2(width * tileSizeWidth, height * tileSizeHeight);
@@ -28,6 +34,9 @@ public class ItemGrid : MonoBehaviour {
    }
 
    #region ItemMethods 
+   /**
+    * renvoies l'objet au coordonnées [x,y]
+    */
    internal InventoryItem GetItem(int x, int y) {
       if (!CheckInGrid(x, y))
          return null;
@@ -35,60 +44,40 @@ public class ItemGrid : MonoBehaviour {
       return inventoryItemSlot[x, y];
    }
 
+   /**
+    * Place un objet dans la grille, renvoies un booléen (indiquant si l'objet a été placé), et un Inventory Item dans
+    * les cas ou l'item est stacké mais que le stack maximum a été atteint
+    */
    public (bool, InventoryItem) PlaceItem(InventoryItem item, int x, int y, ref InventoryItem overlapItem) {
       // On check si l'item sortira de la grille si on le place ici, si c'est le cas, on ne fait rien
       // (donc on renvoie false)
       if (!CheckBoundaries(x, y, item.WIDTH, item.HEIGHT))
          return (false, null);
 
-      // trop d'overlap
+      // Si l'objet overlap avec plus de 2 objets, alors on n'interverti pas
       if (!OverlapCheck(x, y, item.WIDTH, item.HEIGHT, ref overlapItem)) {
          overlapItem = null;
          return (false, null);
       }
 
       if (overlapItem != null) {
-         //si on overlap mais sur un objet qui est stackable :
+         //si on overlap mais sur un objet qui est stackable, on additionne a l'objet stacké ce qu'il faut
+         //et on garde le surplus selectionné
          InventoryItem itemToReturn = CheckOverlapQuantity(item, ref overlapItem);
          if (itemToReturn != null)
             return (true, itemToReturn);
+
+         //Sinon  on clear l'item de la grille
          CleanGridRef(overlapItem);
       }
 
+      // et on interverti les objets (ou place simplement)
       return (PlaceItem(item, x, y), null);
    }
 
-
-   private InventoryItem CheckOverlapQuantity(InventoryItem item, ref InventoryItem overlapItem) {
-      // On regarde toutes les conditions qui rendent le stack impossible
-      if (item.itemData.category != overlapItem.itemData.category) // meme item
-         return null;
-      if (overlapItem.itemData.maxStack < 1)
-         return null;
-      if (overlapItem.quantity == overlapItem.itemData.maxStack) // trop plein
-         return null;
-
-      ItemData oldata = overlapItem.itemData;
-
-      // si on met le maximum sur le slot "overlap"
-      overlapItem.quantity += item.quantity;
-      if (overlapItem.quantity > oldata.maxStack) {
-         item.quantity = overlapItem.quantity - oldata.maxStack;
-         overlapItem.quantity = oldata.maxStack;
-         overlapItem.UpdateQuantity();
-         item.UpdateQuantity();
-      } else {
-         // if you stacked all item :
-         print("item : " + item.onGridPosX + " " + item.onGridPosY);
-         print("overlap : " + overlapItem.onGridPosX + " " + overlapItem.onGridPosY);
-         Destroy(item.gameObject);
-         overlapItem.UpdateQuantity();
-         overlapItem = null;
-      }
-
-      return item;
-   }
-
+   /**
+    * Place un objet dans la grille sans vérifications (fait au préalable)
+    */
    public bool PlaceItem(InventoryItem item, int x, int y) {
       RectTransform itemRt = item.GetComponent<RectTransform>();
       itemRt.SetParent(rt);
@@ -108,6 +97,42 @@ public class ItemGrid : MonoBehaviour {
       return true;
    }
 
+   /**
+    * La fonction sert lors du stacking d'objets, elle renvoies l'item qui restera selectionné
+    */
+   private InventoryItem CheckOverlapQuantity(InventoryItem item, ref InventoryItem overlapItem) {
+      // On regarde toutes les conditions qui rendent le stack impossible
+      if (item.itemData.category != overlapItem.itemData.category) // meme item
+         return null;
+      if (overlapItem.itemData.maxStack <= 1) // pas stackable
+         return null;
+      if (overlapItem.quantity == overlapItem.itemData.maxStack) // trop plein
+         return null;
+
+      ItemData oldata = overlapItem.itemData;
+
+      overlapItem.quantity += item.quantity;
+
+      // si on met le maximum sur le slot "overlap"
+      if (overlapItem.quantity > oldata.maxStack) {
+         // On retire ce qu'on a mis a l'objet selectionné mais il reste selectionné
+         item.quantity = overlapItem.quantity - oldata.maxStack;
+         overlapItem.quantity = oldata.maxStack;
+         overlapItem.UpdateQuantity();
+         item.UpdateQuantity();
+      } else {
+         // Sinon si on a tout stacké nous n'avons plus d'objet selectionné.
+         Destroy(item.gameObject);
+         overlapItem.UpdateQuantity();
+         overlapItem = null;
+      }
+
+      return item;
+   }
+
+   /**
+    * On renvoies l'objet au coordonnées passées en parametre et le renvoies
+    */
    public InventoryItem PickUpItem(int x, int y) {
       // On regarde si on clique dans la grille
       if (!CheckInGrid(x, y))
@@ -125,6 +150,9 @@ public class ItemGrid : MonoBehaviour {
       return toReturn;
    }
 
+   /**
+    * Supprimes dans le tableau un item (lors d'une selection par exemple)
+    */
    public void CleanGridRef(InventoryItem item) {
       for (int i = 0; i < item.WIDTH; i++) {
          for (int j = 0; j < item.HEIGHT; j++) {
@@ -133,13 +161,13 @@ public class ItemGrid : MonoBehaviour {
       }
    }
 
-   public InventoryItem itemAtPos(int x, int y) {
-      return inventoryItemSlot[x, y];
-   }
-
    #endregion
 
    #region Calculus Tools
+
+   /**
+    * Donne la case selectionnée dans la grille avec la souris
+    */
    public Vector2Int GetTileGridPosition(Vector2 mousePos) {
       positionOnGrid.x = mousePos.x - rt.position.x;
       positionOnGrid.y = rt.position.y - mousePos.y;
@@ -150,6 +178,9 @@ public class ItemGrid : MonoBehaviour {
       return tileGridPos;
    }
 
+   /**
+    * Calcule la position pour que le sprite soit bien placé 
+    */
    public Vector2 CalculatePositionOnGrid(InventoryItem item, int x, int y) {
       Vector2 position = new Vector2();
       position.x = x * tileSizeWidth + tileSizeWidth * item.WIDTH / 2;
@@ -157,10 +188,16 @@ public class ItemGrid : MonoBehaviour {
       return position;
    }
 
+   /**
+    * Verifies que les parametres décrivent bien une case de la grille
+    */
    public bool CheckInGrid(int x, int y) {
       return !(x >= gridSizeWidth || x < 0 || y < 0 || y >= gridSizeHeight);
    }
 
+   /**
+    * Meme chose que la fonction précédente, mais en plus vérifies avec une taille d'objet
+    */
    public bool CheckBoundaries(int x, int y, int width, int height) {
       if (!CheckInGrid(x, y))
          return false;
@@ -170,6 +207,11 @@ public class ItemGrid : MonoBehaviour {
       return true;
    }
 
+   /**
+    * Nous donne un objet d'overlap lors de la pose d'un item dans la grille
+    * Si on overlap plus d'un objet, alors on renvoie false. Si on overlap un seul objet, on
+    * change (via le mot clef ref) cet objet et on renvoies true. Sinon l'overlap est null et on renvoies true
+    */
    private bool OverlapCheck(int x, int y, int width, int height, ref InventoryItem overlapItem) {
       for (int i = 0; i < width; i++) {
          for (int j = 0; j < height; j++) {
@@ -188,6 +230,9 @@ public class ItemGrid : MonoBehaviour {
       return true;
    }
 
+   /**
+    * Regarde si l'objet la place est prise
+    */
    private bool CheckAvailableSpace(int x, int y, int width, int height) {
       for (int i = 0; i < width; i++) {
          for (int j = 0; j < height; j++) {
@@ -199,6 +244,9 @@ public class ItemGrid : MonoBehaviour {
       return true;
    }
 
+   /**
+    * Affiche la grille (débug)
+    */
    public void ViewGrid() {
       String toPrint = "";
       for (int i = 0; i < gridSizeWidth; i++) {
@@ -212,6 +260,9 @@ public class ItemGrid : MonoBehaviour {
       print(toPrint);
    }
 
+   /**
+    * Donnes les coordonées pour placer un objet dans l'inventaire
+    */
    internal Vector2Int? FindSpaceForObject(InventoryItem item) {
       int width = gridSizeWidth - (item.WIDTH - 1);
       int height = gridSizeHeight - (item.HEIGHT - 1);
