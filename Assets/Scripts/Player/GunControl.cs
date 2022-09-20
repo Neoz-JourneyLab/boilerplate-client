@@ -36,14 +36,38 @@ public class GunControl : MonoBehaviour {
       UpdateText();
    }
 
+   public void EquipGun(Gun newGun, int ammo) {
+      if (equipedGun != null)
+         Destroy(equipedGun);
+      equipedGun = Instantiate(newGun, gunHolder);
+      equipedGun.name = newGun.name;
+      equipedGun.capacity = ammo;
+      UpdateText();
+   }
+
    public void UnequipGun() {
       Destroy(equipedGun.gameObject);
       equipedGun = null;
+      UpdateText();
+   }
+
+   public int UnequipGunAmmo() {
+      int toReturn = equipedGun.capacity;
+      Destroy(equipedGun.gameObject);
+      equipedGun = null;
+
+      UpdateText();
+      return toReturn;
    }
 
    public void UpdateText() {
-      gunNameText.text = equipedGun.name.ToUpper();
-      ammoText.text = equipedGun.capacity + "/" + equipedGun.maxCapacity;
+      if (equipedGun != null) {
+         gunNameText.text = equipedGun.name.ToUpper();
+         ammoText.text = equipedGun.capacity + "/" + equipedGun.maxCapacity;
+      } else {
+         gunNameText.text = "";
+         ammoText.text = "";
+      }
    }
 
    void OnShoot() {

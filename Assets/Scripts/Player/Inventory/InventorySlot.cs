@@ -30,7 +30,7 @@ public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
          return;
 
       if (itemToEquip.itemData.category == ItemCategory.Pamas)
-         gc.EquipGun(pamas);
+         gc.EquipGun(pamas, itemToEquip.weaponData.currentAmmo);
 
       itemInSlot = itemToEquip;
    }
@@ -38,7 +38,7 @@ public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
    public InventoryItem UnequipSlot() {
       InventoryItem toReturn = itemInSlot;
       itemInSlot = null;
-      gc.UnequipGun();
+      toReturn.weaponData.currentAmmo = gc.UnequipGunAmmo();
       return toReturn;
    }
 
