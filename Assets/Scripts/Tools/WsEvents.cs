@@ -25,6 +25,10 @@ public class WsEvents : MonoBehaviour {
 	#endregion
 
 	#region listeners
+	public static void ChangeState(string json) {
+		string name = JObject.Parse(json)["name"].ToString();
+		GameObject.Find(name).GetComponent<Levier>().ChangeState();
+	}
 	public static void NewGameAvailable(string json) {
 		string nickname = JObject.Parse(json)["nickname"].ToString();
 		string id = JObject.Parse(json)["id"].ToString();

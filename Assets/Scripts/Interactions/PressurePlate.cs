@@ -14,8 +14,8 @@ public class PressurePlate : MonoBehaviour {
 		if (!closed) return;
 		closed = false;
 		if (playerOnPlate > 1) return; //déjà quelq'un
-		StopCoroutine(nameof(CloseDor));
 		StartCoroutine(nameof(OpenDor));
+		StopCoroutine(nameof(CloseDor));
 	}
 
 	private void OnTriggerExit(Collider other) {

@@ -10,13 +10,17 @@ public class Levier : MonoBehaviour {
 	bool inRange = false;
 
 	private void OnTriggerEnter(Collider other) {
-		if (other.tag != "Player" && other.tag != "OtherPlayer") return;
+		if (other.tag != "Player") return;
 		interactionText.text = closed ? "Activer" : "Désactiver";
 		inRange = true;
 	}
 
 	void OnAction() {
 		if (!inRange) return;
+		uWebSocketManager.EmitEv("change:state", new { name });
+	}
+
+	public void ChangeState() {
 		closed = !closed;
 		if (!closed) {
 			StopCoroutine(nameof(CloseDor));
@@ -29,7 +33,7 @@ public class Levier : MonoBehaviour {
 	}
 
 	private void OnTriggerExit(Collider other) {
-		if (other.tag != "Player" && other.tag != "OtherPlayer") return;
+		if (other.tag != "Player") return;
 		interactionText.text = "";
 		inRange = false;
 	}

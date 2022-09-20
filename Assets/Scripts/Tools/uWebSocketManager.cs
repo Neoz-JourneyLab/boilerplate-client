@@ -21,6 +21,7 @@ public class uWebSocketManager : MonoBehaviour {
 		{ "new:game:available", WsEvents.NewGameAvailable },
 		{ "cancel:game", WsEvents.CancelGame},
 		{ "joined:game", WsEvents.JoinedGame},
+		{ "change:state", WsEvents.ChangeState},
 	};
 	public static string socketId;
 	public WebSocket ws;
