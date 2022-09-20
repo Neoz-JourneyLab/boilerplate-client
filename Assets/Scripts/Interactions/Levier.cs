@@ -35,14 +35,14 @@ public class Levier : MonoBehaviour {
 	}
 
 	IEnumerator CloseDor() {
-		GetComponent<AudioSource>().Play();
+		wall.GetComponent<AudioSource>().Play();
 		while (wall.transform.position.y < 4f) {
 			wall.transform.position = new Vector3(wall.transform.position.x, wall.transform.position.y + 0.1f, wall.transform.position.z);
 			yield return new WaitForSeconds(0.01f);
 		}
 	}
 	IEnumerator OpenDor() {
-		GetComponent<AudioSource>().Play();
+		wall.GetComponent<AudioSource>().Play();
 		while (wall.transform.position.y > -7.5f) {
 			wall.transform.position = new Vector3(wall.transform.position.x, wall.transform.position.y - 0.1f, wall.transform.position.z);
 			yield return new WaitForSeconds(0.01f);

@@ -38,7 +38,7 @@ public class PlayerControl : MonoBehaviour {
       } else {
          gameObject.transform.position = GameObject.Find("PLAYER_2").transform.position;
          foreach (var item in GameObject.FindGameObjectsWithTag("spawner")) {
-            Destroy(item);
+            //Destroy(item);
          }
       }
    }

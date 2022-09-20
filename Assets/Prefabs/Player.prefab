@@ -179,7 +179,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dd1b070e459279c4191f6ddc83c99806, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 2.5
+  speed: 5
   cameraOffset: 0.25
   cameraHeight: 40
   footstepDelay: 1.5
@@ -216,6 +216,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   selectedItemGrid: {fileID: 0}
+  inventoryHolder: {fileID: 0}
+  inventory: {fileID: 0}
+  obstruction: {fileID: 0}
+  selectedSlot: {fileID: 0}
+  selectedItem: {fileID: 0}
+  overlapItem: {fileID: 0}
+  itemPrefab: {fileID: 0}
+  canvasTransform: {fileID: 0}
+  inventoryHighlight: {fileID: 0}
 --- !u!81 &3602271459594992362
 AudioListener:
   m_ObjectHideFlags: 0
