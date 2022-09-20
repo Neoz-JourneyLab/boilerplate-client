@@ -11,7 +11,7 @@ using UnityEngine.UI;
 public class InventoryItem : MonoBehaviour {
    public ItemData itemData;
    public int quantity;
-
+   public WeaponData weaponData;
    public int HEIGHT {
       get {
          if (!rotated)
@@ -50,6 +50,9 @@ public class InventoryItem : MonoBehaviour {
       GetComponent<RectTransform>().sizeDelta = size;
       rt = GetComponent<RectTransform>();
 
+      if (itemData.category == ItemCategory.Pamas)
+         weaponData = new WeaponData(0);
+
       UpdateQuantity();
    }
 
@@ -61,5 +64,13 @@ public class InventoryItem : MonoBehaviour {
 
    public void UpdateQuantity() {
       quantityText.text = quantity.ToString();
+   }
+}
+
+public class WeaponData {
+   public int currentAmmo;
+
+   public WeaponData(int ammo) {
+      currentAmmo = ammo;
    }
 }
