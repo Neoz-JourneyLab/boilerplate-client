@@ -24,15 +24,15 @@ public class Lobby : MonoBehaviour {
 	
 	public void LoadGame(string id) {
 		Game g = games.Find(g => g.id == id);
-		SceneManager.LoadScene(g.name);
+		SceneManager.LoadScene(g.level);
 	}
 
 	IEnumerator RequestGames() {
 		while (string.IsNullOrWhiteSpace(uWebSocketManager.socketId)) yield return new WaitForSeconds(0.2f);
-		uWebSocketManager.EmitEv("request:games");
 		if(PlayerPrefs.HasKey("nickname")) {
 			uWebSocketManager.EmitEv("nickname", new { nickname = PlayerPrefs.GetString("nickname") });
 		}
+		uWebSocketManager.EmitEv("request:games");
 	}
 
 	public void NewGame(string name, string nickname, string id, string level) {
@@ -53,8 +53,9 @@ public class Lobby : MonoBehaviour {
 			g.id = id;
 			g.nickname = nickname;
 			g.name = name;
+			g.level = level;
 		} else {
-			games.Add(new Game() { id = id, nickname = nickname, name = name });
+			games.Add(new Game() { id = id, nickname = nickname, name = name, level = level });
 		}
 	}
 
@@ -64,7 +65,7 @@ public class Lobby : MonoBehaviour {
 			gameIF.interactable = true;
 			uWebSocketManager.EmitEv("cancel:game", new { id });
 		} else {
-			//join game
+			uWebSocketManager.EmitEv("join:game", new { id });
 		}
 	}
 
@@ -88,4 +89,5 @@ class Game {
 	public string id;
 	public string nickname;
 	public string name;
+	public string level;
 }
