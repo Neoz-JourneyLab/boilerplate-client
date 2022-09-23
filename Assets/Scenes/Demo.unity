@@ -693,7 +693,6 @@ GameObject:
   - component: {fileID: 205660750}
   - component: {fileID: 205660752}
   - component: {fileID: 205660753}
-  - component: {fileID: 205660754}
   m_Layer: 0
   m_Name: AppManager
   m_TagString: AppManager
@@ -740,25 +739,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6edfdf301a5f51044a49cc828953ea63, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  uri: 7.tcp.eu.ngrok.io:14609
---- !u!114 &205660754
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 205660748}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f3051452d86f8134dafc0b75157417e6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  items:
-  - {fileID: 11400000, guid: a1595441cd6f70841b503961c94afe69, type: 2}
-  - {fileID: 11400000, guid: 658677ca56378064eabfef25568abde7, type: 2}
-  - {fileID: 11400000, guid: 5b4f377e3ad6ef7419a2a37883173466, type: 2}
-  - {fileID: 11400000, guid: b7713b30c31016f46bb815af883ed05f, type: 2}
-  - {fileID: 11400000, guid: deb99875c8c6f674eaad5b38eff1bf01, type: 2}
+  uri: localhost
 --- !u!1 &212219598
 GameObject:
   m_ObjectHideFlags: 0

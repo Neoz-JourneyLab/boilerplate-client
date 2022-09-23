@@ -29,7 +29,7 @@ public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
       if (itemInSlot != null)
          return;
 
-      if (itemToEquip.itemData.category == ItemCategory.Pamas)
+      if (itemToEquip.itemData.category == ItemCategory.weapon.ToString())
          gc.EquipGun(pamas, itemToEquip.weaponData.currentAmmo);
 
       itemInSlot = itemToEquip;

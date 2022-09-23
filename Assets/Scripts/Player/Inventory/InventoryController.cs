@@ -144,10 +144,10 @@ public class InventoryController : MonoBehaviour {
       itemRt.SetParent(canvasTransform);
       itemRt.SetAsLastSibling();
 
-      int selectedItemID = Random.Range(0, FindObjectOfType<ItemCollection>().items.Count);
+      int selectedItemID = Random.Range(0, ItemCollection.GetItems().Count);
       //int selectedItemID = 0;
-      item.Set(FindObjectOfType<ItemCollection>().items[selectedItemID]);
-      item.name = item.itemData.name;
+      item.Set(ItemCollection.GetItems()[selectedItemID]);
+      item.name = item.itemData.category.ToString();
    }
 
    /**

@@ -4,6 +4,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using TMPro;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 using static Tools;
@@ -21,10 +22,18 @@ public class WsEvents : MonoBehaviour {
 	static GameObject zombiePrefab = null;
 	static PlayerControl player = null;
 	public static bool host = false;
+	static Dictionary<string, Light> otherPlayersLights = new Dictionary<string, Light>();
 
 	#endregion
 
 	#region listeners
+	public static void SeedsItems(string json) {
+		List<ItemData> items = JsonConvert.DeserializeObject<List<ItemData>>(json);
+		foreach (var item in items) {
+			item.SetIcon();
+			ItemCollection.Set(item);
+		}
+	}
 	public static void ChangeState(string json) {
 		string name = JObject.Parse(json)["name"].ToString();
 		GameObject.Find(name).GetComponent<Levier>().ChangeState();
@@ -79,6 +88,12 @@ public class WsEvents : MonoBehaviour {
 	public static void Plot(string json) {
 		PlayerPos pos = JsonConvert.DeserializeObject<PlayerPos>(json);
 		if (pos.id == uWebSocketManager.socketId) return;
+		if (!otherPlayersLights.ContainsKey(pos.id)) {
+			otherPlayersLights.Add(pos.id,
+				GameObject.Find(pos.id).transform.Find("GunControl").transform.Find("Pistol").transform.Find("Flashlight").GetComponent<Light>()
+			);
+		}
+		otherPlayersLights[pos.id].intensity = pos.flashLight;
 		PositionSender.Get().PlotOther(pos);
 	}
 
@@ -94,11 +109,12 @@ public class WsEvents : MonoBehaviour {
 	}
 	public static void HitZombie(string json) {
 		if (!GetPlayer().host) return;
-
-		var js = JObject.Parse(json);
-		string zid = js["zid"].ToString();
-		int damages = (int)js["damages"];
-		GameObject.Find(zid).GetComponent<Zombie>().TakeDamages(damages);
+		try {
+			var js = JObject.Parse(json);
+			string zid = js["zid"].ToString();
+			int damages = (int)js["damages"];
+			GameObject.Find(zid).GetComponent<Zombie>().TakeDamages(damages);
+		} catch (Exception) { }
 	}
 	public static void Zombie(string json) {
 		var js = JObject.Parse(json);
@@ -131,6 +147,7 @@ public class PlayerPos {
 	public float x;
 	public float ry;
 	public float z;
+	public float flashLight;
 
 	public float nx;
 	public float nry;

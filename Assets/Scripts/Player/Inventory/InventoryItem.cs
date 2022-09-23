@@ -50,7 +50,7 @@ public class InventoryItem : MonoBehaviour {
       GetComponent<RectTransform>().sizeDelta = size;
       rt = GetComponent<RectTransform>();
 
-      if (itemData.category == ItemCategory.Pamas)
+      if (itemData.category == ItemCategory.weapon.ToString())
          weaponData = new WeaponData(0);
 
       transform.localScale = Vector3.one;

@@ -5,6 +5,13 @@ using UnityEngine;
 /**
  * Ceci stockes les différents items en attendant la BDD
  */
-public class ItemCollection : MonoBehaviour {
-   public List<ItemData> items;
+public static class ItemCollection {
+	static List<ItemData> items = new List<ItemData>();
+	public static List<ItemData> GetItems() {
+		return items;
+	}
+
+	public static void Set(ItemData item) {
+		items.Add(item);
+	}
 }

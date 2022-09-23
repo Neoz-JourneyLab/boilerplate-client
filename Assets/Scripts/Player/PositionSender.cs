@@ -7,7 +7,8 @@ public class PositionSender : MonoBehaviour {
 	[SerializeField] GameObject otherPlayerPrefab;
 	public Dictionary<string, GameObject> otherPlayers = new Dictionary<string, GameObject>();
 	static PositionSender instance;
-	
+	public Light flash = null;
+
 	private void Start() {
 		player = transform;
 		InvokeRepeating(nameof(SendPlot), 1, 0.2f);
@@ -17,7 +18,8 @@ public class PositionSender : MonoBehaviour {
 		uWebSocketManager.EmitEv("send:position", new {
 			player.position.x,
 			player.position.z,
-			ry = player.localEulerAngles.y
+			ry = player.localEulerAngles.y,
+			flashLight = flash == null ? 0 : flash.intensity
 		});
 	}
 
