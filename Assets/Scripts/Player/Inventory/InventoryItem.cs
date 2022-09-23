@@ -53,6 +53,8 @@ public class InventoryItem : MonoBehaviour {
       if (itemData.category == ItemCategory.Pamas)
          weaponData = new WeaponData(0);
 
+      transform.localScale = Vector3.one;
+
       UpdateQuantity();
    }
 
