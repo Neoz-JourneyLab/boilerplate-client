@@ -41,7 +41,6 @@ public class WsEvents : MonoBehaviour {
             itemData = ItemCollection.GetItems().First(i => i.id == item.id)
          };
          inventory.playerItems.Add(itemToAdd);
-         print("Item : " + itemToAdd);
       }
    }
 
