@@ -15,11 +15,9 @@ public class GridInteract : MonoBehaviour {
 	private void Awake() {
 		ic = FindObjectOfType<InventoryController>();
 		itemGrid = GetComponent<ItemGrid>();
-		print("done, " + ic.name);
 	}
 
 	public void OnPointerEnter() {
-		print("interact !");
 		ic.selectedItemGrid = itemGrid;
 		ic.Sibling(itemGrid);
 	}

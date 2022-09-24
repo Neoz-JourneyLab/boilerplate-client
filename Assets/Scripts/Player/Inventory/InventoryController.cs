@@ -72,7 +72,6 @@ public class InventoryController : MonoBehaviour {
 	*/
 	private void HandleHighlight() {
 		Vector2Int posOnGrid = selectedItemGrid.GetTileGridPosition(mousePos);
-		print("post on grid " + posOnGrid);
 		if (selectedItem == null) {
 			highlightedItem = selectedItemGrid.GetItem(posOnGrid.x, posOnGrid.y);
 
@@ -103,21 +102,21 @@ public class InventoryController : MonoBehaviour {
 		if (!canPlaceItem)
 			return;
 
-		selectedItem.GetComponent<Image>().color = new Color(1, 1, 1, 1);
+		selectedItem.prefab.GetComponent<Image>().color = new Color(1, 1, 1, 1);
 
 		// Si on a overlap
 		if (overlapItem != null) {
 			// on regarde si l'overlap était avec un item de même acabit
 			if (itemToStack != null) {
-				selectedItem.GetComponent<Image>().color = new Color(0.5f, 1, 1, 0.75f);
-				itemRt = selectedItem.GetComponent<RectTransform>();
-				selectedItem.transform.SetAsLastSibling();
+				selectedItem.prefab.GetComponent<Image>().color = new Color(0.5f, 1, 1, 0.75f);
+				itemRt = selectedItem.prefab.GetComponent<RectTransform>();
+				selectedItem.prefab.transform.SetAsLastSibling();
 				overlapItem = null;
 			} else {
 				selectedItem = overlapItem;
-				selectedItem.GetComponent<Image>().color = new Color(0.5f, 1, 1, 0.75f);
-				itemRt = selectedItem.GetComponent<RectTransform>();
-				selectedItem.transform.SetAsLastSibling();
+				selectedItem.prefab.GetComponent<Image>().color = new Color(0.5f, 1, 1, 0.75f);
+				itemRt = selectedItem.prefab.GetComponent<RectTransform>();
+				selectedItem.prefab.transform.SetAsLastSibling();
 				overlapItem = null;
 			}
 		} else
@@ -132,10 +131,10 @@ public class InventoryController : MonoBehaviour {
 		if (selectedItem == null)
 			return;
 
-		selectedItem.transform.SetAsLastSibling();
-		itemRt = selectedItem.GetComponent<RectTransform>();
+		selectedItem.prefab.transform.SetAsLastSibling();
+		itemRt = selectedItem.prefab.GetComponent<RectTransform>();
 		// change item opacity when selected
-		selectedItem.GetComponent<Image>().color = new Color(0.5f, 1, 1, 0.75f);
+		selectedItem.prefab.GetComponent<Image>().color = new Color(0.5f, 1, 1, 0.75f);
 	}
 
 	/**
@@ -158,24 +157,24 @@ public class InventoryController : MonoBehaviour {
 			return;
 		InventoryItem item = Instantiate(itemPrefab).GetComponent<InventoryItem>();
 		selectedItem = item;
-		itemRt = item.GetComponent<RectTransform>();
+		itemRt = item.prefab.GetComponent<RectTransform>();
 		itemRt.SetParent(canvasTransform);
 		itemRt.SetAsLastSibling();
 
 		int selectedItemID = Random.Range(0, ItemCollection.GetItems().Count);
 		//int selectedItemID = 0;
 		//item.Set(ItemCollection.GetItems()[selectedItemID]);
-		item.name = item.itemData.category.ToString();
+		item.prefab.name = item.itemData.category.ToString();
 	}
 
 	bool CreateAndInsertItem(ItemGrid grid, InventoryItem item) {
 		GameObject prefab = Instantiate(itemPrefab);
 		//print(JsonConvert.SerializeObject(item));
-		item.Set(prefab);
-
 		itemRt = prefab.GetComponent<RectTransform>();
 		itemRt.SetParent(canvasTransform);
 		itemRt.SetAsLastSibling();
+
+		item.Set(prefab);
 
 		prefab.name = item.itemData.category.ToString();
 
@@ -192,10 +191,9 @@ public class InventoryController : MonoBehaviour {
 	* fonction utilisé pour l'affichage (change l'ordre dans la hierarchie)
 	*/
 	public void Sibling(ItemGrid grid) {
-		if (!selectedItem)
-			return;
-		selectedItem.GetComponent<RectTransform>().parent = grid.GetComponent<RectTransform>();
-		selectedItem.GetComponent<RectTransform>().SetAsLastSibling();
+		if (!selectedItem.prefab)			return;
+		selectedItem.prefab.GetComponent<RectTransform>().parent = grid.GetComponent<RectTransform>();
+		selectedItem.prefab.GetComponent<RectTransform>().SetAsLastSibling();
 	}
 
 	/**
@@ -216,7 +214,7 @@ public class InventoryController : MonoBehaviour {
 	void InsertItem(InventoryItem itemToInsert) {
 		Vector2Int? posOnGrid = selectedItemGrid.FindSpaceForObject(itemToInsert);
 		if (posOnGrid == null) {
-			Destroy(selectedItem.gameObject);
+			Destroy(selectedItem.prefab.gameObject);
 			return;
 		}
 

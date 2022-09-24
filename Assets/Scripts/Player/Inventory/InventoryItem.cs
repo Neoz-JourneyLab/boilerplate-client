@@ -8,7 +8,7 @@ using UnityEngine.UI;
 /**
  * Contient les données propres aux objets a leur creation.
  */
-public class InventoryItem : MonoBehaviour {
+public class InventoryItem {
 	public ItemData itemData;
 	public int quantity;
 	public WeaponData weaponData = null;
@@ -54,7 +54,6 @@ public class InventoryItem : MonoBehaviour {
 			weaponData = new WeaponData(0);
 
 		prefab.transform.localScale = Vector3.one;
-
 		UpdateQuantity();
 	}
 
