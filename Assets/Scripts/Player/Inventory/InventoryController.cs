@@ -72,7 +72,6 @@ public class InventoryController : MonoBehaviour {
 	*/
 	private void HandleHighlight() {
 		Vector2Int posOnGrid = selectedItemGrid.GetTileGridPosition(mousePos);
-		print("post on grid " + posOnGrid);
 		if (selectedItem == null) {
 			highlightedItem = selectedItemGrid.GetItem(posOnGrid.x, posOnGrid.y);
 
