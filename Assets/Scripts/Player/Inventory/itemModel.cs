@@ -24,5 +24,5 @@ public enum ItemCategory {
 }
 
 public enum ItemAlias {
-	pamas
+	pamas, pistolAmmo,
 }
