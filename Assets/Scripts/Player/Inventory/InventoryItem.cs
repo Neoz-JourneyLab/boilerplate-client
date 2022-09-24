@@ -9,70 +9,70 @@ using UnityEngine.UI;
  * Contient les données propres aux objets a leur creation.
  */
 public class InventoryItem : MonoBehaviour {
-   public ItemData itemData;
-   public int quantity;
-   public WeaponData weaponData;
-   public int HEIGHT {
-      get {
-         if (!rotated)
-            return itemData.height;
-         return itemData.width;
-      }
-   }
+	public ItemData itemData;
+	public int quantity;
+	public WeaponData weaponData = null;
+	public GameObject prefab = null;
+	public int HEIGHT {
+		get {
+			if (!rotated)
+				return itemData.height;
+			return itemData.width;
+		}
+	}
 
-   public int WIDTH {
-      get {
-         if (!rotated)
-            return itemData.width;
-         return itemData.height;
-      }
-   }
+	public int WIDTH {
+		get {
+			if (!rotated)
+				return itemData.width;
+			return itemData.height;
+		}
+	}
 
-   public int onGridPosX;
-   public int onGridPosY;
+	public int onGridPosX;
+	public int onGridPosY;
 
-   public bool rotated = false;
+	public bool rotated = false;
 
-   RectTransform rt;
-   TextMeshProUGUI quantityText;
+	RectTransform rt;
+	TextMeshProUGUI quantityText;
 
-   internal void Set(ItemData itemData) {
-      this.itemData = itemData;
-      this.quantity = itemData.initialQuantity;
-      this.quantityText = GetComponentInChildren<TextMeshProUGUI>();
+	internal void Set(GameObject itemPrefab) {
+		prefab = itemPrefab;
 
-      GetComponent<Image>().sprite = itemData.icon;
+		quantityText = prefab.GetComponentInChildren<TextMeshProUGUI>();
+		prefab.GetComponent<Image>().sprite = itemData.icon;
 
-      Vector2 size = new Vector2();
-      size.x = WIDTH * ItemGrid.tileSizeWidth;
-      size.y = HEIGHT * ItemGrid.tileSizeWidth;
+		Vector2 size = new Vector2();
+		size.x = WIDTH * ItemGrid.tileSizeWidth;
+		size.y = HEIGHT * ItemGrid.tileSizeWidth;
 
-      GetComponent<RectTransform>().sizeDelta = size;
-      rt = GetComponent<RectTransform>();
+		prefab.GetComponent<RectTransform>().sizeDelta = size;
+		rt = prefab.GetComponent<RectTransform>();
 
-      if (itemData.category == ItemCategory.weapon.ToString())
-         weaponData = new WeaponData(0);
+		if (itemData.category == ItemCategory.weapon.ToString())
+			weaponData = new WeaponData(0);
 
-      transform.localScale = Vector3.one;
+		prefab.transform.localScale = Vector3.one;
 
-      UpdateQuantity();
-   }
+		UpdateQuantity();
+	}
 
-   internal void Rotate() {
-      rotated = !rotated;
+	internal void Rotate() {
+		rotated = !rotated;
 
-      rt.rotation = Quaternion.Euler(0, 0, rotated ? 90f : 0f);
-   }
+		rt.rotation = Quaternion.Euler(0, 0, rotated ? 90f : 0f);
+	}
 
-   public void UpdateQuantity() {
-      quantityText.text = quantity.ToString();
-   }
+	public void UpdateQuantity() {
+		quantityText.text = quantity.ToString();
+	}
 }
 
 public class WeaponData {
-   public int currentAmmo;
+	public int currentAmmo;
 
-   public WeaponData(int ammo) {
-      currentAmmo = ammo;
-   }
+	public WeaponData(int ammo) {
+		currentAmmo = ammo;
+	}
 }

@@ -38,6 +38,15 @@ public class Zombie : MonoBehaviour {
 			agent.speed,
 			zid = id
 		});
+		DoDamages();
+	}
+
+	public void DoDamages() {
+		GameObject[] players = GameObject.FindGameObjectsWithTag("OtherPlayer").Append(GameObject.FindGameObjectWithTag("Player")).ToArray();
+		foreach (var player in players) {
+			//print(player.name + " : " + Vector3.Distance(player.transform.position, this.transform.position));
+		}		
+		//damages < 2.5
 	}
 
 	public void TakeDamages(int dmg) {

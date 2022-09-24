@@ -21,25 +21,32 @@ public class WsEvents : MonoBehaviour {
 	static TMP_Text serverStatus;
 	static GameObject zombiePrefab = null;
 	static PlayerControl player = null;
-	public static bool host = false;
+	public static bool host = true;
 	static Dictionary<string, Light> otherPlayersLights = new Dictionary<string, Light>();
 
 	#endregion
 
 	#region listeners
+	class UserItem {
+		public string id;
+		public int quantity;
+	}
 	public static void PlayerItems(string json) {
-		List<InventoryItem> items = JsonConvert.DeserializeObject<List<InventoryItem>>(json);
-		var inventory = GameObject.FindGameObjectWithTag("Player").GetComponent<InventoryController>().playerItems;
-		inventory.Clear();
+		print(json);
+		List<UserItem> items = JsonConvert.DeserializeObject<List<UserItem>>(json);
+		var inventory = GameObject.FindGameObjectWithTag("Player").GetComponent<InventoryController>();
+		inventory.playerItems.Clear();
 		foreach (var item in items) {
-			inventory.Add(
+			inventory.playerItems.Add(
 				new InventoryItem() {
 					quantity = item.quantity,
+					itemData = ItemCollection.GetItems().First(i => i.id == item.id)
 				});
 		}
 	}
 
 	public static void SeedsItems(string json) {
+		print(json);
 		List<ItemData> items = JsonConvert.DeserializeObject<List<ItemData>>(json);
 		foreach (var item in items) {
 			item.SetIcon();
