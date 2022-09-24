@@ -153,19 +153,10 @@ public class InventoryController : MonoBehaviour {
 	* Creer un objet aléatoire et l'assigne en tant qu'objet selectionné
 	*/
    void CreateRandomItem() {
-      if (selectedItem != null)
-         return;
-
-      InventoryItem item = Instantiate(itemPrefab).GetComponent<InventoryItem>();
-      selectedItem = item;
-      itemRt = item.prefab.GetComponent<RectTransform>();
-      itemRt.SetParent(canvasTransform);
-      itemRt.SetAsLastSibling();
-
-      int selectedItemID = Random.Range(0, ItemCollection.GetItems().Count);
-      //int selectedItemID = 0;
-      //item.Set(ItemCollection.GetItems()[selectedItemID]);
-      item.prefab.name = item.itemData.category.ToString();
+      InventoryItem item = new InventoryItem();
+      item.itemModel = ItemCollection.GetItems()[0];
+      item.quantity = 1;
+      CreateAndInsertItem(playerGrid, item);
    }
 
    bool CreateAndInsertItem(ItemGrid grid, InventoryItem item) {
@@ -177,7 +168,7 @@ public class InventoryController : MonoBehaviour {
 
       item.Set(prefab);
 
-      prefab.name = item.itemData.category.ToString();
+      prefab.name = item.itemModel.category.ToString();
 
       Vector2Int? posOnGrid = grid.FindSpaceForObject(item);
       if (posOnGrid == null) {
@@ -275,7 +266,7 @@ public class InventoryController : MonoBehaviour {
 
       string json = "";
       foreach (InventoryItem ie in itemsInInventory) {
-         json += (ie.itemData.category + " at pos : [" + ie.onGridPosX + ", " + ie.onGridPosY + "](" + ie.quantity + ") \n");
+         json += (ie.itemModel.category + " at pos : [" + ie.onGridPosX + ", " + ie.onGridPosY + "](" + ie.quantity + ") \n");
       }
       print(json);
 
@@ -326,7 +317,7 @@ public class InventoryController : MonoBehaviour {
    }
 
    void PlaceSlot() {
-      if (!selectedItem.itemData.equipable)
+      if (!selectedItem.itemModel.equipable)
          return;
 
       selectedSlot.EquipSlot(selectedItem);

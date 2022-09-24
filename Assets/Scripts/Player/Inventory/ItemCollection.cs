@@ -7,20 +7,26 @@ using UnityEngine;
  * Ceci stockes les différents items en attendant la BDD
  */
 public static class ItemCollection {
-	static List<ItemData> items = new List<ItemData>();
-	public static List<ItemData> GetItems() {
-		return items;
-	}
+   static List<itemModel> items;
+   public static List<itemModel> GetItems() {
+      if(items == null) {
+         items = new List<itemModel>() {
+      new itemModel() {
+         alias = "pamas",
+         category = ItemCategory.weapon.ToString(),
+         equipable = true,
+         height = 2,
+         width = 2,
+         id = "blabla",
+         maxStack = 1
+      }
+   };
+         items.Last().SetIcon();
+      }
+      return items;
+   }
 
-	public static void Set(ItemData item) {
-		items.Add(item);
-	}
-	/// <summary>
-	/// récupère un modèle d'objet par ID ou par ALIAS
-	/// </summary>
-	/// <param name="idOrAlias"></param>
-	public static ItemData GetItem(string idOrAlias) {
-		if (idOrAlias.StartsWith("0000")) return items.First(i => i.id == idOrAlias);
-		return items.First(i => i.alias == idOrAlias);
-	}
+   public static void Set(itemModel item) {
+      items.Add(item);
+   }
 }
