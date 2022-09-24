@@ -15,9 +15,9 @@ public class Collectible : MonoBehaviour {
 
 	private void OnTriggerEnter(Collider other) {
 		if (other.tag == "Player") {
-			itemModel model = ItemCollection.GetItems()[0];
+			ItemModel model = ItemCollection.GetItems()[0];
 			var item = new InventoryItem() {
-				itemModel = model,
+				model = model,
 				quantity = Random.Range(min, max + 1)
 			};
 			FindObjectOfType<InventoryController>().playerItems.Add(item);

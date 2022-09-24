@@ -22,15 +22,24 @@ public class ItemGrid : MonoBehaviour {
    public void Start() {
       rt = GetComponent<RectTransform>();
       Init(gridSizeWidth, gridSizeHeight);
-      if (name == "PlayerInventory") {
-         GameObject.FindGameObjectWithTag("Player").GetComponent<InventoryController>().SynchroniseItems();
-      }
+
    }
 
-   /**
-	 * Init crée un nouvelle grille de taille width, length
-	 */
-   private void Init(int width, int height) {
+    DateTime refresh = DateTime.UtcNow; 
+  private void Update() {
+    if (refresh > DateTime.UtcNow) return;
+    refresh = DateTime.UtcNow.AddSeconds(3);
+		if (name == "PlayerInventory") {
+      //ici il faut clear les objets avant
+      //il faut call ça sur demande
+			GameObject.FindGameObjectWithTag("Player").GetComponent<InventoryController>().SynchroniseItems();
+		}
+	}
+
+  /**
+  * Init crée un nouvelle grille de taille width, length
+  */
+  private void Init(int width, int height) {
       inventoryItemSlot = new InventoryItem[width, height];
       Vector2 size = new Vector2(width * tileSizeWidth, height * tileSizeHeight);
       rt.sizeDelta = size;
@@ -103,14 +112,14 @@ public class ItemGrid : MonoBehaviour {
 	 */
    private InventoryItem CheckOverlapQuantity(InventoryItem item, ref InventoryItem overlapItem) {
       // On regarde toutes les conditions qui rendent le stack impossible
-      if (item.itemModel.category != overlapItem.itemModel.category) // meme item
+      if (item.model.category != overlapItem.model.category) // meme item
          return null;
-      if (overlapItem.itemModel.maxStack <= 1) // pas stackable
+      if (overlapItem.model.maxStack <= 1) // pas stackable
          return null;
-      if (overlapItem.quantity == overlapItem.itemModel.maxStack) // trop plein
+      if (overlapItem.quantity == overlapItem.model.maxStack) // trop plein
          return null;
 
-      itemModel oldata = overlapItem.itemModel;
+      ItemModel oldata = overlapItem.model;
 
       overlapItem.quantity += item.quantity;
 
@@ -252,7 +261,7 @@ public class ItemGrid : MonoBehaviour {
       for (int i = 0; i < gridSizeWidth; i++) {
          for (int j = 0; j < gridSizeHeight; j++) {
             if (inventoryItemSlot[i, j] != null)
-               toPrint += ("[" + i + "," + j + "] = " + inventoryItemSlot[i, j].itemModel.category + ".");
+               toPrint += ("[" + i + "," + j + "] = " + inventoryItemSlot[i, j].model.category + ".");
          }
          toPrint += "\n";
       }
@@ -264,7 +273,6 @@ public class ItemGrid : MonoBehaviour {
 	 * Donnes les coordonées pour placer un objet dans l'inventaire
 	 */
    internal Vector2Int? FindSpaceForObject(InventoryItem item) {
-      print("width " + item.WIDTH + " " + gridSizeWidth);
       int width = gridSizeWidth - (item.WIDTH - 1);
       int height = gridSizeHeight - (item.HEIGHT - 1);
       for (int i = 0; i < width; i++) {

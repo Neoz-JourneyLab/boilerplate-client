@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu]
-public class itemModel {
+public class ItemModel {
 	public string id = "";
 	public int width = 1;
 	public int height = 1;
@@ -25,4 +25,5 @@ public enum ItemCategory {
 
 public enum ItemAlias {
 	pamas, pistolAmmo,
+	battery,
 }

@@ -7,26 +7,12 @@ using UnityEngine;
  * Ceci stockes les différents items en attendant la BDD
  */
 public static class ItemCollection {
-   static List<itemModel> items;
-   public static List<itemModel> GetItems() {
-      if(items == null) {
-         items = new List<itemModel>() {
-      new itemModel() {
-         alias = "pamas",
-         category = ItemCategory.weapon.ToString(),
-         equipable = true,
-         height = 2,
-         width = 2,
-         id = "blabla",
-         maxStack = 1
-      }
-   };
-         items.Last().SetIcon();
-      }
+   static List<ItemModel> items = new ();
+   public static List<ItemModel> GetItems() {      
       return items;
    }
 
-   public static void Set(itemModel item) {
+   public static void Set(ItemModel item) {
       items.Add(item);
    }
 }

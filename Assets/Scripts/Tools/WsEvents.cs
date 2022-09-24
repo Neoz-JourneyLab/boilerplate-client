@@ -38,14 +38,14 @@ public class WsEvents : MonoBehaviour {
 		foreach (var item in items) {
 			InventoryItem itemToAdd = new InventoryItem {
 				quantity = item.quantity,
-				itemData = ItemCollection.GetItems().First(i => i.id == item.id)
+				model = ItemCollection.GetItems().First(i => i.id == item.id)
 			};
 			inventory.playerItems.Add(itemToAdd);
 		}
 	}
 
 	public static void SeedsItems(string json) {
-		List<ItemData> items = JsonConvert.DeserializeObject<List<ItemData>>(json);
+		List<ItemModel> items = JsonConvert.DeserializeObject<List<ItemModel>>(json);
 		foreach (var item in items) {
 			item.SetIcon();
 			ItemCollection.Set(item);

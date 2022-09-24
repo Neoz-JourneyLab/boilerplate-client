@@ -9,23 +9,23 @@ using UnityEngine.UI;
  * Contient les données propres aux objets a leur creation.
  */
 public class InventoryItem {
-	public itemModel itemModel;
+	public ItemModel model;
 	public int quantity;
 	public WeaponData weaponData = null;
 	public GameObject prefab = null;
 	public int HEIGHT {
 		get {
 			if (!rotated)
-				return itemModel.height;
-			return itemModel.width;
+				return model.height;
+			return model.width;
 		}
 	}
 
 	public int WIDTH {
 		get {
 			if (!rotated)
-				return itemModel.width;
-			return itemModel.height;
+				return model.width;
+			return model.height;
 		}
 	}
 
@@ -37,11 +37,14 @@ public class InventoryItem {
 	RectTransform rt;
 	TextMeshProUGUI quantityText;
 
+	/// <summary>
+	/// place la forme de la prefab, son sprite, etc
+	/// </summary>
 	internal void Set(GameObject itemPrefab) {
 		prefab = itemPrefab;
 
 		quantityText = prefab.GetComponentInChildren<TextMeshProUGUI>();
-		prefab.GetComponent<Image>().sprite = itemModel.icon;
+		prefab.GetComponent<Image>().sprite = model.icon;
 
 		Vector2 size = new Vector2();
 		size.x = WIDTH * ItemGrid.tileSizeWidth;
@@ -50,7 +53,7 @@ public class InventoryItem {
 		prefab.GetComponent<RectTransform>().sizeDelta = size;
 		rt = prefab.GetComponent<RectTransform>();
 
-		if (itemModel.category == ItemCategory.weapon.ToString())
+		if (model.category == ItemCategory.weapon.ToString())
 			weaponData = new WeaponData(0);
 
 		prefab.transform.localScale = Vector3.one;
