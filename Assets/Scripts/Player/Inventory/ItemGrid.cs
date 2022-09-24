@@ -81,7 +81,6 @@ public class ItemGrid : MonoBehaviour {
 	 * Place un objet dans la grille sans vérifications (fait au préalable)
 	 */
    public bool PlaceItem(InventoryItem item, GameObject prefab, int x, int y) {
-      print(item);
       RectTransform itemRt = prefab.GetComponent<RectTransform>();
       itemRt.SetParent(rt);
 
@@ -171,8 +170,8 @@ public class ItemGrid : MonoBehaviour {
 	 * Donne la case selectionnée dans la grille avec la souris
 	 */
    public Vector2Int GetTileGridPosition(Vector2 mousePos) {
-      positionOnGrid.x = mousePos.x - rt.position.x;
-      positionOnGrid.y = rt.position.y - mousePos.y;
+      positionOnGrid.x = (mousePos.x - rt.position.x) * 1920 / Screen.width;
+      positionOnGrid.y = (rt.position.y - mousePos.y) * 1080 / Screen.height;
 
       tileGridPos.x = (int)(positionOnGrid.x / tileSizeWidth);
       tileGridPos.y = (int)(positionOnGrid.y / tileSizeHeight);

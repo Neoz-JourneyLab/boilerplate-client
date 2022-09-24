@@ -20,7 +20,10 @@ public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
    InventorySlot slot;
    GunControl gc;
 
+   RectTransform rt;
+
    void Start() {
+      rt = GetComponent<RectTransform>();
       slot = GetComponent<InventorySlot>();
       gc = FindObjectOfType<GunControl>();
    }
@@ -29,10 +32,16 @@ public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
       if (itemInSlot != null)
          return;
 
+      Vector2 pos = new Vector2();
+      pos.x += itemToEquip.WIDTH * ItemGrid.tileSizeWidth / 2;
+      pos.y -= itemToEquip.HEIGHT * ItemGrid.tileSizeHeight / 2;
+
       if (itemToEquip.itemData.category == ItemCategory.weapon.ToString())
          gc.EquipGun(pamas, itemToEquip.weaponData.currentAmmo);
 
       itemInSlot = itemToEquip;
+      itemToEquip.prefab.transform.parent = transform;
+      itemToEquip.prefab.transform.localPosition = pos;
    }
 
    public InventoryItem UnequipSlot() {
