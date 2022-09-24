@@ -35,7 +35,6 @@ public class WsEvents : MonoBehaviour {
       List<UserItem> items = JsonConvert.DeserializeObject<List<UserItem>>(json);
       var inventory = GameObject.FindGameObjectWithTag("Player").GetComponent<InventoryController>();
       inventory.playerItems.Clear();
-      print(JsonConvert.SerializeObject(items));
       foreach (var item in items) {
          InventoryItem itemToAdd = new InventoryItem {
             quantity = item.quantity,
@@ -47,7 +46,6 @@ public class WsEvents : MonoBehaviour {
    }
 
    public static void SeedsItems(string json) {
-      print(json);
       List<ItemData> items = JsonConvert.DeserializeObject<List<ItemData>>(json);
       foreach (var item in items) {
          item.SetIcon();

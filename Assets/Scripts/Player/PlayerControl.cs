@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.SearchService;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 [RequireComponent(typeof(Rigidbody))]
 public class PlayerControl : MonoBehaviour {
@@ -12,6 +14,7 @@ public class PlayerControl : MonoBehaviour {
 	public float cameraHeight;
 	public float footstepDelay;
 	public bool host = true;
+	int life = 100;
 
 	public AudioSource footstepAudio;
 
@@ -30,7 +33,6 @@ public class PlayerControl : MonoBehaviour {
 		camera = Camera.main.transform;
 		gunHolder = transform.Find("GunHolder");
 		host = WsEvents.host;
-		print("Host : " + host);
 		if (host) {
 			gameObject.transform.position = GameObject.Find("PLAYER_1").transform.position;
 			foreach (var item in GameObject.FindGameObjectsWithTag("spawner")) {
@@ -69,6 +71,12 @@ public class PlayerControl : MonoBehaviour {
 		}
 
 
+	}
+
+	public void TakeDamages(int dmg) {
+		life -= dmg;
+		if (life < 0) SceneManager.LoadScene("Lobby");
+		print("You took " + dmg + " dmg");
 	}
 
 	// Update is called once per frame

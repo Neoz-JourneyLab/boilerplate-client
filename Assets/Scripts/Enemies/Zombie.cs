@@ -4,16 +4,25 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.UI;
 
 public class Zombie : MonoBehaviour {
 	NavMeshAgent agent;
 	DateTime start = DateTime.UtcNow;
 	internal string id = Guid.NewGuid().ToString();
 	int life = 100;
-
+	int damages = 1;
+	float hitRate = 0.5f;
+	GameObject player;
+	Image blood;
 	private void Awake() {
+		blood = GameObject.Find("BloodTexture").GetComponent<Image>();
+		player = GameObject.FindGameObjectWithTag("Player");
 		name = id;
 		agent = GetComponent<NavMeshAgent>();
+		life = (int) Math.Pow((DateTime.UtcNow - start).TotalSeconds, 0.5f) + 100;
+		damages = 5 + (int)Math.Pow((DateTime.UtcNow - start).TotalSeconds, 0.4f);
+		InvokeRepeating(nameof(DoDamages), UnityEngine.Random.Range(0f, 2f), 1/hitRate);
 		if (!GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerControl>().host) return;
 		InvokeRepeating(nameof(SetPos), 1, 1);
 	}
@@ -24,7 +33,7 @@ public class Zombie : MonoBehaviour {
 	void SetPos() {
 		if (life <= 0) return;
 		List<GameObject> others = GameObject.FindGameObjectsWithTag("OtherPlayer").ToList();
-		others.Add(GameObject.FindGameObjectWithTag("Player"));
+		others.Add(player);
 
 		Transform target = others.OrderBy(o => Vector3.Distance(o.transform.position, transform.position)).First().transform;
 
@@ -38,15 +47,22 @@ public class Zombie : MonoBehaviour {
 			agent.speed,
 			zid = id
 		});
-		DoDamages();
 	}
 
 	public void DoDamages() {
-		GameObject[] players = GameObject.FindGameObjectsWithTag("OtherPlayer").Append(GameObject.FindGameObjectWithTag("Player")).ToArray();
-		foreach (var player in players) {
-			//print(player.name + " : " + Vector3.Distance(player.transform.position, this.transform.position));
-		}		
-		//damages < 2.5
+		if (Vector3.Distance(player.transform.position, this.transform.position) < 3.5f) {
+			player.GetComponent<PlayerControl>().TakeDamages(damages);
+			StartCoroutine(nameof(DamagesAnim));
+			FindObjectOfType<AudioManager>().Play("zombie-hit-" + UnityEngine.Random.Range(0, 2));
+		}
+	}
+
+	IEnumerator DamagesAnim() {
+		blood.color = new Color(1, 1, 1, 1);
+		while(blood.color.a > 0) {
+			blood.color = new Color(1, 1, 1, blood.color.a - 0.01f);
+			yield return new WaitForSeconds(0.01f);
+		}
 	}
 
 	public void TakeDamages(int dmg) {

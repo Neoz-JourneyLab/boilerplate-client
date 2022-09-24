@@ -44,7 +44,6 @@ public class uWebSocketManager : MonoBehaviour {
 	/// Ajoute tous les listeners pour les events émis par le serveur
 	/// </summary>
 	public void InitSocket(string uri) {
-		print("Connect on " + uri + "...");
 		ws = new WebSocket(uri);
 		ws.OnOpen += (sender, e) => {
 		};

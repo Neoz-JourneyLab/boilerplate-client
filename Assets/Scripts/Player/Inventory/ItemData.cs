@@ -11,7 +11,6 @@ public class ItemData {
 	public string category = "";
 	public string alias = "";
 	public int maxStack = 1;
-	public int initialQuantity = 1;
 	public bool equipable = false;
 	public Sprite icon;
 
@@ -25,5 +24,5 @@ public enum ItemCategory {
 }
 
 public enum ItemAlias {
-	pamas
+	pamas, pistolAmmo,
 }
