@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [CreateAssetMenu]
-public class ItemData {
+public class itemModel {
 	public string id = "";
 	public int width = 1;
 	public int height = 1;
@@ -11,7 +11,6 @@ public class ItemData {
 	public string category = "";
 	public string alias = "";
 	public int maxStack = 1;
-	public int initialQuantity = 1;
 	public bool equipable = false;
 	public Sprite icon;
 

@@ -9,23 +9,23 @@ using UnityEngine.UI;
  * Contient les données propres aux objets a leur creation.
  */
 public class InventoryItem {
-	public ItemData itemData;
+	public itemModel itemModel;
 	public int quantity;
 	public WeaponData weaponData = null;
 	public GameObject prefab = null;
 	public int HEIGHT {
 		get {
 			if (!rotated)
-				return itemData.height;
-			return itemData.width;
+				return itemModel.height;
+			return itemModel.width;
 		}
 	}
 
 	public int WIDTH {
 		get {
 			if (!rotated)
-				return itemData.width;
-			return itemData.height;
+				return itemModel.width;
+			return itemModel.height;
 		}
 	}
 
@@ -41,7 +41,7 @@ public class InventoryItem {
 		prefab = itemPrefab;
 
 		quantityText = prefab.GetComponentInChildren<TextMeshProUGUI>();
-		prefab.GetComponent<Image>().sprite = itemData.icon;
+		prefab.GetComponent<Image>().sprite = itemModel.icon;
 
 		Vector2 size = new Vector2();
 		size.x = WIDTH * ItemGrid.tileSizeWidth;
@@ -50,7 +50,7 @@ public class InventoryItem {
 		prefab.GetComponent<RectTransform>().sizeDelta = size;
 		rt = prefab.GetComponent<RectTransform>();
 
-		if (itemData.category == ItemCategory.weapon.ToString())
+		if (itemModel.category == ItemCategory.weapon.ToString())
 			weaponData = new WeaponData(0);
 
 		prefab.transform.localScale = Vector3.one;

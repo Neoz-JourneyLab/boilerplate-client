@@ -103,14 +103,14 @@ public class ItemGrid : MonoBehaviour {
 	 */
    private InventoryItem CheckOverlapQuantity(InventoryItem item, ref InventoryItem overlapItem) {
       // On regarde toutes les conditions qui rendent le stack impossible
-      if (item.itemData.category != overlapItem.itemData.category) // meme item
+      if (item.itemModel.category != overlapItem.itemModel.category) // meme item
          return null;
-      if (overlapItem.itemData.maxStack <= 1) // pas stackable
+      if (overlapItem.itemModel.maxStack <= 1) // pas stackable
          return null;
-      if (overlapItem.quantity == overlapItem.itemData.maxStack) // trop plein
+      if (overlapItem.quantity == overlapItem.itemModel.maxStack) // trop plein
          return null;
 
-      ItemData oldata = overlapItem.itemData;
+      itemModel oldata = overlapItem.itemModel;
 
       overlapItem.quantity += item.quantity;
 
@@ -252,7 +252,7 @@ public class ItemGrid : MonoBehaviour {
       for (int i = 0; i < gridSizeWidth; i++) {
          for (int j = 0; j < gridSizeHeight; j++) {
             if (inventoryItemSlot[i, j] != null)
-               toPrint += ("[" + i + "," + j + "] = " + inventoryItemSlot[i, j].itemData.category + ".");
+               toPrint += ("[" + i + "," + j + "] = " + inventoryItemSlot[i, j].itemModel.category + ".");
          }
          toPrint += "\n";
       }
@@ -264,6 +264,7 @@ public class ItemGrid : MonoBehaviour {
 	 * Donnes les coordonées pour placer un objet dans l'inventaire
 	 */
    internal Vector2Int? FindSpaceForObject(InventoryItem item) {
+      print("width " + item.WIDTH + " " + gridSizeWidth);
       int width = gridSizeWidth - (item.WIDTH - 1);
       int height = gridSizeHeight - (item.HEIGHT - 1);
       for (int i = 0; i < width; i++) {

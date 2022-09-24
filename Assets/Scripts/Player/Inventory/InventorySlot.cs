@@ -36,7 +36,7 @@ public class InventorySlot : MonoBehaviour, IPointerEnterHandler, IPointerExitHa
       pos.x += itemToEquip.WIDTH * ItemGrid.tileSizeWidth / 2;
       pos.y -= itemToEquip.HEIGHT * ItemGrid.tileSizeHeight / 2;
 
-      if (itemToEquip.itemData.category == ItemCategory.weapon.ToString())
+      if (itemToEquip.itemModel.category == ItemCategory.weapon.ToString())
          gc.EquipGun(pamas, itemToEquip.weaponData.currentAmmo);
 
       itemInSlot = itemToEquip;
