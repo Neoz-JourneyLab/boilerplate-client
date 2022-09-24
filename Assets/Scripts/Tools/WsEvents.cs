@@ -27,6 +27,18 @@ public class WsEvents : MonoBehaviour {
 	#endregion
 
 	#region listeners
+	public static void PlayerItems(string json) {
+		List<InventoryItem> items = JsonConvert.DeserializeObject<List<InventoryItem>>(json);
+		var inventory = GameObject.FindGameObjectWithTag("Player").GetComponent<InventoryController>().inventoryItems;
+		inventory.Clear();
+		foreach (var item in items) {
+			inventory.Add(
+				new InventoryItem() {
+					quantity = item.quantity,
+				});
+		}
+	}
+
 	public static void SeedsItems(string json) {
 		List<ItemData> items = JsonConvert.DeserializeObject<List<ItemData>>(json);
 		foreach (var item in items) {

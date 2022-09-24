@@ -23,6 +23,7 @@ public class uWebSocketManager : MonoBehaviour {
 		{ "joined:game", WsEvents.JoinedGame},
 		{ "change:state", WsEvents.ChangeState},
 		{ "seeds:items", WsEvents.SeedsItems},
+		{ "player:items", WsEvents.PlayerItems},
 	};
 	public static string socketId;
 	public WebSocket ws;
