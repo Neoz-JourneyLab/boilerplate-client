@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class Exit : MonoBehaviour {
-	List<string> playersHits = new List<string>();
+	public List<string> playersHits = new List<string>();
 	private void OnTriggerEnter(Collider other) {
 		if (other.tag != "Player" && other.tag != "OtherPlayer") return;
 		if (other.tag == "Player" && !playersHits.Contains(uWebSocketManager.socketId)) playersHits.Add(uWebSocketManager.socketId);

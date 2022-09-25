@@ -76,7 +76,6 @@ public class PlayerControl : MonoBehaviour {
 	public void TakeDamages(int dmg) {
 		life -= dmg;
 		if (life < 0) SceneManager.LoadScene("Lobby");
-		print("You took " + dmg + " dmg");
 	}
 
 	// Update is called once per frame
