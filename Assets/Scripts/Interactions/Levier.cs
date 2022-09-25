@@ -29,13 +29,17 @@ public class Levier : MonoBehaviour {
 			StartCoroutine(nameof(CloseDor));
 			StopCoroutine(nameof(OpenDor));
 		}
-		interactionText.text = closed ? "Activer" : "Désactiver";
+		if (inRange) {
+			interactionText.text = closed ? "Activer" : "Désactiver";
+		}
 	}
 
 	private void OnTriggerExit(Collider other) {
 		if (other.tag != "Player") return;
-		interactionText.text = "";
-		inRange = false;
+		if (inRange) {
+			interactionText.text = "";
+			inRange = false;
+		}
 	}
 
 	IEnumerator CloseDor() {

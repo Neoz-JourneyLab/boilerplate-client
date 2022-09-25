@@ -134,6 +134,7 @@ GameObject:
   - component: {fileID: 205660750}
   - component: {fileID: 205660752}
   - component: {fileID: 205660753}
+  - component: {fileID: 205660754}
   m_Layer: 0
   m_Name: AppManager
   m_TagString: AppManager
@@ -181,6 +182,22 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   uri: 0.tcp.eu.ngrok.io:19114
+--- !u!114 &205660754
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 205660748}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 326a72f7de5347449aa327c9d5677060, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  clips:
+  - {fileID: 8300000, guid: 47bdeb09af5ccf24894febfa80e51015, type: 3}
+  - {fileID: 8300000, guid: cd55ae0f616f0c740a0226f6ff375fec, type: 3}
+  - {fileID: 8300000, guid: c64c22922d97a6047b9a80b7d4b84066, type: 3}
 --- !u!1 &1082627392
 GameObject:
   m_ObjectHideFlags: 0
