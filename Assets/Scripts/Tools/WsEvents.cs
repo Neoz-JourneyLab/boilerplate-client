@@ -113,7 +113,7 @@ public class WsEvents : MonoBehaviour {
 		PlayerPos pos = JsonConvert.DeserializeObject<PlayerPos>(json);
 		if (pos.id == uWebSocketManager.socketId) return;
 		if (!otherPlayersLights.ContainsKey(pos.id)) {
-			otherPlayersLights.Add(pos.id,
+			otherPlayersLights.Add(pos.id,	
 				 GameObject.Find(pos.id).transform.Find("GunControl").transform.Find("Pistol").transform.Find("Flashlight").GetComponent<Light>()
 			);
 		}
