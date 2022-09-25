@@ -36,7 +36,7 @@ public class Collectible : MonoBehaviour {
          item.onGridPosY = (int)itemPlace.Value.y;
          FindObjectOfType<InventoryController>().playerItems.Add(item);
          uWebSocketManager.EmitEv("item:amount", new { quantity = item.quantity, model = model.id, x = (int) itemPlace.Value.x, y = (int) itemPlace.Value.y });
-         //Destroy(transform.parent.gameObject);
+         Destroy(transform.parent.gameObject);
       }
    }
 }
