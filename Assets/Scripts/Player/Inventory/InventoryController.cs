@@ -18,9 +18,8 @@ public class InventoryController : MonoBehaviour {
    public List<InventoryItem> playerItems = new List<InventoryItem>();
 
    public GameObject inventoryHolder;
-   public GameObject inventory;
-   public GameObject obstruction;
 
+   [HideInInspector]
    public InventorySlot selectedSlot;
 
    Vector2 mousePos;
@@ -35,6 +34,7 @@ public class InventoryController : MonoBehaviour {
    [SerializeField] GameObject itemPrefab;
    [SerializeField] Transform canvasTransform;
 
+   [HideInInspector]
    public InventoryHighlight inventoryHighlight;
 
    private void Awake() {
