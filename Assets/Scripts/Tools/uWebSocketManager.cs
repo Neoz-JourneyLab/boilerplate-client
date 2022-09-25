@@ -52,7 +52,7 @@ public class uWebSocketManager : MonoBehaviour {
 			Payload payload = JsonUtility.FromJson<Payload>(e.Data.ToString());
 			if (payload.id != null && payload.id != socketId) {
 				socketId = payload.id;
-				Emit("seeds", null);
+				//Emit("seeds", null);
 			}
 			if (events.ContainsKey(payload.ev)) {
 				//routage de l'event serveur
