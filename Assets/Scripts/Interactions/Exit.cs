@@ -8,7 +8,7 @@ public class Exit : MonoBehaviour {
 	private void OnTriggerEnter(Collider other) {
 		if (other.tag != "Player" && other.tag != "OtherPlayer") return;
 		if (other.tag == "Player" && !playersHits.Contains(uWebSocketManager.socketId)) playersHits.Add(uWebSocketManager.socketId);
-		if (other.tag == "OtherPlayer" && playersHits.Contains(other.name)) playersHits.Add(other.name);
+		if (other.tag == "OtherPlayer" && !playersHits.Contains(other.name)) playersHits.Add(other.name);
 		if(playersHits.Count == 2) {
 			uWebSocketManager.EmitEv("victory", new { SceneManager.GetActiveScene().name });
 			SceneManager.LoadScene("Lobby");
