@@ -853,7 +853,7 @@ MonoBehaviour:
     m_Options:
     - m_Text: Les catacombes de Markus
       m_Image: {fileID: 0}
-    - m_Text: ???
+    - m_Text: TEST
       m_Image: {fileID: 0}
     - m_Text: ???
       m_Image: {fileID: 0}
@@ -1085,7 +1085,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: 0, y: -0.000024087009}
+  m_AnchoredPosition: {x: 0, y: 0.00092641206}
   m_SizeDelta: {x: 0, y: 300}
   m_Pivot: {x: 0, y: 1}
 --- !u!114 &523541988
@@ -1198,7 +1198,7 @@ MonoBehaviour:
   m_HandleRect: {fileID: 360210111}
   m_Direction: 2
   m_Value: 0
-  m_Size: 1
+  m_Size: 0.9999977
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:
@@ -3044,6 +3044,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 326a72f7de5347449aa327c9d5677060, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  clips: []
 --- !u!1 &1517833484
 GameObject:
   m_ObjectHideFlags: 0

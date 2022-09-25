@@ -64,34 +64,35 @@ public class ItemGrid : MonoBehaviour {
 	 * Place un objet dans la grille, renvoies un booléen (indiquant si l'objet a été placé), et un Inventory Item dans
 	 * les cas ou l'item est stacké mais que le stack maximum a été atteint
 	 */
-   public (bool, InventoryItem) PlaceItem(InventoryItem item, GameObject prefab, int x, int y, ref InventoryItem overlapItem) {
+   public (bool, InventoryItem, bool) PlaceItem(InventoryItem item, GameObject prefab, int x, int y, ref InventoryItem overlapItem) {
       // On check si l'item sortira de la grille si on le place ici, si c'est le cas, on ne fait rien
       // (donc on renvoie false)
       if (!CheckBoundaries(x, y, item.WIDTH, item.HEIGHT))
-         return (false, null);
+         return (false, null, true);
 
       // Si l'objet overlap avec plus de 2 objets, alors on n'interverti pas
       if (!OverlapCheck(x, y, item.WIDTH, item.HEIGHT, ref overlapItem)) {
          overlapItem = null;
-         return (false, null);
+         return (false, null, true);
       }
 
       bool test = false;
 
       if (overlapItem != null) {
          test = true;
-         //si on overlap mais sur un objet qui est stackable, on additionne a l'objet stacké ce qu'il faut
-         //et on garde le surplus selectionné
-         InventoryItem itemToReturn = CheckOverlapQuantity(item, ref overlapItem);
+      //si on overlap mais sur un objet qui est stackable, on additionne a l'objet stacké ce qu'il faut
+      //et on garde le surplus selectionné
+      bool needToSwap = true;
+         InventoryItem itemToReturn = CheckOverlapQuantity(item, ref overlapItem, ref needToSwap);
          if (itemToReturn != null)
-            return (true, itemToReturn);
+            return (true, itemToReturn, needToSwap);
 
          //Sinon  on clear l'item de la grille
          CleanGridRef(overlapItem);
       }
 
       // et on interverti les objets (ou place simplement)
-      return (PlaceItem(item, prefab, x, y), null);
+      return (PlaceItem(item, prefab, x, y), null, true);
    }
 
    /**
@@ -118,7 +119,7 @@ public class ItemGrid : MonoBehaviour {
    /**
 	 * La fonction sert lors du stacking d'objets, elle renvoies l'item qui restera selectionné
 	 */
-   private InventoryItem CheckOverlapQuantity(InventoryItem item, ref InventoryItem overlapItem) {
+   private InventoryItem CheckOverlapQuantity(InventoryItem item, ref InventoryItem overlapItem, ref bool needToSwap) {
       // On regarde toutes les conditions qui rendent le stack impossible
       if (item.model.category != overlapItem.model.category) // meme item
          return null;
@@ -127,20 +128,22 @@ public class ItemGrid : MonoBehaviour {
       if (overlapItem.quantity == overlapItem.model.maxStack) // trop plein
          return null;
 
-      ItemModel oldata = overlapItem.model;
+      ItemModel overlapModel = overlapItem.model;
 
       overlapItem.quantity += item.quantity;
+		uWebSocketManager.EmitEv("stack:items", new { addOnId = overlapItem.id, removeOnId = item.id });
 
-      // si on met le maximum sur le slot "overlap"
-      if (overlapItem.quantity > oldata.maxStack) {
+		// si on met le maximum sur le slot "overlap"
+		if (overlapItem.quantity > overlapModel.maxStack) {
          // On retire ce qu'on a mis a l'objet selectionné mais il reste selectionné
-         item.quantity = overlapItem.quantity - oldata.maxStack;
-         overlapItem.quantity = oldata.maxStack;
+         item.quantity = overlapItem.quantity - overlapModel.maxStack;
+         overlapItem.quantity = overlapModel.maxStack;
          overlapItem.UpdateQuantity();
          item.UpdateQuantity();
-      } else {
-         // Sinon si on a tout stacké nous n'avons plus d'objet selectionné.
-         Destroy(item.prefab.gameObject);
+		} else {
+      // Sinon si on a tout stacké nous n'avons plus d'objet selectionné.
+         needToSwap = false;
+				 Destroy(item.prefab.gameObject);
          overlapItem.UpdateQuantity();
          overlapItem = null;
       }

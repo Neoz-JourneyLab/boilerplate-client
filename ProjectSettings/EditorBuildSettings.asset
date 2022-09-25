@@ -11,4 +11,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Les catacombes de Markus.unity
     guid: b67b4d1bb3060054d8543b1923ed241d
+  - enabled: 1
+    path: Assets/Scenes/TEST.unity
+    guid: 95c12fa129abb994d806151937d847f9
   m_configObjects: {}

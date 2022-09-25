@@ -40,7 +40,7 @@ public class Lobby : MonoBehaviour {
 		game.transform.Find("GameName").GetComponent<TMP_Text>().text = name + $" ({nickname}) - {level}";
 		game.name = id;
 
-		if (nickname == PlayerPrefs.GetString("nickname")) {
+		if (nickname == PlayerPrefs.GetString("nickname") && level != "TEST") {
 			game.transform.Find("Join").transform.Find("txt").GetComponent<TMP_Text>().text = "Annuler";
 			nicknameIF.interactable = false;
 			gameIF.interactable = false;
@@ -60,7 +60,7 @@ public class Lobby : MonoBehaviour {
 	}
 
 	public void CancelOrJoin(string id) {
-		if (games.Find(g => g.id == id).nickname == nicknameIF.text) {
+		if (games.Find(g => g.id == id).nickname == nicknameIF.text && games.Find(g => g.id == id).level != "TEST") {
 			nicknameIF.interactable = true;
 			gameIF.interactable = true;
 			uWebSocketManager.EmitEv("cancel:game", new { id });
