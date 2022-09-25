@@ -112,13 +112,16 @@ public class WsEvents : MonoBehaviour {
 	public static void Plot(string json) {
 		PlayerPos pos = JsonConvert.DeserializeObject<PlayerPos>(json);
 		if (pos.id == uWebSocketManager.socketId) return;
+		PositionSender.Get().PlotOther(pos);
 		if (!otherPlayersLights.ContainsKey(pos.id)) {
-			otherPlayersLights.Add(pos.id,	
-				 GameObject.Find(pos.id).transform.Find("GunControl").transform.Find("Pistol").transform.Find("Flashlight").GetComponent<Light>()
-			);
+			GameObject prefab = GameObject.Find(pos.id);
+			GameObject gc = prefab.transform.Find("GunControl").gameObject;
+			GameObject pis = gc.transform.Find("Pistol").gameObject;
+			GameObject fl = pis.transform.Find("Flashlight").gameObject;
+			Light l = fl.GetComponent<Light>();
+			otherPlayersLights.Add(pos.id, l);
 		}
 		otherPlayersLights[pos.id].intensity = pos.flashLight;
-		PositionSender.Get().PlotOther(pos);
 	}
 
 	public static void ZombieDead(string json) {
