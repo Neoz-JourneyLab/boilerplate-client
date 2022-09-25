@@ -11,6 +11,7 @@ public class Gun : MonoBehaviour {
    public int damages;
 
    public bool automatic;
+   public ItemAlias ammoType;
    public AudioSource shootAudio;
    public AudioSource clickAudio;
    public AudioSource reloadAudio;
@@ -20,6 +21,8 @@ public class Gun : MonoBehaviour {
    public Light muzzleFlash;
 
    bool canShoot;
+
+   private int ammoToReload;
 
    float nextShot;
    // Start is called before the first frame update
@@ -35,12 +38,13 @@ public class Gun : MonoBehaviour {
    public Transform Shoot() {
       if (!canShoot)
          return null;
-      if (capacity <= 0) {
-         GameObject.FindObjectOfType<AudioManager>().PlaySound(clickAudio);
-         return null;
-      }
       if (nextShot > Time.time)
          return null;
+      if (capacity <= 0) {
+         GameObject.FindObjectOfType<AudioManager>().PlaySound(clickAudio);
+         nextShot = Time.time + fireRate;
+         return null;
+      }
 
       nextShot = Time.time + fireRate;
       capacity--;
@@ -62,6 +66,7 @@ public class Gun : MonoBehaviour {
    public void ShotAnim() {
       muzzleFlash.gameObject.SetActive(true);
       Invoke(nameof(DisableLight), 0.05f);
+      // Changer le recul
       GetComponent<Animator>().Play("shoot");
       GameObject ps = Instantiate(particles, muzzle.transform.position, muzzle.transform.rotation);
       ps.GetComponent<ParticleSystem>().Play();
@@ -72,8 +77,11 @@ public class Gun : MonoBehaviour {
       muzzleFlash.gameObject.SetActive(false);
    }
 
-   public void Reload() {
+   public void Reload(int ammo) {
+      if (ammo == 0)
+         return;
       canShoot = false;
+      ammoToReload = ammo;
       Invoke(nameof(ReloadEnd), reloadTime);
       GameObject.FindObjectOfType<AudioManager>().PlaySound(reloadAudio);
       GetComponent<Animator>().Play("reload");
@@ -81,10 +89,8 @@ public class Gun : MonoBehaviour {
 
    void ReloadEnd() {
       canShoot = true;
-      if (capacity == 0)
-         capacity = maxCapacity;
-      else
-         capacity = maxCapacity + 1;
+      capacity = ammoToReload;
+      ammoToReload = 0;
       GetComponent<Animator>().SetBool("reload", false);
       transform.parent.parent.GetComponent<GunControl>().UpdateText();
    }

@@ -29,7 +29,10 @@ public class WsEvents : MonoBehaviour {
 	#region listeners
 	class UserItem {
 		public string id;
+		public string modelId;
 		public int quantity;
+		public int x;
+		public int y;
 	}
 	public static void PlayerItems(string json) {
 		List<UserItem> items = JsonConvert.DeserializeObject<List<UserItem>>(json);
@@ -38,7 +41,11 @@ public class WsEvents : MonoBehaviour {
 		foreach (var item in items) {
 			InventoryItem itemToAdd = new InventoryItem {
 				quantity = item.quantity,
-				model = ItemCollection.GetItems().First(i => i.id == item.id)
+				model = ItemCollection.GetItems().First(i => i.id == item.modelId),
+				id = item.id,
+				onGridPosY = item.y,
+				onGridPosX = item.x,
+				inInventory = true,
 			};
 			inventory.playerItems.Add(itemToAdd);
 		}

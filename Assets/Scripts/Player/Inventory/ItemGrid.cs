@@ -19,14 +19,14 @@ public class ItemGrid : MonoBehaviour {
    [SerializeField] int gridSizeWidth;
    [SerializeField] int gridSizeHeight;
 
-   public void Start() {
+   public void Awake() {
       rt = GetComponent<RectTransform>();
       Init(gridSizeWidth, gridSizeHeight);
-
    }
 
-    DateTime refresh = DateTime.UtcNow; 
-  private void Update() {
+   DateTime refresh = DateTime.UtcNow;
+   private void Update() {
+      /*
     if (refresh > DateTime.UtcNow) return;
     refresh = DateTime.UtcNow.AddSeconds(3);
 		if (name == "PlayerInventory") {
@@ -34,12 +34,17 @@ public class ItemGrid : MonoBehaviour {
       //il faut call ça sur demande
 			GameObject.FindGameObjectWithTag("Player").GetComponent<InventoryController>().SynchroniseItems();
 		}
-	}
+      */
+   }
 
-  /**
-  * Init crée un nouvelle grille de taille width, length
-  */
-  private void Init(int width, int height) {
+   private void OnEnable() {
+
+   }
+
+   /**
+   * Init crée un nouvelle grille de taille width, length
+   */
+   private void Init(int width, int height) {
       inventoryItemSlot = new InventoryItem[width, height];
       Vector2 size = new Vector2(width * tileSizeWidth, height * tileSizeHeight);
       rt.sizeDelta = size;
@@ -71,7 +76,10 @@ public class ItemGrid : MonoBehaviour {
          return (false, null);
       }
 
+      bool test = false;
+
       if (overlapItem != null) {
+         test = true;
          //si on overlap mais sur un objet qui est stackable, on additionne a l'objet stacké ce qu'il faut
          //et on garde le surplus selectionné
          InventoryItem itemToReturn = CheckOverlapQuantity(item, ref overlapItem);
@@ -164,10 +172,14 @@ public class ItemGrid : MonoBehaviour {
 	 * Supprimes dans le tableau un item (lors d'une selection par exemple)
 	 */
    public void CleanGridRef(InventoryItem item) {
-      for (int i = 0; i < item.WIDTH; i++) {
-         for (int j = 0; j < item.HEIGHT; j++) {
-            inventoryItemSlot[item.onGridPosX + i, item.onGridPosY + j] = null;
+      try {
+         for (int i = 0; i < item.WIDTH; i++) {
+            for (int j = 0; j < item.HEIGHT; j++) {
+               inventoryItemSlot[item.onGridPosX + i, item.onGridPosY + j] = null;
+            }
          }
+      } catch (Exception e) {
+         print(e.Message);
       }
    }
 
@@ -273,6 +285,7 @@ public class ItemGrid : MonoBehaviour {
 	 * Donnes les coordonées pour placer un objet dans l'inventaire
 	 */
    internal Vector2Int? FindSpaceForObject(InventoryItem item) {
+      // null reference exception pourquoi ?
       int width = gridSizeWidth - (item.WIDTH - 1);
       int height = gridSizeHeight - (item.HEIGHT - 1);
       for (int i = 0; i < width; i++) {
