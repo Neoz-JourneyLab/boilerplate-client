@@ -11,6 +11,7 @@ public class Exit : MonoBehaviour {
 		if (other.tag == "OtherPlayer" && playersHits.Contains(other.name)) playersHits.Add(other.name);
 		if(playersHits.Count == 2) {
 			uWebSocketManager.EmitEv("victory", new { SceneManager.GetActiveScene().name });
+			SceneManager.LoadScene("Lobby");
 		}
 	}
 }
