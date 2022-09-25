@@ -181,7 +181,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6edfdf301a5f51044a49cc828953ea63, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  uri: 0.tcp.eu.ngrok.io:19114
+  uri: localhost:9997
 --- !u!114 &205660754
 MonoBehaviour:
   m_ObjectHideFlags: 0
