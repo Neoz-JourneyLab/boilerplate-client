@@ -7,6 +7,7 @@ TagManager:
   - Console
   - AppManager
   - Info
+  - highlight
   layers:
   - Default
   - TransparentFX

@@ -20,4 +20,12 @@ public static class Tools {
     uwr.SetRequestHeader("Content-Type", "application/json");
     return uwr;
   }
+
+  static Dictionary<string, Sprite> sprites = new Dictionary<string, Sprite>();
+  internal static Sprite GetSprite(string uri) {
+    if (!sprites.ContainsKey(uri)) {
+      sprites.Add(uri, Resources.Load<Sprite>(uri));
+		}
+    return sprites[uri];
+  }
 }

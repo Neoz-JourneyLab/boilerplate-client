@@ -13,6 +13,7 @@ public static class ColorPalette {
 		{ Palette.darkRed, GetFromHex("8C0000") },
 		{ Palette.whatsappGray, GetFromHex("1A2329") },
 		{ Palette.gold, GetFromHex("FFE410") },
+		{ Palette.lightGreen, GetFromHex("AAFFAE") },
 	};
 
 	public static Color Get(Palette col) {
@@ -46,5 +47,6 @@ public enum Palette {
 	whatsappGreen,
 	whatsappGray,
 	darkRed,
-	gold
+	gold,
+	lightGreen
 }
