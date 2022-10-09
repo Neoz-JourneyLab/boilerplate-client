@@ -7,13 +7,14 @@ public static class ColorPalette {
 	private static readonly Dictionary<Palette, Color> palette = new Dictionary<Palette, Color>()
 	{
 		{ Palette.paleBlue, GetFromHex("BFE2FF") },
-		{ Palette.red, GetFromHex("D41D1D") },
+		{ Palette.unit_red, GetFromHex("D41D1D") },
 		{ Palette.lime, GetFromHex("7eff25") },
 		{ Palette.whatsappGreen, GetFromHex("004A3C") },
 		{ Palette.darkRed, GetFromHex("8C0000") },
 		{ Palette.whatsappGray, GetFromHex("1A2329") },
 		{ Palette.gold, GetFromHex("FFE410") },
 		{ Palette.lightGreen, GetFromHex("AAFFAE") },
+		{ Palette.unit_blue, GetFromHex("4ACDF9") },
 	};
 
 	public static Color Get(Palette col) {
@@ -42,11 +43,12 @@ public static class ColorPalette {
 }
 public enum Palette {
 	paleBlue,
-	red,
+	unit_red,
 	lime,
 	whatsappGreen,
 	whatsappGray,
 	darkRed,
 	gold,
-	lightGreen
+	lightGreen,
+	unit_blue
 }
