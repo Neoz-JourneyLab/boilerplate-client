@@ -7,9 +7,30 @@ using System.Text;
 using UnityEngine;
 
 public static class Crypto {
-  public static string Hash(string txt) => Convert.ToBase64String(new SHA256Managed().ComputeHash(Encoding.UTF8.GetBytes(txt)));
+	private static readonly RandomNumberGenerator csp = RandomNumberGenerator.Create();
 
-  public static string Encrypt(string info, string pass = "", int minLen = 16) {
+	public static byte[] Hash(byte[] data) {
+		var hashed = SHA256.Create().ComputeHash(data);
+		return hashed;
+	}
+	public static byte[] GenerateRandomHash() {
+		var hash = new byte[32];
+		csp.GetBytes(hash);
+		hash = Hash(hash);
+		return hash;
+	}
+	public static byte[] KDF(byte[] init, byte[] salt, int clicks) {
+		clicks = (clicks * 184) % 1953125;
+
+		int keyLength = 256;
+
+		var kdf = new Rfc2898DeriveBytes(init, salt, clicks);
+		byte[] key = kdf.GetBytes(keyLength / 8);
+
+		return key;
+	}
+
+	public static string Encrypt(string info, string pass = "", int minLen = 16) {
     info = info.Length + "___" + info;
     while (info.Length < minLen) {
       info += Guid.NewGuid();

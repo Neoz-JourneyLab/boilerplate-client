@@ -14,25 +14,32 @@ using static MainClass;
 
 public class TestHttp : MonoBehaviour {
   public void Post() {
-    StartCoroutine(TestPost("/test", CreateDic(new List<string>() { "test", "test" })));
+    StartCoroutine(TestPost("/server:status", new Dictionary<string, string>()));
   }
 
-  static IEnumerator TestPost(string route, IReadOnlyDictionary<string, string> data) {
+  private void Start() {
+    Post();
+  }
+  
+  static IEnumerator TestPost(string route, Dictionary<string, string> data) {
     UnityWebRequest uwr = GetUwr(route, data);
     yield return uwr.SendWebRequest();
 
     if (uwr.responseCode != 200) {
-      console.Prompt($"Error during {route} : " + uwr.error, Color.red);
       yield break;
     }
 
-    console.Prompt("Réponse du serveur http : " + uwr.downloadHandler.text);
     Response res = JsonConvert.DeserializeObject<Response>(uwr.downloadHandler.text);
-    console.Prompt("Variable test : " + res.test);
+
+    if(res.status == "online") {
+      GameObject.FindGameObjectWithTag("AppManager").GetComponent<uWebSocketManager>().Initialisation();
+    }
   }
 }
 
 [Serializable]
 class Response {
-  public string test;
+  public string status;
+  public string client_version;
+  public string version;
 }

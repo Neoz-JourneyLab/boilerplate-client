@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Net;
 using Newtonsoft.Json;
 using TMPro;
+using UnityEditor.Build.Content;
 using UnityEngine;
 using UnityEngine.UI;
 using WebSocket = WebSocketSharp.WebSocket;
@@ -13,12 +14,15 @@ public class uWebSocketManager : MonoBehaviour {
 	Dictionary<string, EventDelegation> events = new() {
 		{ "pong", WsEvents.Pong },
 		{ "new:message", WsEvents.NewMessage },
+		{ "auth:response", WsEvents.AuthOK },
+		{ "auth:error", WsEvents.AuthError },
+		{ "user:info", WsEvents.UserInfos },
 	};
 	[SerializeField] string socketId;
 	public WebSocket ws;
-	[SerializeField] GameObject serverStatus;
+	bool first = true;
 
-	private void Start() {
+	public void Initialisation() {
 		InvokeRepeating(nameof(Ping), 1, 1);
 		InitSocket("ws://localhost:9997/");
 	}
@@ -35,11 +39,19 @@ public class uWebSocketManager : MonoBehaviour {
 			Payload payload = JsonUtility.FromJson<Payload>(e.Data.ToString());
 			if (payload.id != null && payload.id != socketId) {
 				socketId = payload.id;
+				if (first) {
+					UnityMainThread.wkr.AddJob(() => {
+						GameObject.Find("Nick IF").GetComponent<TMP_InputField>().interactable = true;
+						GameObject.Find("Pass IF").GetComponent<TMP_InputField>().interactable = true;
+						GameObject.Find("Log In").GetComponent<Button>().interactable = true;
+						GameObject.Find("Canvas").GetComponent<MainClass>().Auth();
+					});
+					first = false;
+				}
 				//Debug.Log("Socket ID " + socketId);
 			}
-			if (events.ContainsKey(payload.ev)) {
-				//routage de l'event serveur
-			}
+			if (!events.ContainsKey(payload.ev)) return;
+			//routage de l'event serveur
 			UnityMainThread.wkr.AddJob(() => { events[payload.ev](payload.data); });
 		};
 		ws.OnClose += (sender, e) => {
@@ -84,7 +96,7 @@ public class uWebSocketManager : MonoBehaviour {
 	}
 
 	public static void EmitEv(string ev, object data = null) {
-		GameObject.Find("AppManager").GetComponent<uWebSocketManager>().Emit(ev, data);
+		GameObject.FindGameObjectWithTag("AppManager").GetComponent<uWebSocketManager>().Emit(ev, data);
 	}
 
 	public void Close(string reason) {
