@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -30,54 +31,72 @@ public static class Crypto {
 		return key;
 	}
 
-	public static string Encrypt(string info, string pass = "", int minLen = 16) {
-    info = info.Length + "___" + info;
-    while (info.Length < minLen) {
-      info += Guid.NewGuid();
-    }
+	public static byte[] EncryptAES(string plainText, byte[] Key, byte[] IV) {
+		byte[] encrypted;
+		if (IV.Length == 32) {
+			IV = IV.Skip(16).ToArray();
+		}
+		// Create a new AesManaged.
+		using (Aes aes = Aes.Create()) {
+			// Create encryptor
+			ICryptoTransform encryptor = aes.CreateEncryptor(Key, IV);
+			// Create MemoryStream
+			using MemoryStream ms = new MemoryStream();
+			// Create crypto stream using the CryptoStream class. This class is the key to encryption
+			// and encrypts and decrypts data from any given stream. In this case, we will pass a memory stream
+			// to encrypt
+			using CryptoStream cs = new CryptoStream(ms, encryptor, CryptoStreamMode.Write);
+			// Create StreamWriter and write data to a stream
+			using (StreamWriter sw = new StreamWriter(cs))
+				sw.Write(plainText);
+			encrypted = ms.ToArray();
+		}
+		// Return encrypted data
+		return encrypted;
+	}
+	public static string DecryptAES(byte[] cipherText, byte[] Key, byte[] IV) {
+		string plaintext = "cannot decrypt";
+		if (IV.Length == 32) {
+			IV = IV.Skip(16).ToArray();
+		}
+		// Create AesManaged
+		using (Aes aes = Aes.Create()) {
+			// Create a decryptor
+			ICryptoTransform decryptor = aes.CreateDecryptor(Key, IV);
+			// Create the streams used for decryption.
+			using MemoryStream ms = new MemoryStream(cipherText);
+			// Create crypto stream
+			using CryptoStream cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Read);
+			// Read crypto stream
+			using StreamReader reader = new StreamReader(cs);
+			plaintext = reader.ReadToEnd();
+		}
+		return plaintext;
+	}
 
-    string passhash = pass != "" ? pass : PlayerPrefs.GetString("pass");
+	internal static string EncryptionRSA(string plainText, string publicKeyXml) {
+		RSACryptoServiceProvider rsa = new RSACryptoServiceProvider();
+		rsa.FromXmlString(publicKeyXml);
 
-    byte[] infoByte = Encoding.UTF8.GetBytes(info);
-    byte[] encryptedByte = new byte[infoByte.Length];
-    byte[] passByte = Encoding.UTF8.GetBytes(passhash);
-    for (int i = 0; i < infoByte.Length; i++) {
-      encryptedByte[i] = (byte)(infoByte[i] ^ passByte[i % passByte.Length]);
-    }
+		byte[] dataToEncrypt = Encoding.UTF8.GetBytes(plainText);
+		byte[] encryptedData = rsa.Encrypt(dataToEncrypt, true);
+		return Convert.ToBase64String(encryptedData);
+	}
 
-    return Convert.ToBase64String(encryptedByte);
-  }
+	internal static string DecryptionRSA(string encryptedData, string privateKeyXml) {
+		RSACryptoServiceProvider rsa = new RSACryptoServiceProvider();
+		rsa.FromXmlString(privateKeyXml);
 
-  internal static string Decrypt(string info, string pass = "") {
-    string passhash = pass != "" ? pass : PlayerPrefs.GetString("pass");
+		byte[] dataToDecrypt = Convert.FromBase64String(encryptedData);
+		byte[] decryptedData = rsa.Decrypt(dataToDecrypt, true);
+		return Encoding.UTF8.GetString(decryptedData);
+	}
 
-    byte[] infoByte = Convert.FromBase64String(info);
-    byte[] decryptedByte = new byte[infoByte.Length];
-    byte[] passByte = Encoding.UTF8.GetBytes(passhash);
-    for (int i = 0; i < infoByte.Length; i++) {
-      decryptedByte[i] = (byte)(infoByte[i] ^ passByte[i % passByte.Length]);
-    }
+	public static string Simplfy_XML_RSA(string xml) {
+		return xml.Replace("<RSAKeyValue><Modulus>", "").Replace("</Modulus><Exponent>AQAB</Exponent></RSAKeyValue>", "");
+	}
 
-    string decrypt = Encoding.UTF8.GetString(decryptedByte);
-    int len = int.Parse(decrypt.Split(new[] { "___" }, StringSplitOptions.RemoveEmptyEntries).First());
-    return decrypt.Split(new[] { "___" }, StringSplitOptions.RemoveEmptyEntries).Last().Substring(0, len);
-  }
-  
-  internal static string EncryptionRSA(string plainText, string publicKeyXml) {
-    RSACryptoServiceProvider rsa = new RSACryptoServiceProvider();
-    rsa.FromXmlString(publicKeyXml);
-
-    byte[] dataToEncrypt = Encoding.UTF8.GetBytes(plainText);
-    byte[] encryptedData = rsa.Encrypt(dataToEncrypt, true);
-    return Convert.ToBase64String(encryptedData);
-  }
-
-  internal static string DecryptionRSA(string encryptedData, string privateKeyXml) {
-    RSACryptoServiceProvider rsa = new RSACryptoServiceProvider();
-    rsa.FromXmlString(privateKeyXml);
-
-    byte[] dataToDecrypt = Convert.FromBase64String(encryptedData);
-    byte[] decryptedData = rsa.Decrypt(dataToDecrypt, true);
-    return Encoding.UTF8.GetString(decryptedData);
-  }
+	public static string Regen_XML_RSA(string xml) {
+		return "<RSAKeyValue><Modulus>" + xml + "</Modulus><Exponent>AQAB</Exponent></RSAKeyValue>";
+	}
 }

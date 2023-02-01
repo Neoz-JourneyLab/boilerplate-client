@@ -19,20 +19,22 @@ public class MainClass : MonoBehaviour {
 
 	[SerializeField] TMP_Text console;
 
+	public string debug = "Boby";
+
 	private void Awake() {
 		authGroup.SetActive(true);
 	}
 
 	void Start() {
 		Application.targetFrameRate = 90;
-		nickname_IF.text = "Boby";
+		nickname_IF.text = debug;
 		password_IF.text = "AZErty";
 	}
 
 	public void Auth() {
 		User.nickname = nickname_IF.text;
 		User.InitPrivateKey();
-		uWebSocketManager.EmitEv("auth", new { nickname = nickname_IF.text, password = password_IF.text, public_rsa = User.GetDefaultPublicKey() });
+		uWebSocketManager.EmitEv("auth", new { nickname = nickname_IF.text, password = password_IF.text, public_rsa = Crypto.Simplfy_XML_RSA(User.GetDefaultPublicKey()) });
 	}
 
 	public void AddContactToList(string name, string id) {

@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Net;
 using Newtonsoft.Json;
 using TMPro;
-using UnityEditor.Build.Content;
 using UnityEngine;
 using UnityEngine.UI;
 using WebSocket = WebSocketSharp.WebSocket;
@@ -11,7 +9,7 @@ using WebSocket = WebSocketSharp.WebSocket;
 // ReSharper disable once InconsistentNaming
 public class uWebSocketManager : MonoBehaviour {
 	delegate void EventDelegation(string e);
-	Dictionary<string, EventDelegation> events = new() {
+	Dictionary<string, EventDelegation> events = new Dictionary<string, EventDelegation>() {
 		{ "pong", WsEvents.Pong },
 		{ "new:message", WsEvents.NewMessage },
 		{ "auth:response", WsEvents.AuthOK },

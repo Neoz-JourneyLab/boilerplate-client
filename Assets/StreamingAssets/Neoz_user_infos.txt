@@ -1,0 +1,24 @@
+{
+  "e52a3456-9396-413e-b315-ec35a1567292": {
+    "nickname": "Boby",
+    "id": "e52a3456-9396-413e-b315-ec35a1567292",
+    "default_public_rsa": "j0so80C8aO+OXgMko9k43QvhwkkE4zUVyCit05NU6hX6lyfkIBwVPKaEcPx+arf52ZtiEZwJe4rv0kex5J2xVvwTdqg3vEEVxm6rqIydpf/+KZqCeZ/4Uuay4TrYZPWMnAVwBcLR4o6Dl84cbsmg0AbZzKjWmEPIymtG424zQhE=",
+    "isInit": true,
+    "sending_ratchet": {
+      "valitidy": "2023-02-01T02:57:02",
+      "index": 1,
+      "rsa_public": "qQHftiYvpKF1M7bqgq7BwJ9LJSftQ0b3wlc8i7o1BkDeczXQdyiZ8/oCvJjTPCFfdhD3usnKba+98T6TRzue+vabZVtXOkqgc8aIBFUPMXdrQDqU/JICqqn4SxJ0LUjzaN1XS8HE4miMBwb8+DSLuu02NBB6xm2XlHF117Mn6Kc=",
+      "WARNING__rsa_private": "ukn",
+      "root": "uKLeiA3l9H9DokpmyD7zfEKdnzKZzZnmEsN4RfgcqBY=",
+      "salt": "SoL4N9Yp0bunich9iwFCB5ONr4kcimdfC0t6+i9PJoc="
+    },
+    "receiving_ratchet": {
+      "valitidy": "2023-02-01T02:57:02",
+      "index": 1,
+      "rsa_public": "<RSAKeyValue><Modulus>yG1C2bxgZjUBIOXv+P62B8PJ46AoCQPl/xFx51e50kg7C+bP4QPJg81U/UsRzrVkKFqfo2Qqr622wEE8vlZWXCGoXubmmW614hHufuo2SNTF6Ut69fHf1e+vbwOrwKhQuF8iW2oWqIHXyZ+E+CnYK/TN6fiCiPKurBSgRkPYc40=</Modulus><Exponent>AQAB</Exponent></RSAKeyValue>",
+      "WARNING__rsa_private": "<RSAKeyValue><Modulus>yG1C2bxgZjUBIOXv+P62B8PJ46AoCQPl/xFx51e50kg7C+bP4QPJg81U/UsRzrVkKFqfo2Qqr622wEE8vlZWXCGoXubmmW614hHufuo2SNTF6Ut69fHf1e+vbwOrwKhQuF8iW2oWqIHXyZ+E+CnYK/TN6fiCiPKurBSgRkPYc40=</Modulus><Exponent>AQAB</Exponent><P>y5yMnyryTRLuEQ90d1xQGc/4MhmWzQAPEE00lryN2MoZA2XcnmhGr7knwLmFwwVEK60Awn0Nanwh5ULYAjIUQQ==</P><Q>+/7w9alYGmUWOB9MSYmoT7TQXX5h6LFIjn9mvqkHgJf6BeKAuXBGPilrjgPNXWsTGjEYJ0gqSjEEL+zSt0FcTQ==</Q><DP>pUeUAtRq0dPO+nxQL1/5Car/LzQEbK5ii/oP+Vhf0J3lBhQWrWO6FYS4V0KB6VgKCWYrGrVGQa04GpFTJR0fwQ==</DP><DQ>PFJiy+uls2vPTc/wKwpQyAO4fSjrtw/5FmNY7Pr5WMcIirAVsE44AllX7b7rQhmHkRV/eqfDt87T+cTvC/8RYQ==</DQ><InverseQ>Bw8b7I9J4iS4HLQ+YdBU//VMzQIekWSgGZUOEbx6ZfrHIQIOCGZAeKSJlQZtTpqBAZG3IlRFgWhNjyFmDIbE0g==</InverseQ><D>VPd02qdwWoPn6ZFw7SbV9m66/MOdlUzQyRQVLJTVEt9KIN6FjAe1+ykl+YdEklP1lOHuQS8qpXVIPzKo1Kv3SbBZO4A2gMg6IvaCytPq11zQrFbagK5tq2EQ99oupxd8Nh0yH/KN39UWpCMUr9NP8CsFQaQ0/+cAcFT84QOHlQE=</D></RSAKeyValue>",
+      "root": "0TptN9kP9czUPIV3Lygv9kftUGRj2Ed4V14ooQW/mvE=",
+      "salt": "ljb8mdX5+/IDTgpKB3Z/Sla5GplMlBP5yNIES83LCWo="
+    }
+  }
+}
