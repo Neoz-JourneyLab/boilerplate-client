@@ -1,0 +1,77 @@
+[
+  {
+    "alias": "copy to clipboard",
+    "en": "copy to clipboard",
+    "fr": "copier dans le presse papier"
+  },
+  {
+    "alias": "min_req_log",
+    "en": "At least #X chars for username and #Y for the password.",
+    "fr": "Au moins #X caractères pour le pseudo, et #Y pour le mot de passe"
+  },
+  {
+    "alias": "Add",
+    "en": "Add",
+    "fr": "+"
+  },
+  {
+    "alias": "Add new user...",
+    "en": "Add new user...",
+    "fr": "Ajouter un contact"
+  },
+  {
+    "alias": "Connecting to server...",
+    "en": "Connecting to server...",
+    "fr": "Connexion au serveur..."
+  },
+  {
+    "alias": "Password",
+    "en": "Password",
+    "fr": "Mot de passe"
+  },
+  {
+    "alias": "Nickname",
+    "en": "Nickname",
+    "fr": "Nom d'utilisateur"
+  },
+  {
+    "alias": "Memorize nick",
+    "en": "Memorize nick",
+    "fr": "Mémoriser le nom"
+  },
+  {
+    "alias": "Memorize pass",
+    "en": "Memorize pass",
+    "fr": "Mémoriser le mot de passe"
+  },
+  {
+    "alias": "Log In",
+    "en": "Log In",
+    "fr": "Connexion"
+  },
+  {
+    "alias": "server",
+    "en": "server",
+    "fr": "serveur"
+  },
+  {
+    "alias": "SHARE_INFO",
+    "en": "SHARE THIS WITH YOUR CONTACT<br>TO BE SURE THAT YOU USE THE GOOD KEY<br><#FF0000>IF NOT THE SAME, THERE IS A BUG<br>OR A MAN IN THE MIDDLE ATTACK AND NOTHING IS SAFE !<br>",
+    "fr": "PARTAGEZ CELA AVEC VOTRE CONTACT<br>POUR ÊTRE SÛR D'UTILISER LA BONNE CLÉ<br><#FF0000>SI CE N'EST PAS LA MÊME, IL Y A UN BUG<br>OU UNE ATTAQUE DE L'HOMME DU MILIEU ET RIEN N'EST SÛR !<br>"
+  },
+  {
+    "alias": "RECIEVE_INFO",
+    "en": "<br><#00FFFF><u>YOU WILL RECIEVE NEXT RATCHET INFO WITH YOUR KEY :</u><br><br>",
+    "fr": "<br><#00FFFF><u>VOUS RECEVREZ LE PROCHAIN RATCHET D'INFO AVEC VOTRE CLE :</u><br><br>"
+  },
+    {
+    "alias": "SEND_INFO",
+    "en": "<br><#FFFF00><u>YOU WILL SEND NEXT RATCHET INFO ON HIS KEY :</u><br><br>",
+    "fr": "<br><#FFFF00><u>VOUS ENVERREZ LE PROCHAIN RATCHET D'INFO SUR SA CLE :</u><br><br>"
+  },
+  {
+    "alias": "Send",
+    "en": "Send",
+    "fr": "Envoyer"
+  }
+]

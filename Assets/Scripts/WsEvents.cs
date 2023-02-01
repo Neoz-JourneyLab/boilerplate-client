@@ -6,6 +6,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 using WebSocketSharp;
 using static Tools;
 
@@ -18,7 +19,7 @@ public class WsEvents : MonoBehaviour {
 
 	static int latency;
 	public static readonly Dictionary<string, DateTime> pings = new Dictionary<string, DateTime>();
-	static TMP_Text serverStatus;
+	public static TMP_Text serverStatus;
 	static readonly MessageManager MM = GameObject.Find("Canvas").GetComponent<MessageManager>();
 
 	#endregion
@@ -34,8 +35,9 @@ public class WsEvents : MonoBehaviour {
 		if (serverStatus == null) {
 			serverStatus = GameObject.Find("server infos").GetComponent<TMP_Text>();
 		}
-		serverStatus.color = ColorPalette.Get(Palette.paleBlue);
-		serverStatus.text = $"server : {GetDateFromStr(serverTime).ToShortDateString() + " " + GetDateFromStr(serverTime).ToLongTimeString()}, {latency}ms";
+		float a = serverStatus.color.a;
+		serverStatus.color = ColorPalette.Get(Palette.paleBlue, a);
+		serverStatus.text = Languages.Get("server") + $" : {GetDateFromStr(serverTime).ToShortDateString() + " " + GetDateFromStr(serverTime).ToLongTimeString()} (ping {latency}ms)";
 	}
 	public static void UserInfos(string json) {
 		if (json.StartsWith("{\"err\"")) {
@@ -54,6 +56,8 @@ public class WsEvents : MonoBehaviour {
 			User.users_infos[id].default_public_rsa = foreign_rsa;
 
 			GameObject.Find("Canvas").GetComponent<MainClass>().AddContactToList(nick, id);
+			TMP_Text txt = GameObject.Find("contact_" + nick).transform.Find("nick").GetComponent<TMP_Text>();
+			txt.color = new Color(1f, .63f, 0);
 			User.SaveData("infos");
 			return;
 		}
@@ -69,11 +73,17 @@ public class WsEvents : MonoBehaviour {
 			default_public_rsa = foreign_rsa,
 			isInit = true,
 			sending_ratchet = new Ratchet().Init(Convert.ToBase64String(hash), foreign_rsa, "ukn", DateTime.UtcNow),
-			receiving_ratchet = new Ratchet().Init(Convert.ToBase64String(hash), dedicaced_rsa.ToXmlString(false), dedicaced_rsa.ToXmlString(true), DateTime.UtcNow),
+			receiving_ratchet = new Ratchet().Init(Convert.ToBase64String(hash), Crypto.Simplfy_XML_RSA(dedicaced_rsa.ToXmlString(false)), dedicaced_rsa.ToXmlString(true), DateTime.UtcNow),
 		};
 
+		MM.Focus(id);
+
+		//il faut à présent notifier l'utilisateur distant du ROOT qu'on lui a attribué.
+		//sinon, si il nous ajoute à son tour sans qu'on lui envoie un message, il nous parlera sur notre RSA par défaut
+		//c'est lors de la réception de ce message qu'on pourra être sur que la com est établie
+		MM.SendFirstMessage();
+
 		GameObject.Find("Canvas").GetComponent<MainClass>().AddContactToList(nick, id);
-		User.SaveData("infos");
 	}
 
 	public static void NewMessage(string json) {
@@ -96,6 +106,7 @@ public class WsEvents : MonoBehaviour {
 			return; //skip
 		}
 
+		//si on reçoit un message d'un user encore inconnu
 		if (!User.users_infos.ContainsKey(fgn)) {
 			User.users_infos[fgn] = new UserInfo() {
 				id = fgn,
@@ -103,6 +114,16 @@ public class WsEvents : MonoBehaviour {
 				isInit = false
 			};
 			uWebSocketManager.EmitEv("request:user:info", new { id = fgn });
+		} 
+		// si on recoit un nouveau message d'un user connu et qu'on l'a pas en focus
+		else if(m.from != User.id && MM.focus_user_id != m.from && m.distributed == false) {
+			TMP_Text txt = GameObject.Find("contact_" + User.users_infos[fgn].nickname).transform.Find("nick").GetComponent<TMP_Text>();
+			txt.color = new Color(1, .63f, 0);
+		}
+
+		//si c'est pas nous qui avont envoyé le message, on précise qu'il est distribué
+		if (m.from != User.id && !m.distributed) {
+			uWebSocketManager.EmitEv("set:distributed", new { m.id, from = m.from });
 		}
 
 		//si on a pas les infos d'user (et que c'est pas nous l'emetteur), c'est qu'il nous a écrit en premier
@@ -138,7 +159,7 @@ public class WsEvents : MonoBehaviour {
 			if (m.send_at > User.users_infos[fgn].sending_ratchet.valitidy) {
 
 				// on regenère nos données d'émission avec la clé RSA fournie (pour lui fournir notre nouveau root d'émission au prochaine message)
-				User.users_infos[fgn].sending_ratchet.Renew(m.send_at, m.sender_rsa_info, "ukn");
+				User.users_infos[fgn].sending_ratchet.Renew(m.send_at, m.sender_rsa_info);
 
 				//il nous transmet également ses paramètres de ratchet d'émission avec notre clé RSA dédiée (transmise au précédent 1er message qu'on a envoyé)
 				//on dédie ensuite une nouvelle clé RSA (suite de fonction SET) pour lui transférer (vu qu'on a bien récupéré son root d'émission)
@@ -163,22 +184,39 @@ public class WsEvents : MonoBehaviour {
 			if (User.conversations[fgn].FirstOrDefault(me => me.send_at > m.send_at) == null) {
 				m.Decrypt();
 				MM.Parse(m);
-			} else MM.LoadConv();
+			} else {
+				MM.LoadConv(fgn);
+			}
 		}
 	}
 
+	public static void MessageDistributed(string json) {
+		string with = JObject.Parse(json)["with"].ToString();
+		string id_message = JObject.Parse(json)["id"].ToString();
+
+		User.conversations[with].First(m => m.id == id_message).distributed = true;
+		MM.SetDistributed(with, id_message);
+	}
+
 	public static void AuthOK(string json) {
+		if (!GameObject.Find("Main Camera").GetComponent<uWebSocketManager>().first) return;
+		GameObject.Find("Main Camera").GetComponent<uWebSocketManager>().first = false;
+
 		string user_id = JObject.Parse(json)["user_id"].ToString();
 		User.id = user_id;
 		User.LoadData();
-		GameObject.Find("auth error").GetComponent<TMP_Text>().text = "";
 		GameObject.Find("AuthGroup").SetActive(false);
+		GameObject.Find("Canvas").GetComponent<MainClass>().SaveAuthInfos();
 		uWebSocketManager.EmitEv("request:conversations");
+		GameObject.Find("Canvas").GetComponent<MainClass>().logInBT.GetComponent<Button>().interactable = true;
 	}
 
 	public static void AuthError(string json) {
-		Debug.Log(json);
-		GameObject.Find("auth error").GetComponent<TMP_Text>().text = "AUTH ERROR : " + json;
+		string user_id = JObject.Parse(json)["message"].ToString();
+		GameObject logInInfo = GameObject.Find("Canvas").GetComponent<MainClass>().logInInfo;
+		GameObject.Find("Canvas").GetComponent<MainClass>().logInBT.GetComponent<Button>().interactable = true;
+		logInInfo.SetActive(true);
+		logInInfo.transform.Find("Txt").GetComponent<TMP_Text>().text = user_id;
 	}
 
 	public static void Err(string json) {

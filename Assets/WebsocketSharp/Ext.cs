@@ -734,7 +734,7 @@ namespace WebSocketSharp {
                 message = "Must not be empty.";
                 return false;
             }
-
+             
             var uri = uriString.ToUri();
             if (!uri.IsAbsoluteUri) {
                 message = "Must be the absolute URI: " + uriString;

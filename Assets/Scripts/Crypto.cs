@@ -56,20 +56,24 @@ public static class Crypto {
 	}
 	public static string DecryptAES(byte[] cipherText, byte[] Key, byte[] IV) {
 		string plaintext = "cannot decrypt";
-		if (IV.Length == 32) {
-			IV = IV.Skip(16).ToArray();
-		}
-		// Create AesManaged
-		using (Aes aes = Aes.Create()) {
-			// Create a decryptor
-			ICryptoTransform decryptor = aes.CreateDecryptor(Key, IV);
-			// Create the streams used for decryption.
-			using MemoryStream ms = new MemoryStream(cipherText);
-			// Create crypto stream
-			using CryptoStream cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Read);
-			// Read crypto stream
-			using StreamReader reader = new StreamReader(cs);
-			plaintext = reader.ReadToEnd();
+		try {
+			if (IV.Length == 32) {
+				IV = IV.Skip(16).ToArray();
+			}
+			// Create AesManaged
+			using (Aes aes = Aes.Create()) {
+				// Create a decryptor
+				ICryptoTransform decryptor = aes.CreateDecryptor(Key, IV);
+				// Create the streams used for decryption.
+				using MemoryStream ms = new MemoryStream(cipherText);
+				// Create crypto stream
+				using CryptoStream cs = new CryptoStream(ms, decryptor, CryptoStreamMode.Read);
+				// Read crypto stream
+				using StreamReader reader = new StreamReader(cs);
+				plaintext = reader.ReadToEnd();
+			}
+		} catch(Exception ex) { 
+			return "deccryption impossible : " + ex.Message;
 		}
 		return plaintext;
 	}

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Security.Policy;
@@ -12,6 +13,8 @@ using UnityEngine;
 public static class User {
 	public static string nickname;
 	public static string id;
+	public static byte[] pass_kdf;
+	public static byte[] pass_IV;
 	public static Dictionary<string, UserInfo> users_infos = new Dictionary<string, UserInfo>();
 	public static Dictionary<string, List<Message>> conversations = new Dictionary<string, List<Message>>();
 	public static Dictionary<string, string> messageId_root = new Dictionary<string, string>();
@@ -19,23 +22,25 @@ public static class User {
 
 	public static void InitPrivateKey() {
 		if (File.Exists(Application.streamingAssetsPath + "/" + nickname + "_default_private_key.txt")) {
-			default_private_key = File.ReadAllText(Application.streamingAssetsPath + "/" + nickname + "_default_private_key.txt");
+			string pk = File.ReadAllText(Application.streamingAssetsPath + "/" + nickname + "_default_private_key.txt");
+			default_private_key = Crypto.DecryptAES(Convert.FromBase64String(pk), pass_kdf, pass_IV);
 		} else {
 			default_private_key = new RSACryptoServiceProvider().ToXmlString(true);
-			File.WriteAllText(Application.streamingAssetsPath + "/" + nickname + "_default_private_key.txt", default_private_key);
+			string pk = Convert.ToBase64String(Crypto.EncryptAES(default_private_key, pass_kdf, pass_IV));
+			File.WriteAllText(Application.streamingAssetsPath + "/" + nickname + "_default_private_key.txt", pk);
 		}
 	}
 
 	public static string GetDefaultPublicKey() {
 		var tmp = new RSACryptoServiceProvider();
 		tmp.FromXmlString(default_private_key);
-		return tmp.ToXmlString(false);
+		return Crypto.Simplfy_XML_RSA(tmp.ToXmlString(false));
 	}
 
 	public static string WARNING___GetDefaultPrivateKey() {
 		var tmp = new RSACryptoServiceProvider();
 		tmp.FromXmlString(default_private_key);
-		return Crypto.Simplfy_XML_RSA(tmp.ToXmlString(true));
+		return tmp.ToXmlString(true);
 	}
 
 	public static void SaveData(string data) {
@@ -44,31 +49,52 @@ public static class User {
 			//File.WriteAllText(Application.streamingAssetsPath + "/" + nickname + "_conversations.txt", c);
 		}
 		if (data.Contains("infos")) {
-			string ui = JsonConvert.SerializeObject(users_infos, Formatting.Indented);
-			File.WriteAllText(Application.streamingAssetsPath + "/" + nickname + "_user_infos.txt", ui);
+			//on ne save pas les infos si il n'y a aucun messages : il y a eu une erreur de com
+			var infos = users_infos.Where(u => conversations.ContainsKey(u.Key)).ToDictionary(i => i.Key, i => i.Value);
+			string ui = JsonConvert.SerializeObject(infos, Formatting.Indented);
+			string encrypted = Convert.ToBase64String(Crypto.EncryptAES(ui, pass_kdf, pass_IV));
+			File.WriteAllText(Application.streamingAssetsPath + "/" + nickname + "_user_infos.txt", encrypted);
+			File.WriteAllText(Application.streamingAssetsPath + "/" + nickname + "_user_infos_CLEAR.txt", ui);
 		}
 		if (data.Contains("roots")) {
 			string rt = JsonConvert.SerializeObject(messageId_root, Formatting.Indented);
-			File.WriteAllText(Application.streamingAssetsPath + "/" + nickname + "_messages_roots.txt", rt);
+			string encrypted = Convert.ToBase64String(Crypto.EncryptAES(rt, pass_kdf, pass_IV));
+			File.WriteAllText(Application.streamingAssetsPath + "/" + nickname + "_messages_roots.txt", encrypted);
+			File.WriteAllText(Application.streamingAssetsPath + "/" + nickname + "_messages_roots_CLEAR.txt", rt);
 		}
 	}
 
 	public static void LoadData() {
 		if (File.Exists(Application.streamingAssetsPath + "/" + nickname + "_user_infos.txt")) {
-			users_infos = JsonConvert.DeserializeObject<Dictionary<string, UserInfo>>(File.ReadAllText(Application.streamingAssetsPath + "/" + nickname + "_user_infos.txt"));
-			if (users_infos == null) users_infos = new Dictionary<string, UserInfo>();
-			MainClass mc = GameObject.Find("Canvas").GetComponent<MainClass>();
-			foreach (var ui in users_infos.Values) {
-				mc.AddContactToList(ui.nickname, ui.id);
+			try {
+				string encrypted = File.ReadAllText(Application.streamingAssetsPath + "/" + nickname + "_user_infos.txt");
+				users_infos = JsonConvert.DeserializeObject<Dictionary<string, UserInfo>>(Crypto.DecryptAES(Convert.FromBase64String(encrypted), pass_kdf, pass_IV));
+				MainClass mc = GameObject.Find("Canvas").GetComponent<MainClass>();
+				foreach (var ui in users_infos.Values) {
+					mc.AddContactToList(ui.nickname, ui.id);
+				}
+			} catch (Exception ex) {
+				users_infos ??= new Dictionary<string, UserInfo>();
 			}
 		}
+
 		if (File.Exists(Application.streamingAssetsPath + "/" + nickname + "_conversations.txt")) {
-			conversations = JsonConvert.DeserializeObject<Dictionary<string, List<Message>>>(File.ReadAllText(Application.streamingAssetsPath + "/" + nickname + "_conversations.txt"));
-			if (conversations == null) conversations = new Dictionary<string, List<Message>>();
+			try {
+				string encrypted = File.ReadAllText(Application.streamingAssetsPath + "/" + nickname + "_conversations.txt");
+				conversations = JsonConvert.DeserializeObject<Dictionary<string, List<Message>>>(Crypto.DecryptAES(Convert.FromBase64String(encrypted), pass_kdf, pass_IV));
+			} catch (Exception ex) {
+				conversations ??= new Dictionary<string, List<Message>>();
+			}
 		}
 		if (File.Exists(Application.streamingAssetsPath + "/" + nickname + "_messages_roots.txt")) {
-			messageId_root = JsonConvert.DeserializeObject<Dictionary<string, string>>(File.ReadAllText(Application.streamingAssetsPath + "/" + nickname + "_messages_roots.txt"));
-			if (messageId_root == null) messageId_root = new Dictionary<string, string>();
+			try {
+
+				string encrypted = File.ReadAllText(Application.streamingAssetsPath + "/" + nickname + "_messages_roots.txt");
+				messageId_root = JsonConvert.DeserializeObject<Dictionary<string, string>>(Crypto.DecryptAES(Convert.FromBase64String(encrypted), pass_kdf, pass_IV));
+			} catch (Exception ex) {
+				messageId_root ??= new Dictionary<string, string>();
+
+			}
 		}
 	}
 }
@@ -100,7 +126,9 @@ public class Ratchet {
 		return this;
 	}
 
-	public void Renew(DateTime val, string rsa_pu, string rsa_pr) {
+	//renouvelle le ratchet d'émission avec un root aléatoire
+	//il sera communiqué au prochain message qu'on enverra, avec la RSA publique fournie par l'autre user
+	public void Renew(DateTime val, string rsa_pu) {
 		rsa_public = rsa_pu;
 		WARNING__rsa_private = "ukn";
 		valitidy = val;
@@ -109,18 +137,20 @@ public class Ratchet {
 		root = Convert.ToBase64String(hash);
 	}
 
-	public void PrepareNextRSA() {
-		RSACryptoServiceProvider dedicaced_rsa = new RSACryptoServiceProvider();
-		rsa_public = dedicaced_rsa.ToXmlString(false);
-		WARNING__rsa_private = dedicaced_rsa.ToXmlString(true);
-	}
-
+	//récupère notre root de réception grace à la clé RSA qu'on avait envoyé auparavant
+	//prépare une nouvelle clé RSA pour recevoir un nouveau root quand l'user nous répondra
 	public void Set(string new_root, DateTime val) {
-		root = new_root;
-		//(root a decoder avec private RSA)
+		//(root a decoder avec private RSA précédent)
+		root = Crypto.DecryptionRSA(new_root, WARNING__rsa_private);
 		valitidy = val;
 		byte[] hash = Convert.FromBase64String(root);
-		PrepareNextRSA();
+		PrepareNextRSA(); // puis on génère un autre RSA pour le prochain envoi
+	}
+
+	public void PrepareNextRSA() {
+		RSACryptoServiceProvider dedicaced_rsa = new RSACryptoServiceProvider();
+		rsa_public = Crypto.Simplfy_XML_RSA(dedicaced_rsa.ToXmlString(false));
+		WARNING__rsa_private = dedicaced_rsa.ToXmlString(true);
 	}
 }
 
@@ -149,7 +179,7 @@ public class Message {
 		if (plain != "") return;
 		int ticks = int.Parse(ratchet_infos.Split(' ')[1]);
 
-		if(!User.messageId_root.ContainsKey(id)) {
+		if (!User.messageId_root.ContainsKey(id)) {
 			plain = "<#FF0000>missing ratchet root for this message";
 			return;
 		}
@@ -159,7 +189,7 @@ public class Message {
 		var IV = Crypto.KDF(salt, Convert.FromBase64String(root), salt[6]);
 		var kdf = Crypto.KDF(Convert.FromBase64String(root), salt, ticks);
 		plain = Crypto.DecryptAES(Convert.FromBase64String(cipher), kdf, IV);
-		
+
 		/*
 		cipher += "\n<#FF00C0>root avec " + User.messageId_root[id].Substring(0, 5);
 

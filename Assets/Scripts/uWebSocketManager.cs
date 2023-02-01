@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using Newtonsoft.Json;
 using TMPro;
 using UnityEngine;
@@ -8,6 +9,8 @@ using WebSocket = WebSocketSharp.WebSocket;
 
 // ReSharper disable once InconsistentNaming
 public class uWebSocketManager : MonoBehaviour {
+	[SerializeField] GameObject mainBlocker;
+
 	delegate void EventDelegation(string e);
 	Dictionary<string, EventDelegation> events = new Dictionary<string, EventDelegation>() {
 		{ "pong", WsEvents.Pong },
@@ -15,14 +18,16 @@ public class uWebSocketManager : MonoBehaviour {
 		{ "auth:response", WsEvents.AuthOK },
 		{ "auth:error", WsEvents.AuthError },
 		{ "user:info", WsEvents.UserInfos },
+		{ "message:distributed", WsEvents.MessageDistributed },
 	};
 	[SerializeField] string socketId;
 	public WebSocket ws;
-	bool first = true;
+	public bool first = true;
 
 	public void Initialisation() {
 		InvokeRepeating(nameof(Ping), 1, 1);
-		InitSocket("ws://localhost:9997/");
+		InitSocket(File.ReadAllText(Application.streamingAssetsPath + "/realm.txt"));//"ws://localhost:9997/");
+		//mainBlocker.SetActive(true);
 	}
 
 	/// <summary>
@@ -31,6 +36,9 @@ public class uWebSocketManager : MonoBehaviour {
 	public void InitSocket(string uri) {
 		ws = new WebSocket(uri);
 		ws.OnOpen += (sender, e) => {
+			UnityMainThread.wkr.AddJob(() => {
+				mainBlocker.SetActive(false);
+			});
 		};
 		ws.OnMessage += (sender, e) => {
 			//Le message contient l'évenement (listé dans WsEvents.cs) et les datas en JSON
@@ -41,10 +49,13 @@ public class uWebSocketManager : MonoBehaviour {
 					UnityMainThread.wkr.AddJob(() => {
 						GameObject.Find("Nick IF").GetComponent<TMP_InputField>().interactable = true;
 						GameObject.Find("Pass IF").GetComponent<TMP_InputField>().interactable = true;
-						GameObject.Find("Log In").GetComponent<Button>().interactable = true;
 						GameObject.Find("Canvas").GetComponent<MainClass>().Auth();
 					});
-					first = false;
+				} else {
+					//re-auth if
+					UnityMainThread.wkr.AddJob(() => {
+						GameObject.Find("Canvas").GetComponent<MainClass>().Auth();
+					});
 				}
 				//Debug.Log("Socket ID " + socketId);
 			}
@@ -53,6 +64,11 @@ public class uWebSocketManager : MonoBehaviour {
 			UnityMainThread.wkr.AddJob(() => { events[payload.ev](payload.data); });
 		};
 		ws.OnClose += (sender, e) => {
+			UnityMainThread.wkr.AddJob(() => {
+				WsEvents.serverStatus.text = Languages.Get("Reconnecting...");
+				WsEvents.serverStatus.color =  new Color(1, 0.5f, 0);
+				mainBlocker.SetActive(true);
+			});
 		};
 	}
 

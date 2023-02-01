@@ -1,0 +1,22 @@
+{
+  "ab901f78-ed85-41ef-9a3f-37e63dcd6ad1": {
+    "nickname": "Boby",
+    "id": "ab901f78-ed85-41ef-9a3f-37e63dcd6ad1",
+    "default_public_rsa": "ubekwxHCY3XUOlIZuOZCPp+tD1EbsVTLJVNOFZ+nq5h5Q5INadGmMiB3pGvN4lG7VgepodwpWnCon6mmkfMO+Wp0zODcHUi4/rBSKjGV3/GtkF2s8cT04MXXovoCSzNKZFJ6aBVWGDsk47UB+kKRcamlw9eVdWUo9ZgKD4xHOxk=",
+    "isInit": true,
+    "sending_ratchet": {
+      "valitidy": "2023-02-01T15:16:27",
+      "index": 1,
+      "rsa_public": "gi2jYc4LhSFClgm7eYGDa/nyIfwzXAEV6b9FX/coIwLfBSCGIeZg1G9Ssh/REWWGBkuUAfiH9hRddpX63TlhQ/9U7D18yT5MpcaLsr/CY762EsAlzAyWpF7YZOQ3mT+7FKYcLFRkT6TMyyur4bmaxOXSeAaIaHV54yvzEOdQzUE=",
+      "WARNING__rsa_private": "ukn",
+      "root": "yJ5c5/wy71HCYRwDsUsYbU6ozF8tzinDB5PLGuBrPi0="
+    },
+    "receiving_ratchet": {
+      "valitidy": "2023-02-01T15:16:27",
+      "index": 1,
+      "rsa_public": "xKaAz3Oj3E8MnAW09p3ujg3eRAHvnen5TQy84kPRHc8BAZOirCIf7L7HL39d5MwRlwdq9qA2pctYU660zvPd9vs1V/Z0iAmjD2VY/lqDR4e1wVswaw9Wy9chcjKuWlwVvfv7TFiXndKXe4Dj9xKtHLO+l+TvJgt5bBfPOrVOVrM=",
+      "WARNING__rsa_private": "<RSAKeyValue><Modulus>xKaAz3Oj3E8MnAW09p3ujg3eRAHvnen5TQy84kPRHc8BAZOirCIf7L7HL39d5MwRlwdq9qA2pctYU660zvPd9vs1V/Z0iAmjD2VY/lqDR4e1wVswaw9Wy9chcjKuWlwVvfv7TFiXndKXe4Dj9xKtHLO+l+TvJgt5bBfPOrVOVrM=</Modulus><Exponent>AQAB</Exponent><P>6Oc0IrI5XAV4jV7K/TUNONnURTPvC0KTz57jFuhAd9JY9HkMaq0DcAgtyPLa7O9mtN961PYPS7rZmAL1Na4ghw==</P><Q>2CbwK564sNaVoDZNVFTJOTYrTjxCSw2hsQ/e5bLXz+/tNLFH/9EO4yDfMJfTTR8R/E5JaSkOVcYUW2svhtX/dQ==</Q><DP>DHWh8mE6dFPOmTGDBny6ElqE4pbeqOmM4sSLPYR7Pm3AWIPJSEOtNWcam+9yCs7b3b0+4vmu48xBK8Ksv4xrLQ==</DP><DQ>V7mF484pGuwcEce4Hq/Ccwu/C6N9LES+CMRuLD8nQ2cWmDoTBInuRtQCgRA9W6FuhT2ooZteDAW2IVwhD9IuOQ==</DQ><InverseQ>H4GqxPvnVL7R2QEC2bhK4RNEvbtkOG06fO/x8PY0GRTQt53MxW9mARftEs5ZI1vu/Tiw3HfMXGed4tyiqUknwg==</InverseQ><D>E7Fk5uF6wF4+MgW0SJoqQJmM75yOBW9f4uJqq/IEqAqJ3EGPodNNBSVZxxznJzl0bX51rLsAnfvOHZs6ShtL1/n54QdugN+ugiW2fXvalwOG9O/vBRjNWxLPK2xO42grr60x9hInBrw9L95oB46B3ITRQhDLdnw+QUudWVjvzyk=</D></RSAKeyValue>",
+      "root": "fXABGzCCMGVdxjsTmet82U83QTr2Snckg6bYShUeXDA="
+    }
+  }
+}
