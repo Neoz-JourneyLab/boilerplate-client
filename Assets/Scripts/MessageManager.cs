@@ -62,9 +62,18 @@ public class MessageManager : MonoBehaviour {
 	}
 
 	public void Focus(string id) {
+		focus_user_id = id;
+
+		if (id == "") {
+			convoTab.SetActive(false);
+			return;
+		}
 		convoTab.SetActive(true);
 		focus_user_id = id;
 		message_IF.interactable = true;
+		if (User.conversations.ContainsKey(id) && User.conversations[id].Count > 0) {
+			User.conversations[id] = User.conversations[id].OrderBy(m => m.send_at).ToList();
+		}
 		LoadConv();
 		confirmKeyBT.SetActive(true);
 	}
@@ -74,8 +83,8 @@ public class MessageManager : MonoBehaviour {
 	public void ConfirmKey() {
 		confirmKeyPanel.SetActive(!confirmKeyPanel.activeInHierarchy);
 		confirmKeyPanel.GetComponentInChildren<TMP_Text>().text = Languages.Get("SHARE_INFO");// "SHARE THIS WITH YOUR CONTACT<br>TO BE SURE THAT YOU USE THE GOOD KEY<br><#FF0000>IF NOT THE SAME, THERE IS A BUG<br>OR A MAN IN THE MIDDLE ATTACK AND NOTHING IS SAFE<br>";
-		//si nous avons envoyé le dernier message, alors la clé RSA synchronisée est celle de reception
-		//en effet, la future clé de réception distante a déjà été renouvelée par l'utilisateur distant dès la réception de notre message
+																																													//si nous avons envoyé le dernier message, alors la clé RSA synchronisée est celle de reception
+																																													//en effet, la future clé de réception distante a déjà été renouvelée par l'utilisateur distant dès la réception de notre message
 		if (User.conversations[focus_user_id].Last().from == User.id) {
 			string rsa = User.users_infos[focus_user_id].receiving_ratchet.rsa_public;
 			string rsa_split = "";
@@ -88,7 +97,7 @@ public class MessageManager : MonoBehaviour {
 			}
 			key = rsa_split;
 			confirmKeyPanel.GetComponentInChildren<TMP_Text>().text += Languages.Get("RECIEVE_INFO")/*"<br><#00FFFF><u>YOU WILL RECIEVE NEXT RATCHET INFO WITH YOUR KEY :</u><br><br>"*/ + rsa_split;
-		} 
+		}
 		//a l'inverse, si nous ne somme pas le dernier à avoir envoyé un message, nous avons les infos pour l'émission à l'utilisateur distant
 		else {
 			string rsa = User.users_infos[focus_user_id].sending_ratchet.rsa_public;
@@ -97,7 +106,7 @@ public class MessageManager : MonoBehaviour {
 			foreach (char c in rsa) {
 				rsa_split += c;
 				if (count > 1 && count % 10 == 0) rsa_split += " ";
-				if (count > 1  && count % 40 == 0) rsa_split += "\n";
+				if (count > 1 && count % 40 == 0) rsa_split += "\n";
 				count++;
 			}
 			key = rsa_split;
@@ -122,17 +131,32 @@ public class MessageManager : MonoBehaviour {
 		SetSendBT();
 	}
 
-	public void LoadConv(string ifFocus = "") {
-		if (ifFocus != "" && ifFocus != focus_user_id) return;
+	public void PrepareBatch(string id_fgn) {
+		Message prev = null;
+		User.conversations[id_fgn] = User.conversations[id_fgn].OrderBy(m => m.send_at).ToList();
+		//on vérifie les roots
+		foreach (var mes in User.conversations[id_fgn].ToArray()) {
+			//il nous manque le root, si le message précédent était du même auteur c'est le même root
+			if (!mes.decrypted && prev != null && prev.from == mes.from && User.messageId_root.ContainsKey(prev.id)) {
+				User.messageId_root[mes.id] = User.messageId_root[prev.id];
+			}
+			prev = mes;
+		}
+		User.SaveData("roots");
+	}
+
+	public void LoadConv(string idFocus = "") {
+		if (idFocus == "") idFocus = focus_user_id;
+		if (idFocus != focus_user_id) return;
 		if (!User.conversations.ContainsKey(focus_user_id) || focus_user_id == "") return;
 
 		foreach (Transform item in message_scroll.transform) {
 			Destroy(item.gameObject);
 		}
-		User.conversations[focus_user_id] = User.conversations[focus_user_id].OrderBy(m => m.send_at).ToList();
 
 		if (User.conversations[focus_user_id].Count > 1) {
 			foreach (var mes in User.conversations[focus_user_id].ToArray()) {
+				//on tente un decryptage en force, si il nous manque des roots, on prends les précédents
 				mes.Decrypt();
 			}
 		}
@@ -209,7 +233,7 @@ public class MessageManager : MonoBehaviour {
 		//on a pas reçu le message le plus récent, on peut organiser
 		if (indx != User.conversations[focus_user_id].ToArray().Length - 1) {
 			User.conversations[focus_user_id] = User.conversations[focus_user_id].OrderBy(m => m.send_at).ToList();
-		} 
+		}
 
 		LayoutRebuilder.ForceRebuildLayoutImmediate(message_scroll.GetComponent<RectTransform>());
 		Canvas.ForceUpdateCanvases();

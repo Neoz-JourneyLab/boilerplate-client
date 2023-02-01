@@ -4,9 +4,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Security.Cryptography;
-using System.Security.Policy;
 using System.Text;
 using UnityEngine;
 
@@ -19,6 +17,7 @@ public static class User {
 	public static Dictionary<string, List<Message>> conversations = new Dictionary<string, List<Message>>();
 	public static Dictionary<string, string> messageId_root = new Dictionary<string, string>();
 	static string default_private_key;
+	public static Dictionary<string, DateTime> lastSaves = new Dictionary<string, DateTime>();
 
 	public static void InitPrivateKey() {
 		if (File.Exists(Application.streamingAssetsPath + "/" + nickname + "_default_private_key.txt")) {
@@ -45,22 +44,37 @@ public static class User {
 
 	public static void SaveData(string data) {
 		if (data.Contains("messages")) {
-			string c = JsonConvert.SerializeObject(conversations, Formatting.Indented);
-			//File.WriteAllText(Application.streamingAssetsPath + "/" + nickname + "_conversations.txt", c);
+			if (lastSaves.ContainsKey("messages") && (DateTime.UtcNow - lastSaves["messages"]).TotalSeconds < 30) {
+				//Debug.Log("pas de sauvegarde : on a save messages y'a " + (DateTime.UtcNow - lastSaves["messages"]).TotalSeconds + " s");
+			} else {
+				lastSaves["messages"] = DateTime.UtcNow;
+				string c = JsonConvert.SerializeObject(conversations, Formatting.Indented);
+				//File.WriteAllText(Application.streamingAssetsPath + "/" + nickname + "_conversations.txt", c);
+			}
 		}
 		if (data.Contains("infos")) {
-			//on ne save pas les infos si il n'y a aucun messages : il y a eu une erreur de com
-			var infos = users_infos.Where(u => conversations.ContainsKey(u.Key)).ToDictionary(i => i.Key, i => i.Value);
-			string ui = JsonConvert.SerializeObject(infos, Formatting.Indented);
-			string encrypted = Convert.ToBase64String(Crypto.EncryptAES(ui, pass_kdf, pass_IV));
-			File.WriteAllText(Application.streamingAssetsPath + "/" + nickname + "_user_infos.txt", encrypted);
-			File.WriteAllText(Application.streamingAssetsPath + "/" + nickname + "_user_infos_CLEAR.txt", ui);
+			if (lastSaves.ContainsKey("infos") && (DateTime.UtcNow - lastSaves["infos"]).TotalSeconds < 30) {
+				//Debug.Log("pas de sauvegarde : on a save infos y'a " + (DateTime.UtcNow - lastSaves["infos"]).TotalSeconds + " s");
+			} else {
+				lastSaves["infos"] = DateTime.UtcNow;
+				//on ne save pas les infos si il n'y a aucun messages : il y a eu une erreur de com
+				var infos = users_infos.Where(u => conversations.ContainsKey(u.Key)).ToDictionary(i => i.Key, i => i.Value);
+				string ui = JsonConvert.SerializeObject(infos, Formatting.Indented);
+				string encrypted = Convert.ToBase64String(Crypto.EncryptAES(ui, pass_kdf, pass_IV));
+				File.WriteAllText(Application.streamingAssetsPath + "/" + nickname + "_user_infos.txt", encrypted);
+				File.WriteAllText(Application.streamingAssetsPath + "/" + nickname + "_user_infos_CLEAR.txt", ui);
+			}
 		}
 		if (data.Contains("roots")) {
-			string rt = JsonConvert.SerializeObject(messageId_root, Formatting.Indented);
-			string encrypted = Convert.ToBase64String(Crypto.EncryptAES(rt, pass_kdf, pass_IV));
-			File.WriteAllText(Application.streamingAssetsPath + "/" + nickname + "_messages_roots.txt", encrypted);
-			File.WriteAllText(Application.streamingAssetsPath + "/" + nickname + "_messages_roots_CLEAR.txt", rt);
+			if (lastSaves.ContainsKey("roots") && (DateTime.UtcNow - lastSaves["roots"]).TotalSeconds < 30) {
+				//Debug.Log("pas de sauvegarde : on a save roots y'a " + (DateTime.UtcNow - lastSaves["roots"]).TotalSeconds + " s");
+			} else {
+				lastSaves["roots"] = DateTime.UtcNow;
+				string rt = JsonConvert.SerializeObject(messageId_root, Formatting.Indented);
+				string encrypted = Convert.ToBase64String(Crypto.EncryptAES(rt, pass_kdf, pass_IV));
+				File.WriteAllText(Application.streamingAssetsPath + "/" + nickname + "_messages_roots.txt", encrypted);
+				File.WriteAllText(Application.streamingAssetsPath + "/" + nickname + "_messages_roots_CLEAR.txt", rt);
+			}
 		}
 	}
 
@@ -141,10 +155,14 @@ public class Ratchet {
 	//prépare une nouvelle clé RSA pour recevoir un nouveau root quand l'user nous répondra
 	public void Set(string new_root, DateTime val) {
 		//(root a decoder avec private RSA précédent)
-		root = Crypto.DecryptionRSA(new_root, WARNING__rsa_private);
-		valitidy = val;
-		byte[] hash = Convert.FromBase64String(root);
-		PrepareNextRSA(); // puis on génère un autre RSA pour le prochain envoi
+		try {
+			root = Crypto.DecryptionRSA(new_root, WARNING__rsa_private);
+			valitidy = val;
+			PrepareNextRSA(); // puis on génère un autre RSA pour le prochain envoi
+		} catch(Exception ex) {
+			//si on pense recevoir avec notre RSA par défaut par exemple
+			Debug.Log("Mauvais RSA !");
+		}
 	}
 
 	public void PrepareNextRSA() {
@@ -164,6 +182,7 @@ public class Message {
 	public DateTime send_at;
 	public bool distributed;
 	public string plain = "";
+	public bool decrypted = false;
 
 	public void SetDate(string js_date) {
 		//30/01/2023 14:54:29 || 2023-01-31T22:34:54.000Z
@@ -176,57 +195,41 @@ public class Message {
 	}
 
 	public void Decrypt() {
-		if (plain != "") return;
+		if (decrypted) {
+			return;
+		}
 		int ticks = int.Parse(ratchet_infos.Split(' ')[1]);
 
+		//si on recoit un message sans infos de root, c'est qu'elle se situe sur un message en amont.
 		if (!User.messageId_root.ContainsKey(id)) {
 			plain = "<#FF0000>missing ratchet root for this message";
 			return;
 		}
-
-		var root = User.messageId_root[id];
-		var salt = Crypto.Hash(Encoding.UTF8.GetBytes(id));
-		var IV = Crypto.KDF(salt, Convert.FromBase64String(root), salt[6]);
-		var kdf = Crypto.KDF(Convert.FromBase64String(root), salt, ticks);
-		plain = Crypto.DecryptAES(Convert.FromBase64String(cipher), kdf, IV);
-
-		/*
-		cipher += "\n<#FF00C0>root avec " + User.messageId_root[id].Substring(0, 5);
-
-		// si le ratchet ne tiens pas d'infos, on ne met rien à jour
-		if (!ratchet_infos.StartsWith("_")) {
-			//si il possède des infos, on met à jour
-			if (from_us) {
-				//si on envoie le premier message, il faut initialiser notre envoi avec la clé RSA par défaut de l'utilisateur
-				string sending_rsa = first_message ? User.users_infos[GetFgnId()].default_public_rsa : User.users_infos[GetFgnId()].sending_ratchet.rsa_public;
-				User.users_infos[GetFgnId()].receiving_ratchet.rsa_public = sender_rsa_info; //il faut aussi récupéré la clé privée
-				cipher += "<#00FF00>\non recevra futur root avec la clé [RSA " + sender_rsa_info.Substring(0, 5) + "]";
-
-				User.users_infos[GetFgnId()].sending_ratchet.root = ratchet_infos.Split(' ')[0]; //on a envoyé notre nouveau root d'émission chiffré avec la RSA publique, il faut le retrouver déchiffré
-				cipher += "\non envoie partir de maintenant avec le root " + ratchet_infos.Split(' ')[0].Substring(0, 5) + " encrypté avec le RSA " + sending_rsa.Substring(0, 5);
-
-			} else {
-				cipher += "<#00FFFF>\non enverra notre root d'émission avec la clé RSA de l'autre: " + sender_rsa_info.Substring(0, 5);
-				User.users_infos[GetFgnId()].sending_ratchet.rsa_public = sender_rsa_info;
-
-				cipher += "\non recoit avec ses infos décodée par notre précédent RSA " + User.users_infos[GetFgnId()].receiving_ratchet.rsa_public.Substring(0, 5);
-				cipher += "\nle root sera " + ratchet_infos.Split(' ')[0].Substring(0, 5);
-				User.users_infos[GetFgnId()].receiving_ratchet.root = ratchet_infos.Split(' ')[0]; //décodé par rsa
+		try {
+			var root = User.messageId_root[id];
+			if (root.Split('-').Length == 5) {
+				plain = "<#FF0000>root is user ID";
+				Debug.Log("Le root est un UUID d'user : " + root);
+				return;
 			}
-		}
 
-		if (from_us) {
-			cipher += "<#FFFF00>\ndecodé avec " + User.users_infos[GetFgnId()].sending_ratchet.root.Substring(0, 5) + " > " + ticks;
-		} else {
-			cipher += "<#FFFF00>\ndecodé avec " + User.users_infos[GetFgnId()].receiving_ratchet.root.Substring(0, 5) + " > " + ticks;
+			var root_bytes = Convert.FromBase64String(root);
+			var salt = Crypto.Hash(Encoding.UTF8.GetBytes(id));
+			var IV = Crypto.Hash(salt);
+			var kdf = Crypto.KDF(root_bytes, salt, ticks);
+			plain = Crypto.DecryptAES(Convert.FromBase64String(cipher), kdf, IV);
+			decrypted = true;
+		} catch (Exception ex) {
+			plain = "<#FFF000>erreur : " + ex.Message;
+			decrypted = false;
 		}
-		*/
 	}
 
 	public void Encrypt(string root, int ticks) {
+		var root_bytes = Convert.FromBase64String(root);
 		var salt = Crypto.Hash(Encoding.UTF8.GetBytes(id));
-		var IV = Crypto.KDF(salt, Convert.FromBase64String(root), salt[6]);
-		var kdf = Crypto.KDF(Convert.FromBase64String(root), salt, ticks);
+		var IV = Crypto.Hash(salt);
+		var kdf = Crypto.KDF(root_bytes, salt, ticks);
 		cipher = Convert.ToBase64String(Crypto.EncryptAES(plain, kdf, IV));
 		plain = "encrypted";
 	}

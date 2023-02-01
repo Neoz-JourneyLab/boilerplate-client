@@ -7,7 +7,6 @@ using Newtonsoft.Json.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
-using WebSocketSharp;
 using static Tools;
 
 /// <summary>
@@ -19,12 +18,19 @@ public class WsEvents : MonoBehaviour {
 
 	static int latency;
 	public static readonly Dictionary<string, DateTime> pings = new Dictionary<string, DateTime>();
-	public static TMP_Text serverStatus;
+	static TMP_Text serverStatus;
 	static readonly MessageManager MM = GameObject.Find("Canvas").GetComponent<MessageManager>();
-
+	public static List<string> noPreviousMessageFromThosesUsers = new List<string>();
 	#endregion
 
 	#region listeners
+
+	public static TMP_Text GetServerStatusTxt() {
+		if (serverStatus == null) {
+			serverStatus = GameObject.Find("server infos").GetComponent<TMP_Text>();
+		}
+		return serverStatus;
+	}
 
 	public static void Pong(string json) {
 		string pong = JObject.Parse(json)["ping_id"].ToString();
@@ -56,7 +62,7 @@ public class WsEvents : MonoBehaviour {
 			User.users_infos[id].default_public_rsa = foreign_rsa;
 
 			GameObject.Find("Canvas").GetComponent<MainClass>().AddContactToList(nick, id);
-			TMP_Text txt = GameObject.Find("contact_" + nick).transform.Find("nick").GetComponent<TMP_Text>();
+			TMP_Text txt = GameObject.Find("contact_" + id).transform.Find("nick").GetComponent<TMP_Text>();
 			txt.color = new Color(1f, .63f, 0);
 			User.SaveData("infos");
 			return;
@@ -88,7 +94,7 @@ public class WsEvents : MonoBehaviour {
 
 	public static void NewMessage(string json) {
 		string send_at = JObject.Parse(json)["send_at"].ToString();
-		bool pending_batch = JObject.Parse(json)["pending_batch"].ToString() == "True";
+		string pending_batch = JObject.Parse(json)["pending_batch"].ToString();
 
 		Message m = JsonConvert.DeserializeObject<Message>(json);
 		m.SetDate(send_at);
@@ -107,7 +113,7 @@ public class WsEvents : MonoBehaviour {
 		}
 
 		//si on reçoit un message d'un user encore inconnu
-		if (!User.users_infos.ContainsKey(fgn)) {
+		if (!User.users_infos.ContainsKey(fgn) || User.users_infos[fgn].nickname == "") {
 			User.users_infos[fgn] = new UserInfo() {
 				id = fgn,
 				nickname = "",
@@ -117,7 +123,7 @@ public class WsEvents : MonoBehaviour {
 		} 
 		// si on recoit un nouveau message d'un user connu et qu'on l'a pas en focus
 		else if(m.from != User.id && MM.focus_user_id != m.from && m.distributed == false) {
-			TMP_Text txt = GameObject.Find("contact_" + User.users_infos[fgn].nickname).transform.Find("nick").GetComponent<TMP_Text>();
+			TMP_Text txt = GameObject.Find("contact_" + User.users_infos[fgn].id).transform.Find("nick").GetComponent<TMP_Text>();
 			txt.color = new Color(1, .63f, 0);
 		}
 
@@ -147,7 +153,11 @@ public class WsEvents : MonoBehaviour {
 				//c'est par ce qu'on avait pas initialisé l'utilisateur alors qu'il nous avait envoyé des messages
 				print("initialisation tardive des messages pour " + fgn);
 				foreach (var item in User.messageId_root.Where(v => v.Value == fgn).ToArray()) {
-					User.messageId_root[item.Key] = User.users_infos[fgn].receiving_ratchet.root;
+					print("le message " + item.Key + " a un root d'attribué");
+					try {
+						User.messageId_root[item.Key] = User.users_infos[fgn].receiving_ratchet.root;
+						User.conversations[fgn].First(m => m.id == item.Key).Decrypt();
+					} catch(Exception ex) { }
 				}
 			}
 		}
@@ -164,6 +174,7 @@ public class WsEvents : MonoBehaviour {
 				//il nous transmet également ses paramètres de ratchet d'émission avec notre clé RSA dédiée (transmise au précédent 1er message qu'on a envoyé)
 				//on dédie ensuite une nouvelle clé RSA (suite de fonction SET) pour lui transférer (vu qu'on a bien récupéré son root d'émission)
 				User.users_infos[fgn].receiving_ratchet.Set(m.ratchet_infos.Split(' ')[0], m.send_at);
+			} else {
 			}
 		}
 
@@ -172,22 +183,37 @@ public class WsEvents : MonoBehaviour {
 				//si on a envoyé le message, alors son root est celui de notre ratchet d'émission
 				User.messageId_root.Add(m.id, m.from == User.id ? User.users_infos[fgn].sending_ratchet.root : User.users_infos[fgn].receiving_ratchet.root);
 			} else {
+				//sinon, on le stoque temporairement
+				print("le message " + m.id + " n'a pas de root, on attends + d'infos des messages précédents");
 				User.messageId_root.Add(m.id, fgn);
 			}
 		}
 
 		User.SaveData("messages infos roots");
-
+		print(pending_batch);
 		//si on recoit un batch de messages, on attend le dernier pour tout refresh
-		if (!pending_batch) {
-			//si le message est le plus récent, il s'agit d'un nouveau message seul qu'on peut décrypter et afficher.
-			if (User.conversations[fgn].FirstOrDefault(me => me.send_at > m.send_at) == null) {
-				m.Decrypt();
-				MM.Parse(m);
-			} else {
-				MM.LoadConv(fgn);
+		if(pending_batch == "1/1") {
+			m.Decrypt();
+			if (!m.decrypted) {
+				print("impossible de le decrypter : " + m.plain +" > " + User.messageId_root.ContainsKey(m.id));
+				//visiblement pas le bon root
+				if (!noPreviousMessageFromThosesUsers.Contains(fgn)) {
+					uWebSocketManager.EmitEv("request:messages", new { userId = fgn, lastId = m.id });
+				}
+				return;
 			}
+			MM.Parse(m);
 		}
+		else if(pending_batch.Split('/')[0] == pending_batch.Split('/')[1]) {
+			MM.PrepareBatch(fgn);
+			MM.LoadConv(fgn);
+		}
+	}
+
+	public static void NoMoreMessage(string json) {
+		string id = JObject.Parse(json)["id"].ToString();
+		print("no more messages from " + id);
+		noPreviousMessageFromThosesUsers.Add(id);
 	}
 
 	public static void MessageDistributed(string json) {

@@ -11,6 +11,7 @@ using UnityEngine.UI;
 using static Crypto;
 using static Tools;
 using static MainClass;
+using System.IO;
 
 public class TestHttp : MonoBehaviour {
   public void Post() {
@@ -18,8 +19,11 @@ public class TestHttp : MonoBehaviour {
   }
 
   private void Start() {
-    Post();
-  }
+		//Post();
+
+
+		//GameObject.FindGameObjectWithTag("AppManager").GetComponent<uWebSocketManager>().Initialisation();
+	}
   
   static IEnumerator TestPost(string route, Dictionary<string, string> data) {
     UnityWebRequest uwr = GetUwr(route, data);
@@ -32,7 +36,7 @@ public class TestHttp : MonoBehaviour {
     Response res = JsonConvert.DeserializeObject<Response>(uwr.downloadHandler.text);
 
     if(res.status == "online") {
-      GameObject.FindGameObjectWithTag("AppManager").GetComponent<uWebSocketManager>().Initialisation();
+      //GameObject.FindGameObjectWithTag("AppManager").GetComponent<uWebSocketManager>().Initialisation();
     }
   }
 }

@@ -64,7 +64,7 @@
     "en": "<br><#00FFFF><u>YOU WILL RECIEVE NEXT RATCHET INFO WITH YOUR KEY :</u><br><br>",
     "fr": "<br><#00FFFF><u>VOUS RECEVREZ LE PROCHAIN RATCHET D'INFO AVEC VOTRE CLE :</u><br><br>"
   },
-    {
+  {
     "alias": "SEND_INFO",
     "en": "<br><#FFFF00><u>YOU WILL SEND NEXT RATCHET INFO ON HIS KEY :</u><br><br>",
     "fr": "<br><#FFFF00><u>VOUS ENVERREZ LE PROCHAIN RATCHET D'INFO SUR SA CLE :</u><br><br>"
@@ -73,5 +73,15 @@
     "alias": "Send",
     "en": "Send",
     "fr": "Envoyer"
+  },
+  {
+    "alias": "Realm",
+    "en": "Realm",
+    "fr": ""
+  },
+  {
+    "alias": "LogOut",
+    "en": "LogOut",
+    "fr": ""
   }
 ]

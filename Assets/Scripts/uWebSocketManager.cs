@@ -10,6 +10,8 @@ using WebSocket = WebSocketSharp.WebSocket;
 // ReSharper disable once InconsistentNaming
 public class uWebSocketManager : MonoBehaviour {
 	[SerializeField] GameObject mainBlocker;
+	[SerializeField] GameObject reconnectBT;
+	[SerializeField] TMP_InputField realmTxt;
 
 	delegate void EventDelegation(string e);
 	Dictionary<string, EventDelegation> events = new Dictionary<string, EventDelegation>() {
@@ -19,25 +21,66 @@ public class uWebSocketManager : MonoBehaviour {
 		{ "auth:error", WsEvents.AuthError },
 		{ "user:info", WsEvents.UserInfos },
 		{ "message:distributed", WsEvents.MessageDistributed },
+		{ "no:more:messages", WsEvents.NoMoreMessage },
 	};
 	[SerializeField] string socketId;
+	public string URI = "";
 	public WebSocket ws;
 	public bool first = true;
 
-	public void Initialisation() {
-		InvokeRepeating(nameof(Ping), 1, 1);
-		InitSocket(File.ReadAllText(Application.streamingAssetsPath + "/realm.txt"));//"ws://localhost:9997/");
-		//mainBlocker.SetActive(true);
+	private void Start() {
+		URI = File.ReadAllText(Application.streamingAssetsPath + "/realm.txt");
+		InitSocket(URI);
+	}
+
+	//supprime les infos de connexion
+	public void Logout(bool reco) {
+		ws?.CloseAsync();
+		first = true;
+		GameObject.Find("Canvas").GetComponent<MainClass>().authGroup.SetActive(true);
+		GameObject.Find("Nick IF").GetComponent<TMP_InputField>().text = "";
+		GameObject.Find("Pass IF").GetComponent<TMP_InputField>().text = "";
+
+		if(reco && File.Exists(Application.streamingAssetsPath + "/last_auths_infos.txt")) {
+			File.Delete(Application.streamingAssetsPath + "/last_auths_infos.txt");
+		}
+
+
+		User.nickname = "";
+		User.id = "";
+		User.users_infos.Clear();
+		User.conversations.Clear();
+		User.messageId_root.Clear();
+		User.pass_IV = new byte[0];
+		User.pass_kdf = new byte[0];
+		GameObject.Find("Canvas").GetComponent<MainClass>().ClearContats();
+		if (reco) {
+			URI = realmTxt.text;
+			InitSocket(URI);
+			realmTxt.transform.Find("Text Area").transform.Find("Text").GetComponent<TMP_Text>().color = ColorPalette.Get(Palette.paleOrange);
+		} else {
+			CancelInvoke(nameof(Ping));
+			mainBlocker.SetActive(false);
+			reconnectBT.SetActive(true);
+			realmTxt.transform.Find("Text Area").transform.Find("Text").GetComponent<TMP_Text>().color = ColorPalette.Get(Palette.lightGray);
+		}
 	}
 
 	/// <summary>
 	/// Ajoute tous les listeners pour les events émis par le serveur
 	/// </summary>
 	public void InitSocket(string uri) {
+		//ws?.Close();
 		ws = new WebSocket(uri);
+
 		ws.OnOpen += (sender, e) => {
 			UnityMainThread.wkr.AddJob(() => {
+				GameObject.Find("Canvas").GetComponent<MainClass>().SetInputsLogIng(true);
+				InvokeRepeating(nameof(Ping), 0.1f, 1);
+				File.WriteAllText(Application.streamingAssetsPath + "/realm.txt", URI);
+				realmTxt.transform.Find("Text Area").transform.Find("Text").GetComponent<TMP_Text>().color = ColorPalette.Get(Palette.lime);
 				mainBlocker.SetActive(false);
+				reconnectBT.SetActive(false);
 			});
 		};
 		ws.OnMessage += (sender, e) => {
@@ -47,11 +90,9 @@ public class uWebSocketManager : MonoBehaviour {
 				socketId = payload.id;
 				if (first) {
 					UnityMainThread.wkr.AddJob(() => {
-						GameObject.Find("Nick IF").GetComponent<TMP_InputField>().interactable = true;
-						GameObject.Find("Pass IF").GetComponent<TMP_InputField>().interactable = true;
 						GameObject.Find("Canvas").GetComponent<MainClass>().Auth();
 					});
-				} else {
+				} else { 
 					//re-auth if
 					UnityMainThread.wkr.AddJob(() => {
 						GameObject.Find("Canvas").GetComponent<MainClass>().Auth();
@@ -65,11 +106,15 @@ public class uWebSocketManager : MonoBehaviour {
 		};
 		ws.OnClose += (sender, e) => {
 			UnityMainThread.wkr.AddJob(() => {
-				WsEvents.serverStatus.text = Languages.Get("Reconnecting...");
-				WsEvents.serverStatus.color =  new Color(1, 0.5f, 0);
-				mainBlocker.SetActive(true);
+				reconnectBT.SetActive(true);
+				realmTxt.transform.Find("Text Area").transform.Find("Text").GetComponent<TMP_Text>().color = ColorPalette.Get(Palette.red);
+				WsEvents.GetServerStatusTxt().text = Languages.Get("Reconnecting...");
+				GameObject.Find("Canvas").GetComponent<MainClass>().SetInputsLogIng(false);
+				WsEvents.GetServerStatusTxt().color = new Color(1, 0.5f, 0);
 			});
 		};
+
+		ws.ConnectAsync();
 	}
 
 	int tries = 1;
@@ -84,10 +129,15 @@ public class uWebSocketManager : MonoBehaviour {
 			nextTry = DateTime.UtcNow.AddSeconds(Math.Pow(2, tries));
 			//Debug.Log("Next try in " + Math.Pow(2, tries) + "s");
 			socketId = "";
+			ws.CloseAsync();
 			ws.ConnectAsync();
 			WsEvents.pings.Clear();
+			realmTxt.transform.Find("Text Area").transform.Find("Text").GetComponent<TMP_Text>().color = ColorPalette.Get(Palette.red);
+			mainBlocker.SetActive(true);
 			return;
 		}
+		realmTxt.transform.Find("Text Area").transform.Find("Text").GetComponent<TMP_Text>().color = ColorPalette.Get(Palette.lime);
+		mainBlocker.SetActive(false);
 		tries = 1;
 		nextTry = DateTime.UtcNow;
 		string ping_id = Guid.NewGuid().ToString();

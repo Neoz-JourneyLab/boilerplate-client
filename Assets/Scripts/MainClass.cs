@@ -15,7 +15,8 @@ using static Crypto;
 public class MainClass : MonoBehaviour {
 	[SerializeField] TMP_InputField nickname_IF;
 	[SerializeField] TMP_InputField password_IF;
-	[SerializeField] GameObject authGroup;
+	[SerializeField] TMP_InputField realm_IF;
+	public GameObject authGroup;
 	public GameObject logInBT;
 	public GameObject logInInfo;
 
@@ -34,9 +35,24 @@ public class MainClass : MonoBehaviour {
 	int min_len_pass = 5;
 	int min_len_nick = 4;
 
+
+	void OnApplicationQuit() {
+		User.lastSaves.Clear();
+		User.SaveData("infos messages roots");
+	}
+
 	private void Awake() {
+		if (!File.Exists(Application.streamingAssetsPath + "/realm.txt")) {
+			File.WriteAllText(Application.streamingAssetsPath + "/realm.txt", "ws://localhost:9997/");
+		}
+		realm_IF.text = File.ReadAllText(Application.streamingAssetsPath + "/realm.txt");
 		Languages.Init(Application.systemLanguage);
 		authGroup.SetActive(true);
+	}
+
+	public void SetInputsLogIng(bool state) {
+		nickname_IF.interactable = state;
+		password_IF.interactable = state;
 	}
 
 	void Start() {
@@ -65,7 +81,6 @@ public class MainClass : MonoBehaviour {
 
 	public void SaveAuthInfos() {
 		string json = JsonConvert.SerializeObject(new AutoLog() { nick = mem_nick ? nickname_IF.text : "", pass = mem_pass ? password_IF.text : "" }, Formatting.Indented);
-		print("MAC : " + GetMac());
 		var key = Crypto.Hash(Encoding.UTF8.GetBytes(GetMac()));
 		var IV = Crypto.KDF(Encoding.UTF8.GetBytes(GetMac()), Encoding.UTF8.GetBytes(GetMac()), 128);
 		string encrypt = Convert.ToBase64String(Crypto.EncryptAES(json, key, IV));
@@ -105,10 +120,18 @@ public class MainClass : MonoBehaviour {
 	}
 
 	public void AddContactToList(string name, string id) {
+		if (GameObject.Find("contact_" + id) != null) return;
 		GameObject go = Instantiate(contact_prefab, contact_scroll.transform);
-		go.name = "contact_" + name;
+		go.name = "contact_" + id;
 		go.transform.Find("nick").GetComponent<TMP_Text>().text = name;
 		go.GetComponent<ContactPrefab>().id = id;
+	}
+
+	public void ClearContats() {
+		foreach (Transform item in contact_scroll.transform) {
+			Destroy(item.gameObject);
+		}
+		GetComponent<MessageManager>().Focus("");
 	}
 
 	public void MakeAddContactEnbled() {
@@ -117,9 +140,10 @@ public class MainClass : MonoBehaviour {
 
 	public void MakeLogInVisible() {
 		SetPassKdf();
+		logInBT.GetComponent<Button>().interactable = true;
 
 		logInBT.SetActive(password_IF.text.Length >= min_len_pass && nickname_IF.text.Length >= min_len_nick);
-		if (!logInBT.activeSelf) {
+		if (!logInBT.activeSelf && password_IF.text.Length > 0 && nickname_IF.text.Length > 0) {
 			logInInfo.SetActive(true);
 			logInInfo.transform.Find("Txt").GetComponent<TMP_Text>().text = Languages.Get("min_req_log").Replace("#X", min_len_nick.ToString()).Replace("#Y", min_len_pass.ToString());
 		} else {

@@ -21,8 +21,7 @@ public static class Crypto {
 		return hash;
 	}
 	public static byte[] KDF(byte[] init, byte[] salt, int clicks) {
-		clicks = (clicks * 184) % 1953125;
-
+		if(clicks == 0) clicks = 1;
 		int keyLength = 256;
 
 		var kdf = new Rfc2898DeriveBytes(init, salt, clicks);
@@ -33,8 +32,8 @@ public static class Crypto {
 
 	public static byte[] EncryptAES(string plainText, byte[] Key, byte[] IV) {
 		byte[] encrypted;
-		if (IV.Length == 32) {
-			IV = IV.Skip(16).ToArray();
+		if (IV.Length != 16) {
+			IV = IV.Skip(IV.Length - 16).ToArray();
 		}
 		// Create a new AesManaged.
 		using (Aes aes = Aes.Create()) {
@@ -56,7 +55,6 @@ public static class Crypto {
 	}
 	public static string DecryptAES(byte[] cipherText, byte[] Key, byte[] IV) {
 		string plaintext = "cannot decrypt";
-		try {
 			if (IV.Length == 32) {
 				IV = IV.Skip(16).ToArray();
 			}
@@ -72,9 +70,6 @@ public static class Crypto {
 				using StreamReader reader = new StreamReader(cs);
 				plaintext = reader.ReadToEnd();
 			}
-		} catch(Exception ex) { 
-			return "deccryption impossible : " + ex.Message;
-		}
 		return plaintext;
 	}
 

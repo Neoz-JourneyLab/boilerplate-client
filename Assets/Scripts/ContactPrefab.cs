@@ -13,10 +13,12 @@ public class ContactPrefab : MonoBehaviour
 		}
 
 		string lastId = "null";
-    if(User.conversations.ContainsKey(id) && User.conversations[id].Count == 1) {
-			lastId = User.conversations[id].OrderBy(m => m.send_at).Last().id;
+    if(User.conversations.ContainsKey(id)) {
+			lastId = User.conversations[id].OrderBy(m => m.send_at).First().id;
 		}
-    uWebSocketManager.EmitEv("request:messages", new { userNickname = User.users_infos[id].nickname, lastId });
+		if(!WsEvents.noPreviousMessageFromThosesUsers.Contains(id)) {
+			uWebSocketManager.EmitEv("request:messages", new { userId = id, lastId });
+		}
 		transform.Find("nick").GetComponent<TMP_Text>().color = new Color(0, .77f, 1f);
 
 		foreach (Transform item in transform.parent) {
