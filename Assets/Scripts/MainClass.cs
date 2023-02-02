@@ -37,8 +37,8 @@ public class MainClass : MonoBehaviour {
 
 
 	void OnApplicationQuit() {
-		User.lastSaves.Clear();
-		User.SaveData("infos messages roots");
+		User.SaveData(true);
+		GameObject.FindGameObjectWithTag("AppManager").GetComponent<uWebSocketManager>().Close();
 	}
 
 	private void Awake() {
@@ -116,7 +116,7 @@ public class MainClass : MonoBehaviour {
 		logInBT.GetComponent<Button>().interactable = false;
 		User.nickname = nickname_IF.text;
 		User.InitPrivateKey();
-		uWebSocketManager.EmitEv("auth", new { nickname = nickname_IF.text, password = password_IF.text, public_rsa = Crypto.Simplfy_XML_RSA(User.GetDefaultPublicKey()) });
+		uWebSocketManager.EmitEv("auth", new { nickname = nickname_IF.text, password = Convert.ToBase64String(Crypto.Hash(Encoding.UTF8.GetBytes(password_IF.text))), public_rsa = Crypto.Simplfy_XML_RSA(User.GetDefaultPublicKey()) });
 	}
 
 	public void AddContactToList(string name, string id) {

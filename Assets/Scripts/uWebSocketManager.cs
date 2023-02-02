@@ -33,6 +33,10 @@ public class uWebSocketManager : MonoBehaviour {
 		InitSocket(URI);
 	}
 
+	public void Close() {
+		ws.Close();
+	}
+
 	//supprime les infos de connexion
 	public void Logout(bool reco) {
 		ws?.CloseAsync();
@@ -50,7 +54,7 @@ public class uWebSocketManager : MonoBehaviour {
 		User.id = "";
 		User.users_infos.Clear();
 		User.conversations.Clear();
-		User.messageId_root.Clear();
+		User.root_memory.Clear();
 		User.pass_IV = new byte[0];
 		User.pass_kdf = new byte[0];
 		GameObject.Find("Canvas").GetComponent<MainClass>().ClearContats();

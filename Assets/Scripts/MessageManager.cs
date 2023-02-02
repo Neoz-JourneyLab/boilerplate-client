@@ -10,31 +10,41 @@ public class MessageManager : MonoBehaviour {
 	[SerializeField] GameObject sendBT;
 	[SerializeField] GameObject message_scroll;
 	[SerializeField] GameObject convoTab;
+	[SerializeField] Scrollbar scrollBar;
 	public string focus_user_id = "";
 	public string wait_for_send_next = "";
 
 	public GameObject confirmKeyBT;
 	public GameObject confirmKeyPanel;
 
+	private void Start() {
+		InvokeRepeating(nameof(CheckScroll), 1, 1);
+	}
+
 	public void SendMessage() {
-		if (wait_for_send_next != "") return;
-		if (focus_user_id == "") return;
+		if (wait_for_send_next != "") {
+			print("wait for " + wait_for_send_next);
+			return;
+		}
+		if (focus_user_id == "") {
+			return;
+		}
 		if (message_IF.text == "") return;
 
 		int rid = User.users_infos[focus_user_id].sending_ratchet.index;
 		User.users_infos[focus_user_id].sending_ratchet.index++; //incrément du ratchet pour prochain message si pas reset
-		string ratchet_infos = "_ " + rid.ToString();
+		string ratchet_infos = "";
 		string sender_rsa_info = "";
-
+		string root = User.users_infos[focus_user_id].sending_ratchet.root;
+		string root_id = User.users_infos[focus_user_id].sending_ratchet.root_id;
 
 		//si on envoi un message, on regarde si c'est le premier tick qu'on envoi (donc juste après un renew)
 		//cela survient après la réception d'un message étranger, ou lors de la rédaction du premier message vers cet user
 		if (rid == 1) {
-			string root = User.users_infos[focus_user_id].sending_ratchet.root;
 			string rsa_public = Crypto.Regen_XML_RSA(User.users_infos[focus_user_id].sending_ratchet.rsa_public);
 			//on encrypt le root avec la clé RSA publique fournie par l'autre
 			string encrypted_root = Crypto.EncryptionRSA(root, rsa_public);
-			ratchet_infos = encrypted_root + " " + rid;
+			ratchet_infos = encrypted_root;
 			//de même, si on lui a réatribué un nouveau ratchet, on lui donne notre clé RSA pour qu'il puisse aussi nous en attribuder un
 			sender_rsa_info = Crypto.Simplfy_XML_RSA(User.users_infos[focus_user_id].receiving_ratchet.rsa_public);
 		}
@@ -45,11 +55,11 @@ public class MessageManager : MonoBehaviour {
 			id = id,
 			plain = message_IF.text
 		};
-		message.Encrypt(User.users_infos[focus_user_id].sending_ratchet.root, rid);
+		message.Encrypt(root, rid);
 
-		uWebSocketManager.EmitEv("send:message", new { message.cipher, ratchet_infos, to = focus_user_id, sender_rsa_info, id });
+		uWebSocketManager.EmitEv("send:message", new { message.cipher, ratchet_infos, to = focus_user_id, sender_rsa_info, id, ratchet_index = rid, root_id });
 		message_IF.text = "";
-		User.SaveData("infos");
+		User.SaveData();
 	}
 
 	public void SendFirstMessage() {
@@ -64,12 +74,19 @@ public class MessageManager : MonoBehaviour {
 	public void Focus(string id) {
 		focus_user_id = id;
 
+		string lastId = "null";
+		if (User.conversations.ContainsKey(id)) {
+			lastId = User.conversations[id].OrderBy(m => m.send_at).First().id;
+		}
+		//if (!WsEvents.noPreviousMessageFromThosesUsers.Contains(id)) {
+		//	uWebSocketManager.EmitEv("request:messages", new { userId = id, lastId });
+		//}
+
 		if (id == "") {
 			convoTab.SetActive(false);
 			return;
 		}
 		convoTab.SetActive(true);
-		focus_user_id = id;
 		message_IF.interactable = true;
 		if (User.conversations.ContainsKey(id) && User.conversations[id].Count > 0) {
 			User.conversations[id] = User.conversations[id].OrderBy(m => m.send_at).ToList();
@@ -119,10 +136,10 @@ public class MessageManager : MonoBehaviour {
 	}
 
 	public void Clear() {
-		focus_user_id = "";
 		foreach (Transform item in message_scroll.transform) {
 			Destroy(item.gameObject);
 		}
+		Focus("");
 	}
 
 	//prevent spam / wrong ratchet clicks
@@ -131,18 +148,27 @@ public class MessageManager : MonoBehaviour {
 		SetSendBT();
 	}
 
-	public void PrepareBatch(string id_fgn) {
-		Message prev = null;
-		User.conversations[id_fgn] = User.conversations[id_fgn].OrderBy(m => m.send_at).ToList();
-		//on vérifie les roots
-		foreach (var mes in User.conversations[id_fgn].ToArray()) {
-			//il nous manque le root, si le message précédent était du même auteur c'est le même root
-			if (!mes.decrypted && prev != null && prev.from == mes.from && User.messageId_root.ContainsKey(prev.id)) {
-				User.messageId_root[mes.id] = User.messageId_root[prev.id];
-			}
-			prev = mes;
+	string lastLoad = "";
+	bool isScrolling = false;
+	private void CheckScroll() {
+		if(isScrolling && scrollBar.value >= 1f) {
+			LoadMore();
+			isScrolling = false;
+			return;
 		}
-		User.SaveData("roots");
+		if (scrollBar.value >= 1f) isScrolling = true;
+	}
+
+	public void LoadMore() {
+		if (focus_user_id == "") return;
+		string lastId = User.conversations[focus_user_id].First().id;
+		if (lastLoad == lastId) {
+			print("loast load same ID : " + lastLoad);
+			return;
+		}
+		lastLoad = lastId;
+		if (WsEvents.noPreviousMessageFromThosesUsers.Contains(focus_user_id)) return;
+		uWebSocketManager.EmitEv("request:messages", new { userId = focus_user_id, lastId, limit = 10 });
 	}
 
 	public void LoadConv(string idFocus = "") {
@@ -154,16 +180,9 @@ public class MessageManager : MonoBehaviour {
 			Destroy(item.gameObject);
 		}
 
-		if (User.conversations[focus_user_id].Count > 1) {
-			foreach (var mes in User.conversations[focus_user_id].ToArray()) {
-				//on tente un decryptage en force, si il nous manque des roots, on prends les précédents
-				mes.Decrypt();
-			}
-		}
-
 		DateTime last = DateTime.MinValue;
 		foreach (var message in User.conversations[focus_user_id]) {
-			if (message.plain == "~[INIT]~") continue;
+			if (message.plain == "") continue;
 
 			var delta = (message.send_at - last).TotalHours;
 			last = message.send_at;
@@ -211,29 +230,13 @@ public class MessageManager : MonoBehaviour {
 			return;
 		}
 
-		if (m.plain == "~[INIT]~") return;
+		if (m.plain == "~[INIT]~") {
+			m.plain = Languages.Get("Ceci est le début de vos conversations avec " + User.users_infos[focus_user_id].nickname);
+		}
 
 		GameObject go = SetUpMessage(m);
-		int indx = 0;
 
-		for (int i = 0; i < User.conversations[focus_user_id].ToArray().Length; i++) {
-			if (m.id == User.conversations[focus_user_id][i].id) continue;
-			if (m.plain == "~[INIT]~") continue;
-			if (m.send_at > User.conversations[focus_user_id][i].send_at) {
-				indx = i + 1;
-			}
-		}
-
-		int separators = (from Transform mess in message_scroll.transform
-											where mess.name.StartsWith("DATE_SEPARATOR")
-											select mess).Count();
-
-		go.transform.SetSiblingIndex(indx + separators);
-
-		//on a pas reçu le message le plus récent, on peut organiser
-		if (indx != User.conversations[focus_user_id].ToArray().Length - 1) {
-			User.conversations[focus_user_id] = User.conversations[focus_user_id].OrderBy(m => m.send_at).ToList();
-		}
+		//dernier sibling si on Parse()
 
 		LayoutRebuilder.ForceRebuildLayoutImmediate(message_scroll.GetComponent<RectTransform>());
 		Canvas.ForceUpdateCanvases();

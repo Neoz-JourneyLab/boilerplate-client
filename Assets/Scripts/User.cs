@@ -4,9 +4,11 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 using UnityEngine;
+using WebSocketSharp;
 
 public static class User {
 	public static string nickname;
@@ -15,9 +17,11 @@ public static class User {
 	public static byte[] pass_IV;
 	public static Dictionary<string, UserInfo> users_infos = new Dictionary<string, UserInfo>();
 	public static Dictionary<string, List<Message>> conversations = new Dictionary<string, List<Message>>();
-	public static Dictionary<string, string> messageId_root = new Dictionary<string, string>();
+	public static Dictionary<string, string> root_memory = new Dictionary<string, string>();
 	static string default_private_key;
+
 	public static Dictionary<string, DateTime> lastSaves = new Dictionary<string, DateTime>();
+	static Dictionary<string, string> lastHashSave = new Dictionary<string, string>();
 
 	public static void InitPrivateKey() {
 		if (File.Exists(Application.streamingAssetsPath + "/" + nickname + "_default_private_key.txt")) {
@@ -42,40 +46,32 @@ public static class User {
 		return tmp.ToXmlString(true);
 	}
 
-	public static void SaveData(string data) {
-		if (data.Contains("messages")) {
-			if (lastSaves.ContainsKey("messages") && (DateTime.UtcNow - lastSaves["messages"]).TotalSeconds < 30) {
-				//Debug.Log("pas de sauvegarde : on a save messages y'a " + (DateTime.UtcNow - lastSaves["messages"]).TotalSeconds + " s");
-			} else {
-				lastSaves["messages"] = DateTime.UtcNow;
-				string c = JsonConvert.SerializeObject(conversations, Formatting.Indented);
-				//File.WriteAllText(Application.streamingAssetsPath + "/" + nickname + "_conversations.txt", c);
-			}
+	public static void SaveData(bool force = false) {
+		if(force) {
+			lastSaves.Clear();
 		}
-		if (data.Contains("infos")) {
-			if (lastSaves.ContainsKey("infos") && (DateTime.UtcNow - lastSaves["infos"]).TotalSeconds < 30) {
-				//Debug.Log("pas de sauvegarde : on a save infos y'a " + (DateTime.UtcNow - lastSaves["infos"]).TotalSeconds + " s");
-			} else {
-				lastSaves["infos"] = DateTime.UtcNow;
-				//on ne save pas les infos si il n'y a aucun messages : il y a eu une erreur de com
-				var infos = users_infos.Where(u => conversations.ContainsKey(u.Key)).ToDictionary(i => i.Key, i => i.Value);
-				string ui = JsonConvert.SerializeObject(infos, Formatting.Indented);
-				string encrypted = Convert.ToBase64String(Crypto.EncryptAES(ui, pass_kdf, pass_IV));
-				File.WriteAllText(Application.streamingAssetsPath + "/" + nickname + "_user_infos.txt", encrypted);
-				File.WriteAllText(Application.streamingAssetsPath + "/" + nickname + "_user_infos_CLEAR.txt", ui);
-			}
+		Save("user_infos.txt", users_infos);
+		Save("messages_roots.txt", root_memory);
+	}
+
+	public static void Save(string filename, System.Object obj) {
+		string json = JsonConvert.SerializeObject((object)obj);
+		string encrypted = Convert.ToBase64String(Crypto.EncryptAES(json, pass_kdf, pass_IV));
+		var hash = Convert.ToBase64String(Crypto.Hash(Encoding.UTF8.GetBytes(json)));
+		if (!lastHashSave.ContainsKey(filename)) lastHashSave.Add(filename, hash);
+		else if (lastHashSave[filename] == hash) {
+			//Debug.Log("Hash is same for " + filename + " no saving.");
+			return;
+		} else if (lastSaves.ContainsKey(filename) && (DateTime.UtcNow - lastSaves[filename]).TotalSeconds < 5) {
+			//Debug.Log("File " + filename + " saved " + (DateTime.UtcNow - lastSaves[filename]).TotalSeconds + " ago");
+			return;
 		}
-		if (data.Contains("roots")) {
-			if (lastSaves.ContainsKey("roots") && (DateTime.UtcNow - lastSaves["roots"]).TotalSeconds < 30) {
-				//Debug.Log("pas de sauvegarde : on a save roots y'a " + (DateTime.UtcNow - lastSaves["roots"]).TotalSeconds + " s");
-			} else {
-				lastSaves["roots"] = DateTime.UtcNow;
-				string rt = JsonConvert.SerializeObject(messageId_root, Formatting.Indented);
-				string encrypted = Convert.ToBase64String(Crypto.EncryptAES(rt, pass_kdf, pass_IV));
-				File.WriteAllText(Application.streamingAssetsPath + "/" + nickname + "_messages_roots.txt", encrypted);
-				File.WriteAllText(Application.streamingAssetsPath + "/" + nickname + "_messages_roots_CLEAR.txt", rt);
-			}
-		}
+
+		lastHashSave[filename] = hash;
+		lastSaves[filename] = DateTime.UtcNow;
+
+		File.WriteAllText(Application.streamingAssetsPath + "/" + nickname + "_" + filename, encrypted);		
+		//File.WriteAllText(Application.streamingAssetsPath + "/" + nickname + "_CLEAR_" + filename, json);
 	}
 
 	public static void LoadData() {
@@ -89,25 +85,18 @@ public static class User {
 				}
 			} catch (Exception ex) {
 				users_infos ??= new Dictionary<string, UserInfo>();
+				Debug.Log("cannot load users_infos : " + ex.Message);
 			}
 		}
 
-		if (File.Exists(Application.streamingAssetsPath + "/" + nickname + "_conversations.txt")) {
-			try {
-				string encrypted = File.ReadAllText(Application.streamingAssetsPath + "/" + nickname + "_conversations.txt");
-				conversations = JsonConvert.DeserializeObject<Dictionary<string, List<Message>>>(Crypto.DecryptAES(Convert.FromBase64String(encrypted), pass_kdf, pass_IV));
-			} catch (Exception ex) {
-				conversations ??= new Dictionary<string, List<Message>>();
-			}
-		}
 		if (File.Exists(Application.streamingAssetsPath + "/" + nickname + "_messages_roots.txt")) {
 			try {
 
 				string encrypted = File.ReadAllText(Application.streamingAssetsPath + "/" + nickname + "_messages_roots.txt");
-				messageId_root = JsonConvert.DeserializeObject<Dictionary<string, string>>(Crypto.DecryptAES(Convert.FromBase64String(encrypted), pass_kdf, pass_IV));
+				root_memory = JsonConvert.DeserializeObject<Dictionary<string, string>>(Crypto.DecryptAES(Convert.FromBase64String(encrypted), pass_kdf, pass_IV));
 			} catch (Exception ex) {
-				messageId_root ??= new Dictionary<string, string>();
-
+				root_memory ??= new Dictionary<string, string>();
+				Debug.Log("cannot load root memory : " + ex.Message);
 			}
 		}
 	}
@@ -117,24 +106,23 @@ public class UserInfo {
 	public string nickname;
 	public string id;
 	public string default_public_rsa;
-	public bool isInit = false;
 
 	public Ratchet sending_ratchet;
 	public Ratchet receiving_ratchet;
 }
 
 public class Ratchet {
-	public DateTime valitidy;
-	public int index;
-	public string rsa_public;
-	public string WARNING__rsa_private;
-	public string root;
+	public int index = 0;
+	public string rsa_public = "";
+	public string WARNING__rsa_private = "";
+	public string root = "";
+	public string root_id = "";
+	DateTime lastUpdate = DateTime.MinValue;
 
-	public Ratchet Init(string r, string rsa_pu, string rsa_pr, DateTime val) {
-		valitidy = val;
+	public Ratchet Init(string r, string rid, string rsa_pu, string rsa_pr) {
 		index = 1;
 		root = r;
-		byte[] hash = Convert.FromBase64String(r);
+		root_id = rid;
 		WARNING__rsa_private = rsa_pr;
 		rsa_public = rsa_pu;
 		return this;
@@ -142,27 +130,44 @@ public class Ratchet {
 
 	//renouvelle le ratchet d'émission avec un root aléatoire
 	//il sera communiqué au prochain message qu'on enverra, avec la RSA publique fournie par l'autre user
-	public void Renew(DateTime val, string rsa_pu) {
+	public void Renew(string rsa_pu, DateTime date) {
+		if(date < lastUpdate) {
+			Debug.Log("don't init a ratchet with an old message !");
+			return;
+		}
+		lastUpdate = date;
 		rsa_public = rsa_pu;
 		WARNING__rsa_private = "ukn";
-		valitidy = val;
 		index = 1;
 		var hash = Crypto.GenerateRandomHash();
 		root = Convert.ToBase64String(hash);
+		root_id = Guid.NewGuid().ToString();
+		User.root_memory.Add(root_id, root);
+		//Debug.Log("Ajout d'un root ID pour notre nouveau root d'émission : " + root);
 	}
 
 	//récupère notre root de réception grace à la clé RSA qu'on avait envoyé auparavant
 	//prépare une nouvelle clé RSA pour recevoir un nouveau root quand l'user nous répondra
-	public void Set(string new_root, DateTime val) {
+	public bool Set(string new_root, string new_root_id, DateTime date) {
+		if (date < lastUpdate) {
+			Debug.Log("don't init a ratchet with an old message !");
+			return false;
+		}
+		lastUpdate = date;
+		bool success = true;
+		if (WARNING__rsa_private == "") throw new Exception("Error : RSA private key not loaded");
 		//(root a decoder avec private RSA précédent)
 		try {
 			root = Crypto.DecryptionRSA(new_root, WARNING__rsa_private);
-			valitidy = val;
-			PrepareNextRSA(); // puis on génère un autre RSA pour le prochain envoi
-		} catch(Exception ex) {
+			User.root_memory.Add(new_root_id, root);
+			//Debug.Log("nous savons désormais écouter les root " + new_root_id + " > " + root);
+		} catch (Exception ex) {
 			//si on pense recevoir avec notre RSA par défaut par exemple
-			Debug.Log("Mauvais RSA !");
+			Debug.Log("Erreur RSA, cannot decrypt " + new_root + " with " + WARNING__rsa_private + "'" + ex.Message);
+			success = false;
 		}
+		PrepareNextRSA(); // puis on génère un autre RSA pour le prochain envoi
+		return success;
 	}
 
 	public void PrepareNextRSA() {
@@ -178,6 +183,8 @@ public class Message {
 	public string to;
 	public string cipher;
 	public string ratchet_infos;
+	public int ratchet_index;
+	public string root_id;
 	public string sender_rsa_info;
 	public DateTime send_at;
 	public bool distributed;
@@ -185,9 +192,9 @@ public class Message {
 	public bool decrypted = false;
 
 	public void SetDate(string js_date) {
-		//30/01/2023 14:54:29 || 2023-01-31T22:34:54.000Z
+		//2023-01-31T22:34:54.000Z
 		try {
-			string format = js_date.EndsWith("000Z") ? "yyyy-MM-ddTHH:mm:ss.fffZ" : "dd/MM/yyyy HH:mm:ss";
+			string format = "yyyy-MM-ddTHH:mm:ss.fffZ";
 			send_at = DateTime.ParseExact(js_date, format, CultureInfo.InvariantCulture);
 		} catch (Exception e) {
 			Debug.Log("Error : " + e.Message + " (" + js_date + ")");
@@ -195,33 +202,25 @@ public class Message {
 	}
 
 	public void Decrypt() {
+		plain = "<#FF0000>Invalid key for this message";
 		if (decrypted) {
 			return;
 		}
-		int ticks = int.Parse(ratchet_infos.Split(' ')[1]);
 
-		//si on recoit un message sans infos de root, c'est qu'elle se situe sur un message en amont.
-		if (!User.messageId_root.ContainsKey(id)) {
-			plain = "<#FF0000>missing ratchet root for this message";
+		if (!User.root_memory.ContainsKey(root_id)) {
 			return;
 		}
 		try {
-			var root = User.messageId_root[id];
-			if (root.Split('-').Length == 5) {
-				plain = "<#FF0000>root is user ID";
-				Debug.Log("Le root est un UUID d'user : " + root);
-				return;
-			}
-
+			var root = User.root_memory[root_id];
 			var root_bytes = Convert.FromBase64String(root);
 			var salt = Crypto.Hash(Encoding.UTF8.GetBytes(id));
 			var IV = Crypto.Hash(salt);
-			var kdf = Crypto.KDF(root_bytes, salt, ticks);
+			var kdf = Crypto.KDF(root_bytes, salt, ratchet_index);
 			plain = Crypto.DecryptAES(Convert.FromBase64String(cipher), kdf, IV);
 			decrypted = true;
 		} catch (Exception ex) {
-			plain = "<#FFF000>erreur : " + ex.Message;
 			decrypted = false;
+			plain = ex.Message;
 		}
 	}
 
