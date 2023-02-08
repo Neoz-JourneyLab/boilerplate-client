@@ -3,13 +3,13 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
 using UnityEngine;
-using WebSocketSharp;
 
+/// <summary>
+/// all user-relative statics infos are stored here
+/// </summary>
 public static class User {
 	public static string nickname;
 	public static string id;
@@ -24,13 +24,14 @@ public static class User {
 	static Dictionary<string, string> lastHashSave = new Dictionary<string, string>();
 
 	public static void InitPrivateKey() {
-		if (File.Exists(Application.streamingAssetsPath + "/" + nickname + "_default_private_key.txt")) {
-			string pk = File.ReadAllText(Application.streamingAssetsPath + "/" + nickname + "_default_private_key.txt");
+		string default_rsa_key_path = Application.streamingAssetsPath + "/" + nickname + "_default_private_key.txt";
+		if (File.Exists(default_rsa_key_path)) {
+			string pk = File.ReadAllText(default_rsa_key_path);
 			default_private_key = Crypto.DecryptAES(Convert.FromBase64String(pk), pass_kdf, pass_IV);
 		} else {
 			default_private_key = new RSACryptoServiceProvider().ToXmlString(true);
 			string pk = Convert.ToBase64String(Crypto.EncryptAES(default_private_key, pass_kdf, pass_IV));
-			File.WriteAllText(Application.streamingAssetsPath + "/" + nickname + "_default_private_key.txt", pk);
+			File.WriteAllText(default_rsa_key_path, pk);
 		}
 	}
 
@@ -47,7 +48,7 @@ public static class User {
 	}
 
 	public static void SaveData(bool force = false) {
-		if(force) {
+		if (force) {
 			lastSaves.Clear();
 		}
 		Save("user_infos.txt", users_infos);
@@ -70,7 +71,7 @@ public static class User {
 		lastHashSave[filename] = hash;
 		lastSaves[filename] = DateTime.UtcNow;
 
-		File.WriteAllText(Application.streamingAssetsPath + "/" + nickname + "_" + filename, encrypted);		
+		File.WriteAllText(Application.streamingAssetsPath + "/" + nickname + "_" + filename, encrypted);
 		//File.WriteAllText(Application.streamingAssetsPath + "/" + nickname + "_CLEAR_" + filename, json);
 	}
 
@@ -119,10 +120,12 @@ public class Ratchet {
 	public string root_id = "";
 	DateTime lastUpdate = DateTime.MinValue;
 
-	public Ratchet Init(string r, string rid, string rsa_pu, string rsa_pr) {
+	public Ratchet Init(string rsa_pu, string rsa_pr) {
+		var hash = Crypto.GenerateRandomHash();
+
 		index = 1;
-		root = r;
-		root_id = rid;
+		root = Convert.ToBase64String(hash);
+		root_id = Guid.NewGuid().ToString();
 		WARNING__rsa_private = rsa_pr;
 		rsa_public = rsa_pu;
 		return this;
@@ -131,7 +134,7 @@ public class Ratchet {
 	//renouvelle le ratchet d'émission avec un root aléatoire
 	//il sera communiqué au prochain message qu'on enverra, avec la RSA publique fournie par l'autre user
 	public void Renew(string rsa_pu, DateTime date) {
-		if(date < lastUpdate) {
+		if (date < lastUpdate) {
 			Debug.Log("don't init a ratchet with an old message !");
 			return;
 		}
@@ -214,9 +217,9 @@ public class Message {
 			var root = User.root_memory[root_id];
 			var root_bytes = Convert.FromBase64String(root);
 			var salt = Crypto.Hash(Encoding.UTF8.GetBytes(id));
-			var IV = Crypto.Hash(salt);
-			var kdf = Crypto.KDF(root_bytes, salt, ratchet_index);
-			plain = Crypto.DecryptAES(Convert.FromBase64String(cipher), kdf, IV);
+			var IV = Crypto.Hash(Encoding.UTF8.GetBytes(root_id));
+			var kdf_result = Crypto.KDF(root_bytes, salt, ratchet_index);
+			plain = Crypto.DecryptAES(Crypto.ToObfuscatedBytes(cipher), kdf_result, IV);
 			decrypted = true;
 		} catch (Exception ex) {
 			decrypted = false;
@@ -227,9 +230,9 @@ public class Message {
 	public void Encrypt(string root, int ticks) {
 		var root_bytes = Convert.FromBase64String(root);
 		var salt = Crypto.Hash(Encoding.UTF8.GetBytes(id));
-		var IV = Crypto.Hash(salt);
-		var kdf = Crypto.KDF(root_bytes, salt, ticks);
-		cipher = Convert.ToBase64String(Crypto.EncryptAES(plain, kdf, IV));
+		var IV = Crypto.Hash(Encoding.UTF8.GetBytes(root_id));
+		var kdf_result = Crypto.KDF(root_bytes, salt, ticks);
+		cipher = Crypto.FromObfuscatedByte(Crypto.EncryptAES(plain, kdf_result, IV));
 		plain = "encrypted";
 	}
 

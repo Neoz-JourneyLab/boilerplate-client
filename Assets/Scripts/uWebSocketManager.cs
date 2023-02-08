@@ -1,10 +1,9 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.IO;
-using Newtonsoft.Json;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 using WebSocket = WebSocketSharp.WebSocket;
 
 // ReSharper disable once InconsistentNaming
@@ -22,6 +21,7 @@ public class uWebSocketManager : MonoBehaviour {
 		{ "user:info", WsEvents.UserInfos },
 		{ "message:distributed", WsEvents.MessageDistributed },
 		{ "no:more:messages", WsEvents.NoMoreMessage },
+		{ "err", WsEvents.Err },
 	};
 	[SerializeField] string socketId;
 	public string URI = "";
@@ -45,7 +45,7 @@ public class uWebSocketManager : MonoBehaviour {
 		GameObject.Find("Nick IF").GetComponent<TMP_InputField>().text = "";
 		GameObject.Find("Pass IF").GetComponent<TMP_InputField>().text = "";
 
-		if(reco && File.Exists(Application.streamingAssetsPath + "/last_auths_infos.txt")) {
+		if (reco && File.Exists(Application.streamingAssetsPath + "/last_auths_infos.txt")) {
 			File.Delete(Application.streamingAssetsPath + "/last_auths_infos.txt");
 		}
 
@@ -96,7 +96,7 @@ public class uWebSocketManager : MonoBehaviour {
 					UnityMainThread.wkr.AddJob(() => {
 						GameObject.Find("Canvas").GetComponent<MainClass>().Auth();
 					});
-				} else { 
+				} else {
 					//re-auth if
 					UnityMainThread.wkr.AddJob(() => {
 						GameObject.Find("Canvas").GetComponent<MainClass>().Auth();

@@ -1,12 +1,10 @@
+using Newtonsoft.Json;
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.NetworkInformation;
 using System.Text;
-using Newtonsoft.Json;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -31,94 +29,122 @@ public class MainClass : MonoBehaviour {
 	public bool mem_pass = false;
 	[SerializeField] TMP_Text mem_nick_txt;
 	[SerializeField] TMP_Text mem_pass_txt;
+	readonly int min_len_pass = 5;
+	readonly int min_len_nick = 4;
+	readonly string last_auth_info_file = Application.streamingAssetsPath + "/" + "last_auths_infos.txt";
 
-	int min_len_pass = 5;
-	int min_len_nick = 4;
-
-
+	/// <summary>
+	/// Save user information that was not saved when app in quitted
+	/// </summary>
 	void OnApplicationQuit() {
 		User.SaveData(true);
 		GameObject.FindGameObjectWithTag("AppManager").GetComponent<uWebSocketManager>().Close();
 	}
 
 	private void Awake() {
-		if (!File.Exists(Application.streamingAssetsPath + "/realm.txt")) {
-			File.WriteAllText(Application.streamingAssetsPath + "/realm.txt", "ws://localhost:9997/");
+		string realm_path = Application.streamingAssetsPath + "/realm.txt";
+		if (!File.Exists(realm_path)) {
+			File.WriteAllText(realm_path, "ws://localhost:9997/"); //default local ip
 		}
-		realm_IF.text = File.ReadAllText(Application.streamingAssetsPath + "/realm.txt");
+		//load language manager and prompt auth screen
+		realm_IF.text = File.ReadAllText(realm_path);
 		Languages.Init(Application.systemLanguage);
 		authGroup.SetActive(true);
 	}
 
-	public void SetInputsLogIng(bool state) {
-		nickname_IF.interactable = state;
-		password_IF.interactable = state;
-	}
-
 	void Start() {
 		Application.targetFrameRate = 90;
-		if (File.Exists(Application.streamingAssetsPath + "/" + "last_auths_infos.txt")) {
-			string autolog = File.ReadAllText(Application.streamingAssetsPath + "/" + "last_auths_infos.txt");
-			var key = Crypto.Hash(Encoding.UTF8.GetBytes(GetMac()));
-			var IV = Crypto.KDF(Encoding.UTF8.GetBytes(GetMac()), Encoding.UTF8.GetBytes(GetMac()), 128);
-			autolog = Crypto.DecryptAES(Convert.FromBase64String(autolog), key, IV);
+		//decode credentials if available on local storage
+		if (File.Exists(last_auth_info_file)) {
+			string autolog = File.ReadAllText(last_auth_info_file);
+			//key is mac adress
+			var key = Hash(Encoding.UTF8.GetBytes(GetMac()));
+			var IV = KDF(Encoding.UTF8.GetBytes(GetMac()), Encoding.UTF8.GetBytes(GetMac()), 16);
 
+			//json infos are read from decrypted file
+			autolog = DecryptAES(Convert.FromBase64String(autolog), key, IV);
 			AutoLog al = JsonConvert.DeserializeObject<AutoLog>(autolog);
 			if (al.nick != "") {
 				nickname_IF.text = al.nick;
 				mem_nick = false;
-				ChangeMemNick();
+				ChangeMemNick(); //enable memorize nick
 			}
 			if (al.pass != "") {
 				password_IF.text = al.pass;
 				mem_pass = false;
-				ChangeMemPass();
-				//will auto log in
+				ChangeMemPass(); //enable memorize pass
+
+				//will auto log in : disable log in button
 				logInBT.GetComponent<Button>().interactable = false;
 			}
 		}
 	}
 
+	/// <summary>
+	/// Set input for log in disabled or enabled
+	/// </summary>
+	public void SetInputsLogIng(bool state) {
+		nickname_IF.interactable = state;
+		password_IF.interactable = state;
+	}
+
+	/// <summary>
+	/// save credentials if enabled, encrypt with mac adress
+	/// </summary>
 	public void SaveAuthInfos() {
-		string json = JsonConvert.SerializeObject(new AutoLog() { nick = mem_nick ? nickname_IF.text : "", pass = mem_pass ? password_IF.text : "" }, Formatting.Indented);
-		var key = Crypto.Hash(Encoding.UTF8.GetBytes(GetMac()));
-		var IV = Crypto.KDF(Encoding.UTF8.GetBytes(GetMac()), Encoding.UTF8.GetBytes(GetMac()), 128);
-		string encrypt = Convert.ToBase64String(Crypto.EncryptAES(json, key, IV));
-		File.WriteAllText(Application.streamingAssetsPath + "/" + "last_auths_infos.txt", encrypt);
+		string json = JsonConvert.SerializeObject(new AutoLog() {
+			nick = mem_nick ? nickname_IF.text : "",
+			pass = mem_pass ? password_IF.text : ""
+		}, Formatting.Indented);
+		string mac_adress = GetMac();
+		var key = Hash(Encoding.UTF8.GetBytes(mac_adress));
+		var IV = KDF(Encoding.UTF8.GetBytes(GetMac()), Encoding.UTF8.GetBytes(GetMac()), 128);
+		string encrypt = Convert.ToBase64String(EncryptAES(json, key, IV));
+		File.WriteAllText(last_auth_info_file, encrypt);
 	}
 
+	/// <summary>
+	/// set user hashed password for current session
+	/// </summary>
 	public void SetPassKdf() {
-		byte[] hash = Crypto.Hash(Encoding.UTF8.GetBytes(password_IF.text));
-		User.pass_IV = Crypto.KDF(hash, hash, 32);
-		User.pass_kdf = Crypto.KDF(User.pass_IV, hash, 64);
+		byte[] hash = Hash(Encoding.UTF8.GetBytes(password_IF.text));
+		User.pass_IV = KDF(hash, hash, 32);
+		User.pass_kdf = KDF(User.pass_IV, hash, 64);
 	}
 
+	/// <summary>
+	/// get the mac adress
+	/// </summary>
+	/// <returns>string mac adress</returns>
 	public string GetMac() {
-		var macAddr =
+		string macAddr =
 		(
 				from nic in NetworkInterface.GetAllNetworkInterfaces()
 				where nic.OperationalStatus == OperationalStatus.Up
 				select nic.GetPhysicalAddress().ToString()
 		).FirstOrDefault();
-		if(macAddr == null || macAddr == "") {
+		if (macAddr == null || macAddr == "") {
 			macAddr = "NO MAC ADRESS";
 		}
 		return macAddr;
 	}
 
-	class AutoLog {
-		public string nick;
-		public string pass;
-	}
-
+	/// <summary>
+	/// Auth user on the server
+	/// </summary>
 	public void Auth() {
 		if (nickname_IF.text.Length < min_len_nick || password_IF.text.Length < min_len_pass) return;
 		logInBT.GetComponent<Button>().interactable = false;
 		User.nickname = nickname_IF.text;
-		User.InitPrivateKey();
-		uWebSocketManager.EmitEv("auth", new { nickname = nickname_IF.text, password = Convert.ToBase64String(Crypto.Hash(Encoding.UTF8.GetBytes(password_IF.text))), public_rsa = Crypto.Simplfy_XML_RSA(User.GetDefaultPublicKey()) });
+		User.InitPrivateKey(); //generate or read RSA keypair for that user
+		uWebSocketManager.EmitEv("auth", new { nickname = nickname_IF.text, password = Convert.ToBase64String(Hash(Encoding.UTF8.GetBytes(password_IF.text))), public_rsa = Simplfy_XML_RSA(User.GetDefaultPublicKey()) });
 	}
 
+	/// <summary>
+	/// add user to contact scroll
+	/// </summary>
+	/// <param name="name"></param>
+	/// <param name="id"></param>
 	public void AddContactToList(string name, string id) {
 		if (GameObject.Find("contact_" + id) != null) return;
 		GameObject go = Instantiate(contact_prefab, contact_scroll.transform);
@@ -127,6 +153,9 @@ public class MainClass : MonoBehaviour {
 		go.GetComponent<ContactPrefab>().id = id;
 	}
 
+	/// <summary>
+	/// remove all users from contact scroll
+	/// </summary>
 	public void ClearContats() {
 		foreach (Transform item in contact_scroll.transform) {
 			Destroy(item.gameObject);
@@ -134,10 +163,16 @@ public class MainClass : MonoBehaviour {
 		GetComponent<MessageManager>().Focus("");
 	}
 
+	/// <summary>
+	/// check if you can press "add contact"
+	/// </summary>
 	public void MakeAddContactEnbled() {
 		addContactBT.interactable = new_contact.text.Length > 3;
 	}
 
+	/// <summary>
+	/// Check if login button is enabled
+	/// </summary>
 	public void MakeLogInVisible() {
 		SetPassKdf();
 		logInBT.GetComponent<Button>().interactable = true;
@@ -151,36 +186,63 @@ public class MainClass : MonoBehaviour {
 		}
 	}
 
+	/// <summary>
+	/// request user info to initiate a conversation
+	/// </summary>
 	public void AddContact() {
 		uWebSocketManager.EmitEv("request:user:info", new { nickname = new_contact.text });
 		new_contact.text = "";
 	}
 
-
+	/// <summary>
+	/// clear error console after 5 seconds
+	/// </summary>
+	/// <returns></returns>
 	IEnumerator ClearConsole() {
-		yield return new WaitForSeconds(3);
+		yield return new WaitForSeconds(5);
 		while (console.color.a > 0) {
 			console.color = new Color(console.color.r, console.color.g, console.color.b, console.color.a - 0.1f);
+			Color c = console.transform.parent.GetComponent<Image>().color;
+			console.transform.parent.GetComponent<Image>().color = new Color(c.r, c.g, c.b, console.color.a - 0.1f);
 			yield return new WaitForSeconds(0.05f);
 		}
 		console.text = "";
 	}
 
+	/// <summary>
+	/// display info on console
+	/// </summary>
 	public void Prompt(string log) {
 		StopCoroutine(nameof(ClearConsole));
+		console.transform.parent.GetComponent<Image>().enabled = true;
 		console.text = log;
+		Color c = console.transform.parent.GetComponent<Image>().color;
+		console.transform.parent.GetComponent<Image>().color = new Color(c.r, c.g, c.b, 1);
 		console.color = new Color(1, 0, 0, 1);
 		StartCoroutine(nameof(ClearConsole));
 	}
 
+	/// <summary>
+	/// set or disable if nick is stored locally for next auth
+	/// </summary>
 	public void ChangeMemNick() {
 		mem_nick = !mem_nick;
 		mem_nick_txt.color = mem_nick ? new Color(0.56f, 0.88f, 1) : new Color(0.35f, 0.35f, 0.35f);
 		mem_nick_txt.transform.parent.Find("Image").gameObject.SetActive(mem_nick);
 	}
+
+	/// <summary>
+	/// set or disable if password is stored locally for next auth
+	/// /!\ NOT RECOMMENDED /!\
+	/// </summary>
 	public void ChangeMemPass() {
 		mem_pass = !mem_pass;
 		mem_pass_txt.color = mem_pass ? new Color(1f, 0.46f, 0.35f) : new Color(0.35f, 0.35f, 0.35f);
 		mem_pass_txt.transform.parent.Find("Image").gameObject.SetActive(mem_pass);
+	}
+
+	class AutoLog {
+		public string nick;
+		public string pass;
 	}
 }

@@ -1,6 +1,4 @@
 using System.Collections;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -18,7 +16,7 @@ public class ExperienceBar : MonoBehaviour {
 	public static void SetXpBar(float ratio) {
 		//0 > 770
 		//1 > 0
-		target = ((max-min) * ratio) + min;
+		target = ((max - min) * ratio) + min;
 		GameObject.Find("Canvas").GetComponent<ExperienceBar>().StartCoroutine(nameof(BarAnim));
 	}
 

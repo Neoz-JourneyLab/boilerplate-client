@@ -1,13 +1,10 @@
-using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using UnityEngine;
 
-public class SpriteManager : MonoBehaviour
-{
+public class SpriteManager : MonoBehaviour {
 	Dictionary<string, Sprite> sprites = new Dictionary<string, Sprite>();
 
-  private void Awake() {
+	private void Awake() {
 		foreach (var item in Resources.LoadAll("Sprites", typeof(Sprite))) {
 			if (sprites.ContainsKey(item.name)) {
 				print("conflit : " + item.name);
@@ -15,7 +12,7 @@ public class SpriteManager : MonoBehaviour
 			}
 			sprites.Add(item.name, item as Sprite);
 		}
-  }
+	}
 
 	public static Sprite Get(string name) {
 		var sman = FindObjectOfType<SpriteManager>();

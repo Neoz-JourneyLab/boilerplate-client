@@ -2,201 +2,205 @@ using System;
 using System.Collections.Generic;
 namespace RSG {
 
-  public class PromiseCancelledException : Exception {
-    /// <summary>
-    ///   Just create the exception
-    /// </summary>
-    public PromiseCancelledException() { }
+	public class PromiseCancelledException : Exception {
+		/// <summary>
+		///   Just create the exception
+		/// </summary>
+		public PromiseCancelledException() { }
 
-    /// <summary>
-    ///   Create the exception with description
-    /// </summary>
-    /// <param name="message">Exception description</param>
-    public PromiseCancelledException(string message) : base(message) { }
-  }
+		/// <summary>
+		///   Create the exception with description
+		/// </summary>
+		/// <param name="message">Exception description</param>
+		public PromiseCancelledException(string message) : base(message) { }
+	}
 
-  /// <summary>
-  ///   A class that wraps a pending promise with it's predicate and time data
-  /// </summary>
-  class PredicateWait {
+	/// <summary>
+	///   A class that wraps a pending promise with it's predicate and time data
+	/// </summary>
+	class PredicateWait {
 
-    /// <summary>
-    ///   The frame the promise was started
-    /// </summary>
-    public int frameStarted;
+		/// <summary>
+		///   The frame the promise was started
+		/// </summary>
+		public int frameStarted;
 
-    /// <summary>
-    ///   The pending promise which is an interface for a promise that can be rejected or resolved.
-    /// </summary>
-    public IPendingPromise pendingPromise;
-    /// <summary>
-    ///   Predicate for resolving the promise
-    /// </summary>
-    public Func<TimeData, bool> predicate;
+		/// <summary>
+		///   The pending promise which is an interface for a promise that can be rejected or resolved.
+		/// </summary>
+		public IPendingPromise pendingPromise;
+		/// <summary>
+		///   Predicate for resolving the promise
+		/// </summary>
+		public Func<TimeData, bool> predicate;
 
-    /// <summary>
-    ///   The time data specific to this pending promise. Includes elapsed time and delta time.
-    /// </summary>
-    public TimeData timeData;
+		/// <summary>
+		///   The time data specific to this pending promise. Includes elapsed time and delta time.
+		/// </summary>
+		public TimeData timeData;
 
-    /// <summary>
-    ///   The time the promise was started
-    /// </summary>
-    public float timeStarted;
-  }
+		/// <summary>
+		///   The time the promise was started
+		/// </summary>
+		public float timeStarted;
+	}
 
-  /// <summary>
-  ///   Time data specific to a particular pending promise.
-  /// </summary>
-  public struct TimeData {
-    /// <summary>
-    ///   The amount of time that has elapsed since the pending promise started running
-    /// </summary>
-    public float elapsedTime;
+	/// <summary>
+	///   Time data specific to a particular pending promise.
+	/// </summary>
+	public struct TimeData {
+		/// <summary>
+		///   The amount of time that has elapsed since the pending promise started running
+		/// </summary>
+		public float elapsedTime;
 
-    /// <summary>
-    ///   The amount of time since the last time the pending promise was updated.
-    /// </summary>
-    public float deltaTime;
+		/// <summary>
+		///   The amount of time since the last time the pending promise was updated.
+		/// </summary>
+		public float deltaTime;
 
-    /// <summary>
-    ///   The amount of times that update has been called since the pending promise started running
-    /// </summary>
-    public int elapsedUpdates;
-  }
+		/// <summary>
+		///   The amount of times that update has been called since the pending promise started running
+		/// </summary>
+		public int elapsedUpdates;
+	}
 
-  public interface IPromiseTimer {
-    /// <summary>
-    ///   Resolve the returned promise once the time has elapsed
-    /// </summary>
-    IPromise WaitFor(float seconds);
+	public interface IPromiseTimer {
+		/// <summary>
+		///   Resolve the returned promise once the time has elapsed
+		/// </summary>
+		IPromise WaitFor(float seconds);
 
-    /// <summary>
-    ///   Resolve the returned promise once the predicate evaluates to true
-    /// </summary>
-    IPromise WaitUntil(Func<TimeData, bool> predicate);
+		/// <summary>
+		///   Resolve the returned promise once the predicate evaluates to true
+		/// </summary>
+		IPromise WaitUntil(Func<TimeData, bool> predicate);
 
-    /// <summary>
-    ///   Resolve the returned promise once the predicate evaluates to false
-    /// </summary>
-    IPromise WaitWhile(Func<TimeData, bool> predicate);
+		/// <summary>
+		///   Resolve the returned promise once the predicate evaluates to false
+		/// </summary>
+		IPromise WaitWhile(Func<TimeData, bool> predicate);
 
-    /// <summary>
-    ///   Update all pending promises. Must be called for the promises to progress and resolve at all.
-    /// </summary>
-    void Update(float deltaTime);
+		/// <summary>
+		///   Update all pending promises. Must be called for the promises to progress and resolve at all.
+		/// </summary>
+		void Update(float deltaTime);
 
-    /// <summary>
-    ///   Cancel a waiting promise and reject it immediately.
-    /// </summary>
-    bool Cancel(IPromise promise);
-  }
+		/// <summary>
+		///   Cancel a waiting promise and reject it immediately.
+		/// </summary>
+		bool Cancel(IPromise promise);
+	}
 
-  public class PromiseTimer : IPromiseTimer {
+	public class PromiseTimer : IPromiseTimer {
 
-    /// <summary>
-    ///   Currently pending promises
-    /// </summary>
-    readonly LinkedList<PredicateWait> waiting = new LinkedList<PredicateWait>();
+		/// <summary>
+		///   Currently pending promises
+		/// </summary>
+		readonly LinkedList<PredicateWait> waiting = new LinkedList<PredicateWait>();
 
-    /// <summary>
-    ///   The current running total for the amount of frames the PromiseTimer has run for
-    /// </summary>
-    int curFrame;
-    /// <summary>
-    ///   The current running total for time that this PromiseTimer has run for
-    /// </summary>
-    float curTime;
+		/// <summary>
+		///   The current running total for the amount of frames the PromiseTimer has run for
+		/// </summary>
+		int curFrame;
+		/// <summary>
+		///   The current running total for time that this PromiseTimer has run for
+		/// </summary>
+		float curTime;
 
-    /// <summary>
-    ///   Resolve the returned promise once the time has elapsed
-    /// </summary>
-    public IPromise WaitFor(float seconds) => WaitUntil(t => t.elapsedTime >= seconds);
+		/// <summary>
+		///   Resolve the returned promise once the time has elapsed
+		/// </summary>
+		public IPromise WaitFor(float seconds) => WaitUntil(t => t.elapsedTime >= seconds);
 
-    /// <summary>
-    ///   Resolve the returned promise once the predicate evaluates to false
-    /// </summary>
-    public IPromise WaitWhile(Func<TimeData, bool> predicate) => WaitUntil(t => !predicate(t));
+		/// <summary>
+		///   Resolve the returned promise once the predicate evaluates to false
+		/// </summary>
+		public IPromise WaitWhile(Func<TimeData, bool> predicate) => WaitUntil(t => !predicate(t));
 
-    /// <summary>
-    ///   Resolve the returned promise once the predicate evalutes to true
-    /// </summary>
-    public IPromise WaitUntil(Func<TimeData, bool> predicate) {
-      Promise promise = new Promise();
+		/// <summary>
+		///   Resolve the returned promise once the predicate evalutes to true
+		/// </summary>
+		public IPromise WaitUntil(Func<TimeData, bool> predicate) {
+			Promise promise = new Promise();
 
-      PredicateWait wait = new PredicateWait {
-        timeStarted = curTime, pendingPromise = promise, timeData = new TimeData(), predicate = predicate, frameStarted = curFrame
-      };
+			PredicateWait wait = new PredicateWait {
+				timeStarted = curTime,
+				pendingPromise = promise,
+				timeData = new TimeData(),
+				predicate = predicate,
+				frameStarted = curFrame
+			};
 
-      waiting.AddLast(wait);
+			waiting.AddLast(wait);
 
-      return promise;
-    }
+			return promise;
+		}
 
-    public bool Cancel(IPromise promise) {
-      LinkedListNode<PredicateWait> node = FindInWaiting(promise);
+		public bool Cancel(IPromise promise) {
+			LinkedListNode<PredicateWait> node = FindInWaiting(promise);
 
-      if (node == null) return false;
+			if (node == null) return false;
 
-      node.Value.pendingPromise.Reject(new PromiseCancelledException("Promise was cancelled by user."));
-      waiting.Remove(node);
+			node.Value.pendingPromise.Reject(new PromiseCancelledException("Promise was cancelled by user."));
+			waiting.Remove(node);
 
-      return true;
-    }
+			return true;
+		}
 
-    /// <summary>
-    ///   Update all pending promises. Must be called for the promises to progress and resolve at all.
-    /// </summary>
-    public void Update(float deltaTime) {
-      curTime += deltaTime;
-      curFrame += 1;
+		/// <summary>
+		///   Update all pending promises. Must be called for the promises to progress and resolve at all.
+		/// </summary>
+		public void Update(float deltaTime) {
+			curTime += deltaTime;
+			curFrame += 1;
 
-      LinkedListNode<PredicateWait> node = waiting.First;
-      while (node != null) {
-        PredicateWait wait = node.Value;
+			LinkedListNode<PredicateWait> node = waiting.First;
+			while (node != null) {
+				PredicateWait wait = node.Value;
 
-        float newElapsedTime = curTime - wait.timeStarted;
-        wait.timeData.deltaTime = newElapsedTime - wait.timeData.elapsedTime;
-        wait.timeData.elapsedTime = newElapsedTime;
-        int newElapsedUpdates = curFrame - wait.frameStarted;
-        wait.timeData.elapsedUpdates = newElapsedUpdates;
+				float newElapsedTime = curTime - wait.timeStarted;
+				wait.timeData.deltaTime = newElapsedTime - wait.timeData.elapsedTime;
+				wait.timeData.elapsedTime = newElapsedTime;
+				int newElapsedUpdates = curFrame - wait.frameStarted;
+				wait.timeData.elapsedUpdates = newElapsedUpdates;
 
-        bool result;
-        try {
-          result = wait.predicate(wait.timeData);
-        } catch (Exception ex) {
-          wait.pendingPromise.Reject(ex);
+				bool result;
+				try {
+					result = wait.predicate(wait.timeData);
+				} catch (Exception ex) {
+					wait.pendingPromise.Reject(ex);
 
-          node = RemoveNode(node);
-          continue;
-        }
+					node = RemoveNode(node);
+					continue;
+				}
 
-        if (result) {
-          wait.pendingPromise.Resolve();
+				if (result) {
+					wait.pendingPromise.Resolve();
 
-          node = RemoveNode(node);
-        } else node = node.Next;
-      }
-    }
+					node = RemoveNode(node);
+				} else node = node.Next;
+			}
+		}
 
-    LinkedListNode<PredicateWait> FindInWaiting(IPromise promise) {
-      for (LinkedListNode<PredicateWait> node = waiting.First; node != null; node = node.Next) {
-        if (node.Value.pendingPromise.Id.Equals(promise.Id)) return node;
-      }
+		LinkedListNode<PredicateWait> FindInWaiting(IPromise promise) {
+			for (LinkedListNode<PredicateWait> node = waiting.First; node != null; node = node.Next) {
+				if (node.Value.pendingPromise.Id.Equals(promise.Id)) return node;
+			}
 
-      return null;
-    }
+			return null;
+		}
 
-    /// <summary>
-    ///   Removes the provided node and returns the next node in the list.
-    /// </summary>
-    LinkedListNode<PredicateWait> RemoveNode(LinkedListNode<PredicateWait> node) {
-      LinkedListNode<PredicateWait> currentNode = node;
-      node = node.Next;
+		/// <summary>
+		///   Removes the provided node and returns the next node in the list.
+		/// </summary>
+		LinkedListNode<PredicateWait> RemoveNode(LinkedListNode<PredicateWait> node) {
+			LinkedListNode<PredicateWait> currentNode = node;
+			node = node.Next;
 
-      waiting.Remove(currentNode);
+			waiting.Remove(currentNode);
 
-      return node;
-    }
-  }
+			return node;
+		}
+	}
 }

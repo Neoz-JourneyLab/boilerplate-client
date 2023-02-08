@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
@@ -8,7 +6,7 @@ public class SetWord : MonoBehaviour {
 	[SerializeField] string word;
 
 	private void Start() {
-		TMP_Text txt = GetComponent<TextMeshProUGUI>() == null ? 
+		TMP_Text txt = GetComponent<TextMeshProUGUI>() == null ?
 			GetComponentInChildren<TextMeshProUGUI>() : GetComponent<TextMeshProUGUI>();
 		if (txt == null) {
 			print("/!\\ text for " + gameObject.name + " is null");

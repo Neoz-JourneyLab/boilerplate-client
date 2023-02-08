@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -71,14 +71,13 @@ public class WsEvents : MonoBehaviour {
 		//réception volontaire des informations de l'utilisateur, on lui créer un ratchet d'émission
 		//on assigne un ratchet de réception (peu importe la seed qui sera initialisée à la reception du premier message)
 		//on lui assigne un RSA dédié pour qu'il nous envoie ses informations d'émission
-		var hash = Crypto.GenerateRandomHash();
 		RSACryptoServiceProvider dedicaced_rsa = new RSACryptoServiceProvider();
 
 		User.users_infos[id] = new UserInfo() {
 			id = id,
 			nickname = nick,
-			sending_ratchet = new Ratchet().Init(Convert.ToBase64String(hash), Guid.NewGuid().ToString(), foreign_default_rsa, "ukn"),
-			receiving_ratchet = new Ratchet().Init(Convert.ToBase64String(Crypto.GenerateRandomHash()), Guid.NewGuid().ToString(), Crypto.Simplfy_XML_RSA(dedicaced_rsa.ToXmlString(false)), dedicaced_rsa.ToXmlString(true)),
+			sending_ratchet = new Ratchet().Init(foreign_default_rsa, "ukn"),
+			receiving_ratchet = new Ratchet().Init(Crypto.Simplfy_XML_RSA(dedicaced_rsa.ToXmlString(false)), dedicaced_rsa.ToXmlString(true)),
 		};
 
 		User.root_memory.Add(User.users_infos[id].sending_ratchet.root_id, User.users_infos[id].sending_ratchet.root);
@@ -120,7 +119,8 @@ public class WsEvents : MonoBehaviour {
 		if (!User.conversations.ContainsKey(fgn)) {
 			//ici, il s'agit du premier message reçu (donc du dernier envoyé)
 			User.conversations.Add(fgn, new List<Message>() { m });
-		} else if (User.conversations[fgn].Find(mes => mes.id == m.id) == null) {
+		} 
+		else if (User.conversations[fgn].Find(mes => mes.id == m.id) == null) {
 			DateTime lastMessage = User.conversations[fgn].Last().send_at;
 			DateTime firstMessage = User.conversations[fgn].First().send_at;
 
@@ -138,7 +138,8 @@ public class WsEvents : MonoBehaviour {
 					isLastMessage = true;
 				}
 			}
-		} else {
+		} 
+		else {
 			return; //skip réception du message si déjà en liste
 		}
 
@@ -153,6 +154,11 @@ public class WsEvents : MonoBehaviour {
 			User.users_infos[fgn].receiving_ratchet.WARNING__rsa_private = User.WARNING___GetDefaultPrivateKey();
 			if (logs) print("nous n'avons pas les infos de cet utilisateur");
 			uWebSocketManager.EmitEv("request:user:info", new { id = fgn });
+		}
+
+		//if we sent that message
+		if(m.from == User.id) {
+			User.users_infos[fgn].sending_ratchet.index++; //ratchet increment for next message we will send
 		}
 
 		// si on recoit un nouveau message d'un user connu et qu'on l'a pas en focus
@@ -258,7 +264,7 @@ public class WsEvents : MonoBehaviour {
 	public static void Err(string json) {
 		string code = JObject.Parse(json)["code"].ToString();
 		string message = JObject.Parse(json)["message"].ToString();
-		Debug.Log("Error : " + code + " > " + message);
+		GameObject.Find("Canvas").GetComponent<MainClass>().Prompt("<#FF3000>" + Languages.Get(code) + "\n<#FFF205>" + message);
 	}
 	#endregion
 }

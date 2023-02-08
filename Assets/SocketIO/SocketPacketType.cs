@@ -27,15 +27,15 @@
 #endregion
 
 namespace SocketIO {
-    public enum SocketPacketType {
-        UNKNOWN = -1,
-        CONNECT = 0,
-        DISCONNECT = 1,
-        EVENT = 2,
-        ACK = 3,
-        ERROR = 4,
-        BINARY_EVENT = 5,
-        BINARY_ACK = 6,
-        CONTROL = 7
-    }
+	public enum SocketPacketType {
+		UNKNOWN = -1,
+		CONNECT = 0,
+		DISCONNECT = 1,
+		EVENT = 2,
+		ACK = 3,
+		ERROR = 4,
+		BINARY_EVENT = 5,
+		BINARY_ACK = 6,
+		CONTROL = 7
+	}
 }

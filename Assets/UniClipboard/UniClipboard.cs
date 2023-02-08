@@ -1,35 +1,35 @@
 ﻿using UnityEngine;
 public class UniClipboard {
-  static IBoard _board;
-  static IBoard board {
-    get {
-      if (_board == null) {
-        #if UNITY_EDITOR
-        _board = new EditorBoard();
-        #elif UNITY_ANDROID
+    static IBoard _board;
+    static IBoard board {
+        get {
+            if (_board == null) {
+#if UNITY_EDITOR
+                _board = new EditorBoard();
+#elif UNITY_ANDROID
                 _board = new AndroidBoard();
-        #elif UNITY_IOS
+#elif UNITY_IOS
                 _board = new IOSBoard ();
-        #endif
-      }
-      return _board;
+#endif
+            }
+            return _board;
+        }
     }
-  }
 
-  public static void SetText(string str) => board.SetText(str);
+    public static void SetText(string str) => board.SetText(str);
 
-  public static string GetText() => board.GetText();
+    public static string GetText() => board.GetText();
 }
 
 interface IBoard {
-  void SetText(string str);
-  string GetText();
+    void SetText(string str);
+    string GetText();
 }
 
 class EditorBoard : IBoard {
-  public void SetText(string str) => GUIUtility.systemCopyBuffer = str;
+    public void SetText(string str) => GUIUtility.systemCopyBuffer = str;
 
-  public string GetText() => GUIUtility.systemCopyBuffer;
+    public string GetText() => GUIUtility.systemCopyBuffer;
 }
 
 #if UNITY_IOS

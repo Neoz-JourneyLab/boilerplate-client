@@ -17,60 +17,73 @@ public class MessageManager : MonoBehaviour {
 	public GameObject confirmKeyBT;
 	public GameObject confirmKeyPanel;
 
+	string key = "";
+
+	string lastLoad = "";
+	bool isScrolling = false;
+
 	private void Start() {
+		//check every second if user scroll conversation to load old messages
 		InvokeRepeating(nameof(CheckScroll), 1, 1);
 	}
 
+	/// <summary>
+	/// send a new message to the focused user
+	/// </summary>
 	public void SendMessage() {
-		if (wait_for_send_next != "") {
-			print("wait for " + wait_for_send_next);
-			return;
-		}
-		if (focus_user_id == "") {
-			return;
-		}
+		//to disable spam, wait response from server of previous sent message
+		if (wait_for_send_next != "") return;
+		if (focus_user_id == "") return;
 		if (message_IF.text == "") return;
 
 		int rid = User.users_infos[focus_user_id].sending_ratchet.index;
-		User.users_infos[focus_user_id].sending_ratchet.index++; //incrément du ratchet pour prochain message si pas reset
 		string ratchet_infos = "";
 		string sender_rsa_info = "";
 		string root = User.users_infos[focus_user_id].sending_ratchet.root;
 		string root_id = User.users_infos[focus_user_id].sending_ratchet.root_id;
 
-		//si on envoi un message, on regarde si c'est le premier tick qu'on envoi (donc juste après un renew)
-		//cela survient après la réception d'un message étranger, ou lors de la rédaction du premier message vers cet user
+		//if we send a message, we check if it's the first tick we send (so just after a renew)
+		//this happens after receiving a foreign message, or when writing the first message to this user
 		if (rid == 1) {
 			string rsa_public = Crypto.Regen_XML_RSA(User.users_infos[focus_user_id].sending_ratchet.rsa_public);
-			//on encrypt le root avec la clé RSA publique fournie par l'autre
-			string encrypted_root = Crypto.EncryptionRSA(root, rsa_public);
-			ratchet_infos = encrypted_root;
-			//de même, si on lui a réatribué un nouveau ratchet, on lui donne notre clé RSA pour qu'il puisse aussi nous en attribuder un
+			//we encrypt the root with the public RSA key provided by the other
+			ratchet_infos = Crypto.EncryptionRSA(root, rsa_public);
+			//likewise, if we assigned a new ratchet, we give it our RSA key so that it can also assign us one
 			sender_rsa_info = Crypto.Simplfy_XML_RSA(User.users_infos[focus_user_id].receiving_ratchet.rsa_public);
 		}
 
-		string id = Guid.NewGuid().ToString();
-		wait_for_send_next = id;
+		string id = Guid.NewGuid().ToString(); //random UUID for the message
+		wait_for_send_next = id; //store this to prevent spamming
 		Message message = new Message() {
 			id = id,
+			root_id = root_id,
 			plain = message_IF.text
 		};
-		message.Encrypt(root, rid);
+		message.Encrypt(root, rid); //plain is cleared during this method, and cipher is created
 
 		uWebSocketManager.EmitEv("send:message", new { message.cipher, ratchet_infos, to = focus_user_id, sender_rsa_info, id, ratchet_index = rid, root_id });
 		message_IF.text = "";
-		User.SaveData();
 	}
 
+	/// <summary>
+	/// Send first message to user, initialisating our sending ratchet
+	/// </summary>
 	public void SendFirstMessage() {
 		message_IF.text = "~[INIT]~";
 		SendMessage();
 	}
 
+	/// <summary>
+	/// set send button if ready
+	/// </summary>
 	public void SetSendBT() {
-		sendBT.SetActive(message_IF.text != "" && wait_for_send_next == "");
+		sendBT.GetComponent<Button>().interactable = (message_IF.text != "" && wait_for_send_next == "");
 	}
 
+	/// <summary>
+	/// focus a User and load it's conversation, or close convo tab
+	/// </summary>
+	/// <param name="id">user if to focus</param>
 	public void Focus(string id) {
 		focus_user_id = id;
 
@@ -78,30 +91,26 @@ public class MessageManager : MonoBehaviour {
 		if (User.conversations.ContainsKey(id)) {
 			lastId = User.conversations[id].OrderBy(m => m.send_at).First().id;
 		}
-		//if (!WsEvents.noPreviousMessageFromThosesUsers.Contains(id)) {
-		//	uWebSocketManager.EmitEv("request:messages", new { userId = id, lastId });
-		//}
 
 		if (id == "") {
 			convoTab.SetActive(false);
 			return;
 		}
+
 		convoTab.SetActive(true);
 		message_IF.interactable = true;
-		if (User.conversations.ContainsKey(id) && User.conversations[id].Count > 0) {
-			User.conversations[id] = User.conversations[id].OrderBy(m => m.send_at).ToList();
-		}
+
 		LoadConv();
 		confirmKeyBT.SetActive(true);
 	}
 
-
-	string key = "";
+	/// <summary>
+	/// display next public RSA key that will be used to prevent man in the middle
+	/// </summary>
 	public void ConfirmKey() {
 		confirmKeyPanel.SetActive(!confirmKeyPanel.activeInHierarchy);
-		confirmKeyPanel.GetComponentInChildren<TMP_Text>().text = Languages.Get("SHARE_INFO");// "SHARE THIS WITH YOUR CONTACT<br>TO BE SURE THAT YOU USE THE GOOD KEY<br><#FF0000>IF NOT THE SAME, THERE IS A BUG<br>OR A MAN IN THE MIDDLE ATTACK AND NOTHING IS SAFE<br>";
-																																													//si nous avons envoyé le dernier message, alors la clé RSA synchronisée est celle de reception
-																																													//en effet, la future clé de réception distante a déjà été renouvelée par l'utilisateur distant dès la réception de notre message
+		confirmKeyPanel.GetComponentInChildren<TMP_Text>().text = Languages.Get("SHARE_INFO");
+		//next RSA is on our sending ratchet if we sent last message
 		if (User.conversations[focus_user_id].Last().from == User.id) {
 			string rsa = User.users_infos[focus_user_id].receiving_ratchet.rsa_public;
 			string rsa_split = "";
@@ -113,9 +122,9 @@ public class MessageManager : MonoBehaviour {
 				count++;
 			}
 			key = rsa_split;
-			confirmKeyPanel.GetComponentInChildren<TMP_Text>().text += Languages.Get("RECIEVE_INFO")/*"<br><#00FFFF><u>YOU WILL RECIEVE NEXT RATCHET INFO WITH YOUR KEY :</u><br><br>"*/ + rsa_split;
+			confirmKeyPanel.GetComponentInChildren<TMP_Text>().text += Languages.Get("RECIEVE_INFO") + rsa_split;
 		}
-		//a l'inverse, si nous ne somme pas le dernier à avoir envoyé un message, nous avons les infos pour l'émission à l'utilisateur distant
+		//next RSA is on our receiving ratchet if we receive last message
 		else {
 			string rsa = User.users_infos[focus_user_id].sending_ratchet.rsa_public;
 			string rsa_split = "";
@@ -127,14 +136,20 @@ public class MessageManager : MonoBehaviour {
 				count++;
 			}
 			key = rsa_split;
-			confirmKeyPanel.GetComponentInChildren<TMP_Text>().text += Languages.Get("SEND_INFO") /* "<br><#FFFF00><u>YOU WILL SEND NEXT RATCHET INFO ON HIS KEY :</u><br><br>" */ + rsa_split;
+			confirmKeyPanel.GetComponentInChildren<TMP_Text>().text += Languages.Get("SEND_INFO") + rsa_split;
 		}
 	}
 
+	/// <summary>
+	/// copy public key to clipboard
+	/// </summary>
 	public void CopyKey() {
 		UniClipboard.SetText(key.ToUpper());
 	}
 
+	/// <summary>
+	/// destroy all message prefabs
+	/// </summary>
 	public void Clear() {
 		foreach (Transform item in message_scroll.transform) {
 			Destroy(item.gameObject);
@@ -142,16 +157,19 @@ public class MessageManager : MonoBehaviour {
 		Focus("");
 	}
 
-	//prevent spam / wrong ratchet clicks
+	/// <summary>
+	/// confirm that last send message was correctly sent
+	/// </summary>
 	public void CanSend() {
 		wait_for_send_next = "";
 		SetSendBT();
 	}
 
-	string lastLoad = "";
-	bool isScrolling = false;
+	/// <summary>
+	/// check if user is scrolling convo to load previous messages
+	/// </summary>
 	private void CheckScroll() {
-		if(isScrolling && scrollBar.value >= 1f) {
+		if (isScrolling && scrollBar.value >= 1f) {
 			LoadMore();
 			isScrolling = false;
 			return;
@@ -159,11 +177,13 @@ public class MessageManager : MonoBehaviour {
 		if (scrollBar.value >= 1f) isScrolling = true;
 	}
 
+	/// <summary>
+	/// load previous messages if available
+	/// </summary>
 	public void LoadMore() {
 		if (focus_user_id == "") return;
 		string lastId = User.conversations[focus_user_id].First().id;
-		if (lastLoad == lastId) {
-			print("loast load same ID : " + lastLoad);
+		if (lastLoad == lastId) { //if try to load from same oldest message, cancel
 			return;
 		}
 		lastLoad = lastId;
@@ -171,21 +191,27 @@ public class MessageManager : MonoBehaviour {
 		uWebSocketManager.EmitEv("request:messages", new { userId = focus_user_id, lastId, limit = 10 });
 	}
 
+	/// <summary>
+	/// parse a complete conversation
+	/// </summary>
 	public void LoadConv(string idFocus = "") {
 		if (idFocus == "") idFocus = focus_user_id;
 		if (idFocus != focus_user_id) return;
 		if (!User.conversations.ContainsKey(focus_user_id) || focus_user_id == "") return;
 
+		//clear scroll view
 		foreach (Transform item in message_scroll.transform) {
 			Destroy(item.gameObject);
 		}
 
 		DateTime last = DateTime.MinValue;
+		//parse all messages
 		foreach (var message in User.conversations[focus_user_id]) {
 			if (message.plain == "") continue;
 
 			var delta = (message.send_at - last).TotalHours;
 			last = message.send_at;
+			//add a day/date separator if message are spaced in time
 			if (delta > 12) {
 				GameObject m = Instantiate(message_prefab, message_scroll.transform);
 				m.transform.Find("MessageBG").transform.Find("body").GetComponent<TMP_Text>().text = message.send_at.ToLongDateString();
@@ -201,11 +227,17 @@ public class MessageManager : MonoBehaviour {
 		Canvas.ForceUpdateCanvases();
 	}
 
+	/// <summary>
+	///change the color of time of a message to notify user that his message was delivered
+	/// </summary>
 	public void SetDistributed(string with, string message_id) {
 		if (focus_user_id != with) return;
 		GameObject.Find(message_id).transform.Find("MessageBG").transform.Find("meta").GetComponent<TMP_Text>().color = new Color(0, 0.8f, 1f);
 	}
 
+	/// <summary>
+	/// Set up a message prefab GO
+	/// </summary>
 	public GameObject SetUpMessage(Message message) {
 		GameObject m = Instantiate(message_prefab, message_scroll.transform);
 		m.name = message.id;
@@ -225,6 +257,9 @@ public class MessageManager : MonoBehaviour {
 		return m;
 	}
 
+	/// <summary>
+	/// Parse a single message to the focused conversation
+	/// </summary>
 	public void Parse(Message m) {
 		if (!User.conversations.ContainsKey(focus_user_id) || focus_user_id != (m.from == User.id ? m.to : m.from)) {
 			return;

@@ -41,163 +41,163 @@ using System;
 using System.IO;
 
 namespace WebSocketSharp.Net {
-    internal class ChunkedRequestStream : RequestStream {
-        #region Private Const Fields
+	internal class ChunkedRequestStream : RequestStream {
+		#region Private Const Fields
 
-        private const int _bufferSize = 8192;
+		private const int _bufferSize = 8192;
 
-        #endregion
+		#endregion
 
-        #region Private Fields
+		#region Private Fields
 
-        private HttpListenerContext _context;
-        private ChunkStream Dictecoder;
-        private bool Dictisposed;
-        private bool _noMoreData;
+		private HttpListenerContext _context;
+		private ChunkStream Dictecoder;
+		private bool Dictisposed;
+		private bool _noMoreData;
 
-        #endregion
+		#endregion
 
-        #region Public Constructors
+		#region Public Constructors
 
-        public ChunkedRequestStream(
-          HttpListenerContext context, Stream stream, byte[] buffer, int offset, int length)
-          : base(stream, buffer, offset, length) {
-            _context = context;
-            Dictecoder = new ChunkStream((WebHeaderCollection)context.Request.Headers);
-        }
+		public ChunkedRequestStream(
+			HttpListenerContext context, Stream stream, byte[] buffer, int offset, int length)
+			: base(stream, buffer, offset, length) {
+			_context = context;
+			Dictecoder = new ChunkStream((WebHeaderCollection)context.Request.Headers);
+		}
 
-        #endregion
+		#endregion
 
-        #region Public Properties
+		#region Public Properties
 
-        public ChunkStream Decoder {
-            get {
-                return Dictecoder;
-            }
+		public ChunkStream Decoder {
+			get {
+				return Dictecoder;
+			}
 
-            set {
-                Dictecoder = value;
-            }
-        }
+			set {
+				Dictecoder = value;
+			}
+		}
 
-        #endregion
+		#endregion
 
-        #region Private Methods
+		#region Private Methods
 
-        private void onRead(IAsyncResult asyncResult) {
-            var readState = (ReadBufferState)asyncResult.AsyncState;
-            var ares = readState.AsyncResult;
-            try {
-                var nread = base.EndRead(asyncResult);
-                Dictecoder.Write(ares.Buffer, ares.Offset, nread);
-                nread = Dictecoder.Read(readState.Buffer, readState.Offset, readState.Count);
-                readState.Offset += nread;
-                readState.Count -= nread;
-                if (readState.Count == 0 || !Dictecoder.WantMore || nread == 0) {
-                    _noMoreData = !Dictecoder.WantMore && nread == 0;
-                    ares.Count = readState.InitialCount - readState.Count;
-                    ares.Complete();
+		private void onRead(IAsyncResult asyncResult) {
+			var readState = (ReadBufferState)asyncResult.AsyncState;
+			var ares = readState.AsyncResult;
+			try {
+				var nread = base.EndRead(asyncResult);
+				Dictecoder.Write(ares.Buffer, ares.Offset, nread);
+				nread = Dictecoder.Read(readState.Buffer, readState.Offset, readState.Count);
+				readState.Offset += nread;
+				readState.Count -= nread;
+				if (readState.Count == 0 || !Dictecoder.WantMore || nread == 0) {
+					_noMoreData = !Dictecoder.WantMore && nread == 0;
+					ares.Count = readState.InitialCount - readState.Count;
+					ares.Complete();
 
-                    return;
-                }
+					return;
+				}
 
-                ares.Offset = 0;
-                ares.Count = Math.Min(_bufferSize, Dictecoder.ChunkLeft + 6);
-                base.BeginRead(ares.Buffer, ares.Offset, ares.Count, onRead, readState);
-            } catch (Exception ex) {
-                _context.Connection.SendError(ex.Message, 400);
-                ares.Complete(ex);
-            }
-        }
+				ares.Offset = 0;
+				ares.Count = Math.Min(_bufferSize, Dictecoder.ChunkLeft + 6);
+				base.BeginRead(ares.Buffer, ares.Offset, ares.Count, onRead, readState);
+			} catch (Exception ex) {
+				_context.Connection.SendError(ex.Message, 400);
+				ares.Complete(ex);
+			}
+		}
 
-        #endregion
+		#endregion
 
-        #region Public Methods
+		#region Public Methods
 
-        public override IAsyncResult BeginRead(
-          byte[] buffer, int offset, int count, AsyncCallback callback, object state) {
-            if (Dictisposed)
-                throw new ObjectDisposedException(GetType().ToString());
+		public override IAsyncResult BeginRead(
+			byte[] buffer, int offset, int count, AsyncCallback callback, object state) {
+			if (Dictisposed)
+				throw new ObjectDisposedException(GetType().ToString());
 
-            if (buffer == null)
-                throw new ArgumentNullException("buffer");
+			if (buffer == null)
+				throw new ArgumentNullException("buffer");
 
-            var len = buffer.Length;
-            if (offset < 0 || offset > len)
-                throw new ArgumentOutOfRangeException("'offset' exceeds the size of buffer.");
+			var len = buffer.Length;
+			if (offset < 0 || offset > len)
+				throw new ArgumentOutOfRangeException("'offset' exceeds the size of buffer.");
 
-            if (count < 0 || offset > len - count)
-                throw new ArgumentOutOfRangeException("'offset' + 'count' exceeds the size of buffer.");
+			if (count < 0 || offset > len - count)
+				throw new ArgumentOutOfRangeException("'offset' + 'count' exceeds the size of buffer.");
 
-            var ares = new HttpStreamAsyncResult(callback, state);
-            if (_noMoreData) {
-                ares.Complete();
-                return ares;
-            }
+			var ares = new HttpStreamAsyncResult(callback, state);
+			if (_noMoreData) {
+				ares.Complete();
+				return ares;
+			}
 
-            var nread = Dictecoder.Read(buffer, offset, count);
-            offset += nread;
-            count -= nread;
-            if (count == 0) {
-                // Got all we wanted, no need to bother the decoder yet.
-                ares.Count = nread;
-                ares.Complete();
+			var nread = Dictecoder.Read(buffer, offset, count);
+			offset += nread;
+			count -= nread;
+			if (count == 0) {
+				// Got all we wanted, no need to bother the decoder yet.
+				ares.Count = nread;
+				ares.Complete();
 
-                return ares;
-            }
+				return ares;
+			}
 
-            if (!Dictecoder.WantMore) {
-                _noMoreData = nread == 0;
-                ares.Count = nread;
-                ares.Complete();
+			if (!Dictecoder.WantMore) {
+				_noMoreData = nread == 0;
+				ares.Count = nread;
+				ares.Complete();
 
-                return ares;
-            }
+				return ares;
+			}
 
-            ares.Buffer = new byte[_bufferSize];
-            ares.Offset = 0;
-            ares.Count = _bufferSize;
+			ares.Buffer = new byte[_bufferSize];
+			ares.Offset = 0;
+			ares.Count = _bufferSize;
 
-            var readState = new ReadBufferState(buffer, offset, count, ares);
-            readState.InitialCount += nread;
-            base.BeginRead(ares.Buffer, ares.Offset, ares.Count, onRead, readState);
+			var readState = new ReadBufferState(buffer, offset, count, ares);
+			readState.InitialCount += nread;
+			base.BeginRead(ares.Buffer, ares.Offset, ares.Count, onRead, readState);
 
-            return ares;
-        }
+			return ares;
+		}
 
-        public override void Close() {
-            if (Dictisposed)
-                return;
+		public override void Close() {
+			if (Dictisposed)
+				return;
 
-            Dictisposed = true;
-            base.Close();
-        }
+			Dictisposed = true;
+			base.Close();
+		}
 
-        public override int EndRead(IAsyncResult asyncResult) {
-            if (Dictisposed)
-                throw new ObjectDisposedException(GetType().ToString());
+		public override int EndRead(IAsyncResult asyncResult) {
+			if (Dictisposed)
+				throw new ObjectDisposedException(GetType().ToString());
 
-            if (asyncResult == null)
-                throw new ArgumentNullException("asyncResult");
+			if (asyncResult == null)
+				throw new ArgumentNullException("asyncResult");
 
-            var ares = asyncResult as HttpStreamAsyncResult;
-            if (ares == null)
-                throw new ArgumentException("Wrong IAsyncResult.", "asyncResult");
+			var ares = asyncResult as HttpStreamAsyncResult;
+			if (ares == null)
+				throw new ArgumentException("Wrong IAsyncResult.", "asyncResult");
 
-            if (!ares.IsCompleted)
-                ares.AsyncWaitHandle.WaitOne();
+			if (!ares.IsCompleted)
+				ares.AsyncWaitHandle.WaitOne();
 
-            if (ares.Error != null)
-                throw new HttpListenerException(400, "I/O operation aborted.");
+			if (ares.Error != null)
+				throw new HttpListenerException(400, "I/O operation aborted.");
 
-            return ares.Count;
-        }
+			return ares.Count;
+		}
 
-        public override int Read(byte[] buffer, int offset, int count) {
-            var ares = BeginRead(buffer, offset, count, null, null);
-            return EndRead(ares);
-        }
+		public override int Read(byte[] buffer, int offset, int count) {
+			var ares = BeginRead(buffer, offset, count, null, null);
+			return EndRead(ares);
+		}
 
-        #endregion
-    }
+		#endregion
+	}
 }
