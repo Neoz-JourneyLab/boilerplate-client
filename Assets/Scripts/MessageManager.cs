@@ -47,7 +47,12 @@ public class MessageManager : MonoBehaviour {
 		if (rid == 1) {
 			string rsa_public = Crypto.Regen_XML_RSA(User.users_infos[focus_user_id].sending_ratchet.rsa_public);
 			//we encrypt the root with the public RSA key provided by the other
-			ratchet_infos = Crypto.EncryptionRSA(root, rsa_public);
+			try {
+				ratchet_infos = Crypto.EncryptionRSA(root, rsa_public);
+			} catch(Exception ex) {
+				print("Error : " + ex.Message + " : " + rsa_public);
+				return;
+			}
 			//likewise, if we assigned a new ratchet, we give it our RSA key so that it can also assign us one
 			sender_rsa_info = Crypto.Simplfy_XML_RSA(User.users_infos[focus_user_id].receiving_ratchet.rsa_public);
 		}

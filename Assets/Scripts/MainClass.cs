@@ -55,7 +55,9 @@ public class MainClass : MonoBehaviour {
 	void Start() {
 		Application.targetFrameRate = 90;
 		//decode credentials if available on local storage
-		if (File.Exists(last_auth_info_file)) {
+		if (!File.Exists(last_auth_info_file)) return;
+
+		try {
 			string autolog = File.ReadAllText(last_auth_info_file);
 			//key is mac adress
 			var key = Hash(Encoding.UTF8.GetBytes(GetMac()));
@@ -77,6 +79,9 @@ public class MainClass : MonoBehaviour {
 				//will auto log in : disable log in button
 				logInBT.GetComponent<Button>().interactable = false;
 			}
+		} catch(Exception ex) {
+			print("cannot read creds info : " + ex.Message);
+			File.Delete(last_auth_info_file);
 		}
 	}
 
@@ -98,7 +103,7 @@ public class MainClass : MonoBehaviour {
 		}, Formatting.Indented);
 		string mac_adress = GetMac();
 		var key = Hash(Encoding.UTF8.GetBytes(mac_adress));
-		var IV = KDF(Encoding.UTF8.GetBytes(GetMac()), Encoding.UTF8.GetBytes(GetMac()), 128);
+		var IV = KDF(Encoding.UTF8.GetBytes(GetMac()), Encoding.UTF8.GetBytes(GetMac()), 16);
 		string encrypt = Convert.ToBase64String(EncryptAES(json, key, IV));
 		File.WriteAllText(last_auth_info_file, encrypt);
 	}

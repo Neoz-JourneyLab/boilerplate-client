@@ -6,14 +6,23 @@ using TMPro;
 using UnityEngine;
 using WebSocket = WebSocketSharp.WebSocket;
 
-// ReSharper disable once InconsistentNaming
+/// <summary>
+/// Manage the web socket event for in and out
+/// </summary>
 public class uWebSocketManager : MonoBehaviour {
 	[SerializeField] GameObject mainBlocker;
 	[SerializeField] GameObject reconnectBT;
 	[SerializeField] TMP_InputField realmTxt;
-
+	[SerializeField] string socketId;
+	public string URI = "";
+	public WebSocket ws;
+	public bool first = true;
 	delegate void EventDelegation(string e);
-	Dictionary<string, EventDelegation> events = new Dictionary<string, EventDelegation>() {
+
+	/// <summary>
+	/// Add all listeners for events emitted by the server
+	/// </summary>
+	readonly Dictionary<string, EventDelegation> events = new Dictionary<string, EventDelegation>() {
 		{ "pong", WsEvents.Pong },
 		{ "new:message", WsEvents.NewMessage },
 		{ "auth:response", WsEvents.AuthOK },
@@ -23,21 +32,27 @@ public class uWebSocketManager : MonoBehaviour {
 		{ "no:more:messages", WsEvents.NoMoreMessage },
 		{ "err", WsEvents.Err },
 	};
-	[SerializeField] string socketId;
-	public string URI = "";
-	public WebSocket ws;
-	public bool first = true;
 
+	/// <summary>
+	/// initialize a web socket connexion with the realm text file
+	/// </summary>
 	private void Start() {
-		URI = File.ReadAllText(Application.streamingAssetsPath + "/realm.txt");
+		string realm_path = Application.streamingAssetsPath + "/realm.txt";
+		if (!File.Exists(realm_path)) {
+			File.WriteAllText(realm_path, "ws://localhost:9997");
+		}
+		URI = File.ReadAllText(realm_path);
 		InitSocket(URI);
 	}
 
+	/// <summary>
+	/// close web socket connection
+	/// </summary>
 	public void Close() {
 		ws.Close();
 	}
 
-	//supprime les infos de connexion
+	//log out, and reset all credentials informations
 	public void Logout(bool reco) {
 		ws?.CloseAsync();
 		first = true;
@@ -71,10 +86,9 @@ public class uWebSocketManager : MonoBehaviour {
 	}
 
 	/// <summary>
-	/// Ajoute tous les listeners pour les events émis par le serveur
+	/// Create a web socket connection and start ping method
 	/// </summary>
 	public void InitSocket(string uri) {
-		//ws?.Close();
 		ws = new WebSocket(uri);
 
 		ws.OnOpen += (sender, e) => {
@@ -88,7 +102,7 @@ public class uWebSocketManager : MonoBehaviour {
 			});
 		};
 		ws.OnMessage += (sender, e) => {
-			//Le message contient l'évenement (listé dans WsEvents.cs) et les datas en JSON
+			//The message contains the event (listed in WsEvents.cs) and the data in JSON
 			Payload payload = JsonUtility.FromJson<Payload>(e.Data.ToString());
 			if (payload.id != null && payload.id != socketId) {
 				socketId = payload.id;
@@ -97,15 +111,13 @@ public class uWebSocketManager : MonoBehaviour {
 						GameObject.Find("Canvas").GetComponent<MainClass>().Auth();
 					});
 				} else {
-					//re-auth if
 					UnityMainThread.wkr.AddJob(() => {
 						GameObject.Find("Canvas").GetComponent<MainClass>().Auth();
 					});
 				}
-				//Debug.Log("Socket ID " + socketId);
 			}
 			if (!events.ContainsKey(payload.ev)) return;
-			//routage de l'event serveur
+			//server event routing
 			UnityMainThread.wkr.AddJob(() => { events[payload.ev](payload.data); });
 		};
 		ws.OnClose += (sender, e) => {
@@ -123,6 +135,9 @@ public class uWebSocketManager : MonoBehaviour {
 
 	int tries = 1;
 	DateTime nextTry = DateTime.UtcNow;
+	/// <summary>
+	/// Ping the websocket server : if fail/not received, try a reconnection
+	/// </summary>
 	void Ping() {
 		if (ws == null) return;
 		if (!ws.IsConnected || !ws.IsAlive || WsEvents.pings.Count > 5) {
@@ -131,7 +146,6 @@ public class uWebSocketManager : MonoBehaviour {
 			}
 			tries++;
 			nextTry = DateTime.UtcNow.AddSeconds(Math.Pow(2, tries));
-			//Debug.Log("Next try in " + Math.Pow(2, tries) + "s");
 			socketId = "";
 			ws.CloseAsync();
 			ws.ConnectAsync();
@@ -150,10 +164,10 @@ public class uWebSocketManager : MonoBehaviour {
 	}
 
 	/// <summary>
-	/// Emit sur le socket uws
+	/// Emit on the uws socket
 	/// </summary>
-	/// <param name="ev">Le nom de l'évenement pour le routage</param>
-	/// <param name="data">un objet a passer au serveur</param>
+	/// <param name="ev">The name of the event for the routing</param>
+	/// <param name="data">an object to pass to the server</param>
 	public void Emit(string ev, object data) {
 		if (!ws.IsAlive) {
 			Debug.Log("socket is not alive !");
@@ -163,6 +177,9 @@ public class uWebSocketManager : MonoBehaviour {
 		ws.SendAsync(json, null);
 	}
 
+	/// <summary>
+	/// static access this emit function
+	/// </summary>
 	public static void EmitEv(string ev, object data = null) {
 		GameObject.FindGameObjectWithTag("AppManager").GetComponent<uWebSocketManager>().Emit(ev, data);
 	}
@@ -173,7 +190,7 @@ public class uWebSocketManager : MonoBehaviour {
 }
 
 /// <summary>
-/// Contient le payload pour le serveur, avec l'ID websocket, le nom d'évent et l'objet data "json"
+/// Contains the payload for the server, with websocket id, event name and "json" data object
 /// </summary>
 public class Payload {
 	public string data;
