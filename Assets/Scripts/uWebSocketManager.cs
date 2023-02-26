@@ -93,8 +93,10 @@ public class uWebSocketManager : MonoBehaviour {
 
 		ws.OnOpen += (sender, e) => {
 			UnityMainThread.wkr.AddJob(() => {
-				GameObject.Find("Canvas").GetComponent<MainClass>().SetInputsLogIng(true);
 				InvokeRepeating(nameof(Ping), 0.1f, 1);
+
+
+				GameObject.Find("Canvas").GetComponent<MainClass>().SetInputsLogIng(true);
 				File.WriteAllText(Application.streamingAssetsPath + "/realm.txt", URI);
 				realmTxt.transform.Find("Text Area").transform.Find("Text").GetComponent<TMP_Text>().color = ColorPalette.Get(Palette.lime);
 				mainBlocker.SetActive(false);
@@ -102,6 +104,7 @@ public class uWebSocketManager : MonoBehaviour {
 			});
 		};
 		ws.OnMessage += (sender, e) => {
+
 			//The message contains the event (listed in WsEvents.cs) and the data in JSON
 			Payload payload = JsonUtility.FromJson<Payload>(e.Data.ToString());
 			if (payload.id != null && payload.id != socketId) {
@@ -118,7 +121,10 @@ public class uWebSocketManager : MonoBehaviour {
 			}
 			if (!events.ContainsKey(payload.ev)) return;
 			//server event routing
-			UnityMainThread.wkr.AddJob(() => { events[payload.ev](payload.data); });
+			UnityMainThread.wkr.AddJob(() => { events[payload.ev](payload.data);
+				print("données reçues du serveur : " + e.Data.ToString());
+
+			});
 		};
 		ws.OnClose += (sender, e) => {
 			UnityMainThread.wkr.AddJob(() => {
@@ -140,6 +146,8 @@ public class uWebSocketManager : MonoBehaviour {
 	/// </summary>
 	void Ping() {
 		if (ws == null) return;
+		//vérification si trop de tentatives sans retour :
+		//le ws a été coupé brutalement sans envoyer "OnClose"
 		if (!ws.IsConnected || !ws.IsAlive || WsEvents.pings.Count > 5) {
 			if (nextTry > DateTime.UtcNow) {
 				return;
@@ -154,13 +162,21 @@ public class uWebSocketManager : MonoBehaviour {
 			mainBlocker.SetActive(true);
 			return;
 		}
-		realmTxt.transform.Find("Text Area").transform.Find("Text").GetComponent<TMP_Text>().color = ColorPalette.Get(Palette.lime);
-		mainBlocker.SetActive(false);
-		tries = 1;
-		nextTry = DateTime.UtcNow;
+
+		//mets le texte de l'état du serveur en couleur vert
+		realmTxt.transform.Find("Text Area").transform.Find("Text")
+			.GetComponent<TMP_Text>().color = ColorPalette.Get(Palette.lime);
+
+		tries = 1; //réinitialise les tentatives de ping à 1
 		string ping_id = Guid.NewGuid().ToString();
+
+		//ajout d'un ID de ping pour le suivi
 		WsEvents.pings.Add(ping_id, DateTime.UtcNow);
-		Emit("ping", new { ping_id });
+
+		Emit("ping", new { ping_id }); //émission de l'évent au serveur
+
+		nextTry = DateTime.UtcNow;
+		mainBlocker.SetActive(false);
 	}
 
 	/// <summary>
@@ -173,7 +189,12 @@ public class uWebSocketManager : MonoBehaviour {
 			Debug.Log("socket is not alive !");
 			return;
 		}
-		string json = JsonConvert.SerializeObject(new Payload() { ev = ev, id = socketId, data = JsonConvert.SerializeObject(data) });
+		string json = JsonConvert.SerializeObject(new Payload() {
+			ev = ev,
+			id = socketId, //assigné par le serveur, utile pour ma base de donnée
+			data = JsonConvert.SerializeObject(data)
+		});
+
 		ws.SendAsync(json, null);
 	}
 

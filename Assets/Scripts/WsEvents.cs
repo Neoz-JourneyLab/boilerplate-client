@@ -50,7 +50,7 @@ public class WsEvents : MonoBehaviour {
 		}
 		float a = serverStatus.color.a;
 		serverStatus.color = ColorPalette.Get(Palette.paleBlue, a);
-		serverStatus.text = Languages.Get("server") + $" : {GetDateFromStr(serverTime).ToShortDateString() + " " + GetDateFromStr(serverTime).ToLongTimeString()} (ping {latency}ms)";
+		serverStatus.text = Languages.Get("server") + $" : {GetDateFromStr(serverTime).ToShortDateString() 			+ " " + GetDateFromStr(serverTime).ToLongTimeString()} (ping {latency}ms)";
 	}
 
 	/// <summary>
