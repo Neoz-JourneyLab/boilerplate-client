@@ -1,6 +1,13 @@
 {
 	"devDependencies": {
+		"@types/jquery": "^3.5.30",
 		"typescript": "^5.5.4",
-		"vite": "^5.3.5"
+		"vite": "^5.3.5",
+		"vite-plugin-node-polyfills": "^0.22.0"
+	},
+	"dependencies": {
+		"@types/node": "^22.1.0",
+		"csv-parser": "^3.0.0",
+		"fs": "0.0.1-security"
 	}
 }
