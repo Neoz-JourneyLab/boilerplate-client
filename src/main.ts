@@ -1,4 +1,5 @@
 interface Personnel {
+    id: string
     grade: grade_e
     nom: string
     prenom: string
@@ -23,7 +24,6 @@ function readCSVFile(file: File): Promise<string> {
         };
         reader.readAsText(file);
     });
-    //Affect(services_e.planton_ps)
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -31,8 +31,24 @@ document.addEventListener('DOMContentLoaded', () => {
         const input = event.target as HTMLInputElement;
         if (input.files && input.files[0]) {
             try {
+                mecs = []
                 const data = await readCSVFile(input.files[0]);
-                console.log(data);
+                for (const l of data.split('\n')) {
+                    if (l.startsWith('Nom;Prénom') || l.length === 0) continue
+                    const field = l.split(';')
+                    mecs.push({
+                        id: field[0] + field[1] + field[2],
+                        nom: field[0],
+                        prenom: field[1],
+                        grade: grade_e[field[2] as keyof typeof grade_e],
+                        compagnie: parseInt(field[3]),
+                        apte: field[4].startsWith('oui')
+                    })
+                }
+                for (const s of Object.values(services_e)) {
+                    console.log('gestion de', s)
+                    Affect(s)
+                }
             } catch (error) {
                 console.error('Error reading CSV file:', error);
             }
@@ -49,10 +65,51 @@ const services: Service[] = [
         grades: [grade_e.sdt, grade_e.cpl, grade_e.cch, grade_e.cc1],
         duration: 1,
         effectif: 2
-    }
+    },
+    {
+        alias: services_e.chef_ps,
+        grades: [grade_e.sgt],
+        duration: 1,
+        effectif: 1
+    },
+    {
+        alias: services_e.semaine,
+        grades: [grade_e.sgt, grade_e.cch, grade_e.cc1],
+        duration: 1,
+        effectif: 1
+    },
+    {
+        alias: services_e.chef_spi,
+        grades: [grade_e.sgt],
+        duration: 1,
+        effectif: 1
+    },
+    {
+        alias: services_e.cpa,
+        grades: [grade_e.sch],
+        duration: 1,
+        effectif: 1
+    },
+    {
+        alias: services_e.cp,
+        grades: [grade_e.adj, grade_e.adc, grade_e.maj, grade_e.ltn],
+        duration: 1,
+        effectif: 1
+    },
+    {
+        alias: services_e.chef_ei,
+        grades: [grade_e.sgt, grade_e.cch, grade_e.cc1],
+        duration: 1,
+        effectif: 1
+    },
+    {
+        alias: services_e.planton_ei,
+        grades: [grade_e.sdt, grade_e.cpl, grade_e.cch, grade_e.cc1],
+        duration: 1,
+        effectif: 4
+    },
 ]
-const mecs: Personnel[] = [
-]
+let mecs: Personnel[] = []
 
 function getDaysInMonth(year: number, month: number): number {
     // Le mois suivant avec le jour 0 renvoie le dernier jour du mois précédent
@@ -63,42 +120,41 @@ function getDaysInMonthFromDate(date: Date): number {
     const month = date.getMonth();
     return getDaysInMonth(year, month);
 }
-
+const ponctionnés: string[] = []
 const Affect = function (s: services_e) {
     const service = services.find(x => x.alias === s)!
     const nbServices = Math.ceil(28 / service.duration)
 
     const effectifTotal = mecs.filter(x => x.apte && service.grades.includes(x.grade)).length
     let personnel: Personnel[] = []
-    let tries = 0;
-    while (personnel.length < getDaysInMonthFromDate(new Date())) {
-        if (tries++ > 100) {
-            console.log('PAS ASSEZ DE PERSONNEL')
-            break
-        }
-        for (let i = 1; i < 10; i++) {
-            const compagnie = mecs.filter(x => x.apte && x.compagnie == i && service.grades.includes(x.grade))
-            const effectifCompagnie = compagnie.length
-            const ratio = effectifCompagnie / effectifTotal
-            const nbMecs = Math.ceil(ratio * service.effectif * 28)
-            console.log('cie', i, 'donne', nbMecs)
-            for (let m = 0; m < nbMecs; m++) {
-                const mec = compagnie[Math.floor(Math.random() * compagnie.length)]
-                if (personnel.some(x => x.nom === mec.nom)) {
-                    console.log(mec.nom, 'deja utilised')
-                    continue
-                }
-                personnel.push(mec)
+    for (let i = 1; i < 10; i++) {
+        const compagnie = mecs.filter(x => x.apte && x.compagnie == i && service.grades.includes(x.grade))
+        let dispo = mecs.filter(x => x.apte && x.compagnie == i && service.grades.includes(x.grade) && !(ponctionnés.includes(x.id)))
+
+        const effectifCompagnie = compagnie.length
+        const ratio = effectifCompagnie / effectifTotal
+        const nbMecs = Math.ceil(ratio * service.effectif * nbServices)
+        console.log('cie', i, 'donne', nbMecs, 'pax/', effectifCompagnie, '(', effectifCompagnie, '/', effectifTotal, ')')
+        for (let m = 0; m < nbMecs; m++) {
+            if (dispo.length === 0) {
+                console.log('pas de dispo pour cie', i)
+                break
             }
+            const mec = dispo[Math.floor(Math.random() * dispo.length)]
+            ponctionnés.push(mec.id)
+            personnel.push(mec)
+            dispo = mecs.filter(x => x.apte && x.compagnie == i && service.grades.includes(x.grade) && !(ponctionnés.includes(x.id)))
         }
     }
 
     personnel = personnel.sort((x, y) => Math.random() - 0.5)
-    console.log(personnel.length)
-    console.log(personnel[0])
     const container = $('#body')
-    for (let d = 1; d <= getDaysInMonthFromDate(new Date()); d++) {
+    for (let d = 1; d <= getDaysInMonthFromDate(new Date()); d += (service.duration)) {
         const mec = personnel[d - 1]
+        if(!mec) {
+            console.log('plus de mec dispo pour le jour', d, 'service', service.alias)
+            break
+        }
         let hex = '#000000'
         switch (mec.compagnie) {
             case 1:
