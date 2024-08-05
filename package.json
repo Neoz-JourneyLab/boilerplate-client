@@ -6,8 +6,6 @@
 		"vite-plugin-node-polyfills": "^0.22.0"
 	},
 	"dependencies": {
-		"@types/node": "^22.1.0",
-		"csv-parser": "^3.0.0",
-		"fs": "0.0.1-security"
+		"@types/node": "^22.1.0"
 	}
 }

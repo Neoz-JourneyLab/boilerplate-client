@@ -1,5 +1,3 @@
-import { readCSV } from "./read_csv"
-
 interface Personnel {
     grade: grade_e
     nom: string
@@ -14,6 +12,34 @@ interface Service {
     effectif: number,
 }
 
+function readCSVFile(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+            resolve(reader.result as string);
+        };
+        reader.onerror = () => {
+            reject(reader.error);
+        };
+        reader.readAsText(file);
+    });
+    //Affect(services_e.planton_ps)
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('csvInput')!.addEventListener('change', async (event: Event) => {
+        const input = event.target as HTMLInputElement;
+        if (input.files && input.files[0]) {
+            try {
+                const data = await readCSVFile(input.files[0]);
+                console.log(data);
+            } catch (error) {
+                console.error('Error reading CSV file:', error);
+            }
+        }
+    });
+})
+
 enum grade_e { sdt = 'sdt', cpl = 'cpl', cch = 'cch', cc1 = 'cc1', sgt = 'sgt', sch = 'sch', adj = 'adj', adc = 'adc', maj = 'maj', ltn = 'ltn', cne = 'cne' }
 enum services_e { chef_ps = 'chef_ps', planton_ps = 'planton_ps', chef_spi = 'chef_spi', cpa = 'cpa', cp = 'cp', semaine = 'semaine', planton_ei = 'planton_ei', chef_ei = 'chef_ei' }
 
@@ -27,24 +53,6 @@ const services: Service[] = [
 ]
 const mecs: Personnel[] = [
 ]
-
-const GenererMoulinette = function () {
-    for (let i = 0; i < 200; i++) {
-        mecs.push({
-            grade: getRandomEnumValue(grade_e),
-            nom: 'SOLDAT_' + i,
-            prenom: '_',
-            apte: Math.random() > 0.1,
-            compagnie: Math.floor(Math.random() * 9) + 1
-        })
-    }
-}
-
-const RecupererCSVMoulinette = function(){
-    readCSV('./CSV/Effectifs.csv')
-}
-
-RecupererCSVMoulinette()
 
 function getDaysInMonth(year: number, month: number): number {
     // Le mois suivant avec le jour 0 renvoie le dernier jour du mois précédent
@@ -142,8 +150,7 @@ export const GetBackCol = function (col: string, prefer_white: boolean = false) 
     const b = parseInt(c.substring(4, 6), 16) * 0.144
     if (r + g + b > (prefer_white ? 200 : 100)) return '#000'
     else return '#FFF'
-  }
-Affect(services_e.planton_ps)
+}
 
 function getRandomEnumValue<T>(enumObj: T): T[keyof T] {
     const enumValues = Object.values(enumObj) as T[keyof T][];
