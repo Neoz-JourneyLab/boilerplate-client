@@ -23,14 +23,7 @@ public class uWebSocketManager : MonoBehaviour {
 	/// Add all listeners for events emitted by the server
 	/// </summary>
 	readonly Dictionary<string, EventDelegation> events = new Dictionary<string, EventDelegation>() {
-		{ "pong", WsEvents.Pong },
-		{ "new:message", WsEvents.NewMessage },
-		{ "auth:response", WsEvents.AuthOK },
-		{ "auth:error", WsEvents.AuthError },
-		{ "user:info", WsEvents.UserInfos },
-		{ "message:distributed", WsEvents.MessageDistributed },
-		{ "no:more:messages", WsEvents.NoMoreMessage },
-		{ "err", WsEvents.Err },
+
 	};
 
 	/// <summary>
@@ -56,7 +49,6 @@ public class uWebSocketManager : MonoBehaviour {
 	public void Logout(bool reco) {
 		ws?.CloseAsync();
 		first = true;
-		GameObject.Find("Canvas").GetComponent<MainClass>().authGroup.SetActive(true);
 		GameObject.Find("Nick IF").GetComponent<TMP_InputField>().text = "";
 		GameObject.Find("Pass IF").GetComponent<TMP_InputField>().text = "";
 
@@ -64,24 +56,13 @@ public class uWebSocketManager : MonoBehaviour {
 			File.Delete(Application.streamingAssetsPath + "/last_auths_infos.txt");
 		}
 
-
-		User.nickname = "";
-		User.id = "";
-		User.users_infos.Clear();
-		User.conversations.Clear();
-		User.root_memory.Clear();
-		User.pass_IV = new byte[0];
-		User.pass_kdf = new byte[0];
-		GameObject.Find("Canvas").GetComponent<MainClass>().ClearContats();
 		if (reco) {
 			URI = realmTxt.text;
 			InitSocket(URI);
-			realmTxt.transform.Find("Text Area").transform.Find("Text").GetComponent<TMP_Text>().color = ColorPalette.Get(Palette.paleOrange);
 		} else {
 			CancelInvoke(nameof(Ping));
 			mainBlocker.SetActive(false);
 			reconnectBT.SetActive(true);
-			realmTxt.transform.Find("Text Area").transform.Find("Text").GetComponent<TMP_Text>().color = ColorPalette.Get(Palette.lightGray);
 		}
 	}
 
@@ -95,10 +76,7 @@ public class uWebSocketManager : MonoBehaviour {
 			UnityMainThread.wkr.AddJob(() => {
 				InvokeRepeating(nameof(Ping), 0.1f, 1);
 
-
-				GameObject.Find("Canvas").GetComponent<MainClass>().SetInputsLogIng(true);
 				File.WriteAllText(Application.streamingAssetsPath + "/realm.txt", URI);
-				realmTxt.transform.Find("Text Area").transform.Find("Text").GetComponent<TMP_Text>().color = ColorPalette.Get(Palette.lime);
 				mainBlocker.SetActive(false);
 				reconnectBT.SetActive(false);
 			});
@@ -111,11 +89,9 @@ public class uWebSocketManager : MonoBehaviour {
 				socketId = payload.id;
 				if (first) {
 					UnityMainThread.wkr.AddJob(() => {
-						GameObject.Find("Canvas").GetComponent<MainClass>().Auth();
 					});
 				} else {
 					UnityMainThread.wkr.AddJob(() => {
-						GameObject.Find("Canvas").GetComponent<MainClass>().Auth();
 					});
 				}
 			}
@@ -129,10 +105,6 @@ public class uWebSocketManager : MonoBehaviour {
 		ws.OnClose += (sender, e) => {
 			UnityMainThread.wkr.AddJob(() => {
 				reconnectBT.SetActive(true);
-				realmTxt.transform.Find("Text Area").transform.Find("Text").GetComponent<TMP_Text>().color = ColorPalette.Get(Palette.red);
-				WsEvents.GetServerStatusTxt().text = Languages.Get("Reconnecting...");
-				GameObject.Find("Canvas").GetComponent<MainClass>().SetInputsLogIng(false);
-				WsEvents.GetServerStatusTxt().color = new Color(1, 0.5f, 0);
 			});
 		};
 
@@ -158,14 +130,9 @@ public class uWebSocketManager : MonoBehaviour {
 			ws.CloseAsync();
 			ws.ConnectAsync();
 			WsEvents.pings.Clear();
-			realmTxt.transform.Find("Text Area").transform.Find("Text").GetComponent<TMP_Text>().color = ColorPalette.Get(Palette.red);
 			mainBlocker.SetActive(true);
 			return;
 		}
-
-		//mets le texte de l'état du serveur en couleur vert
-		realmTxt.transform.Find("Text Area").transform.Find("Text")
-			.GetComponent<TMP_Text>().color = ColorPalette.Get(Palette.lime);
 
 		tries = 1; //réinitialise les tentatives de ping à 1
 		string ping_id = Guid.NewGuid().ToString();
