@@ -4,6 +4,11 @@ using UnityEngine;
 using System.Text;
 using System;
 using System.Security.Cryptography;
+using UnityEngine.Windows.Speech;
+using System.Collections.Generic;
+using System.Linq;
+using static Unity.IO.LowLevel.Unsafe.AsyncReadManagerMetrics;
+using System.Buffers.Binary;
 
 public class UdpManager : MonoBehaviour {
   UdpClient udpClient;
@@ -11,22 +16,82 @@ public class UdpManager : MonoBehaviour {
   // Start is called before the first frame update
   void Start() {
     udpClient = new UdpClient();
-    serverEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 3000);
-    InvokeRepeating(nameof(Test), 1, 1);
+    serverEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 69);
+    //InvokeRepeating(nameof(Test), 1, 1);
     ReceiveAck();
   }
 
-  void Test() {
-    StringBuilder sb = new StringBuilder();
-    for (int i = 0; i < 200000; i++) {
-      sb.Append(i.ToString() + ";");
-    }
-    Send(sb.ToString());
+  void Update() {
+    if (Input.GetKeyDown(KeyCode.Space))
+      Send("BONJOUR SERVEUR COMMENT TU VAS ?");
   }
 
+  readonly int MTU = 1200;
+  ushort mid = 0;
+  ushort[] acks = new ushort[32];
+  ushort last_ack = 65535;
+  ushort sequence_id = 0;
+  bool received_once = false;
   void Send(string message) {
-    byte[] data = Encoding.UTF8.GetBytes(message);
-    udpClient.Send(data, data.Length, serverEndPoint);
+    byte[] message_bin = Encoding.UTF8.GetBytes(message);
+    uint fragments_count = (uint)Math.Ceiling(message_bin.Length / (float)MTU);
+    /*
+0 = no fragment id
+1 = 8 bits fid (255 frag max)
+2 = 16 bits fid (65 535 frag max)
+3 = 32 bits fid (4 294 967 295 max)
+     */
+    byte frag_len_val = (byte)(fragments_count == 1 ? 0 : (fragments_count <= 255 ? 1 : (fragments_count <= 65535 ? 2 : 3)));
+    ushort frag_len = (ushort)((frag_len_val & 0b00000011) << 6);
+    ushort header_size = (ushort)(15 + frag_len_val + (frag_len_val == 3 ? 1 : 0));
+    /*
+0: message
+1 : ping
+2: connect
+3: disconnect
+     */
+    ushort frag_type = (2 & 0b00000011) << 3;
+    if (mid == ushort.MaxValue) mid = 0;
+    ushort message_id = mid++;
+    for (uint f = 0; f < fragments_count; f++) {
+      byte is_last_frag = (byte)(((byte)((f == (fragments_count - 1)) ? 1 : 0) & 0b00000001) << 5);
+      byte flags = (byte)(0 ^ frag_len | is_last_frag | frag_type);
+      byte[] fragment = new byte[Math.Min(MTU, message_bin.Length - f * MTU)];
+      Buffer.BlockCopy(message_bin, (int)(MTU * f), fragment, 0, fragment.Length);
+      byte[] buffer = new byte[header_size + fragment.Length];
+      //0 - 3 : checksum
+      //4 - 5 : seq id
+      //6 - 7 : message id
+      //8 : flags [FL L FT 000]
+      //9 - 10 : ack id
+      //11 - 14 : ack bitfield
+      //15 - 18 : fragment id
+      if (sequence_id == ushort.MaxValue) sequence_id = 0;
+      Buffer.BlockCopy(new ushort[1] { sequence_id++ }, 0, buffer, 4, 2);
+      Buffer.BlockCopy(new ushort[1] { message_id }, 0, buffer, 6, 2);
+      buffer[8] = flags;
+      Buffer.BlockCopy(new ushort[1] { last_ack }, 0, buffer, 9, 2);
+      uint olds_aks = 0;
+      for (int i = 1; i <= 32; i++) {
+        int old_ack = last_ack - i;
+        if (!acks.Contains((ushort)old_ack)) {
+          olds_aks |= (uint)(1 << (i - 1));
+        }
+      }
+      Buffer.BlockCopy(new uint[1] { olds_aks }, 0, buffer, 11, 4);
+
+      if (frag_len_val == 1) {
+        Buffer.BlockCopy(new byte[1] { (byte)f }, 0, buffer, 15, 1);
+      } else if (frag_len_val == 2) {
+        Buffer.BlockCopy(new ushort[1] { (ushort)f }, 0, buffer, 15, 2);
+      } else if (frag_len_val == 3) {
+        Buffer.BlockCopy(new uint[1] { f }, 0, buffer, 15, 4);
+      }
+      Buffer.BlockCopy(fragment, 0, buffer, header_size, fragment.Length);
+      uint checksum = Crc32.Compute(buffer);
+      Buffer.BlockCopy(new uint[1] { checksum }, 0, buffer, 0, 4);
+      udpClient.Send(buffer, buffer.Length, serverEndPoint);
+    }
   }
 
   void ReceiveAck() {
@@ -37,13 +102,47 @@ public class UdpManager : MonoBehaviour {
     try {
       // Fin de la réception et récupération des données
       byte[] receivedData = udpClient.EndReceive(result, ref serverEndPoint);
-      string receivedMessage = Encoding.UTF8.GetString(receivedData);
-      Debug.Log("Message reçu du serveur: " + Convert.ToBase64String(SHA256.Create().ComputeHash(receivedData)));
-    }
-    catch (Exception e) {
+      uint sent_checksum = BinaryPrimitives.ReverseEndianness(BitConverter.ToUInt32(receivedData, 0));
+      Buffer.BlockCopy(new uint[] { 0 }, 0, receivedData, 0, 4);
+      uint received_checksum = Crc32.Compute(receivedData);
+      ushort sequence_id = BinaryPrimitives.ReverseEndianness(BitConverter.ToUInt16(receivedData, 4));
+      ushort r_message_id = BinaryPrimitives.ReverseEndianness(BitConverter.ToUInt16(receivedData, 6));
+      ushort r_flags = receivedData[8];
+      byte r_fragment_len_flag = (byte)(r_flags & 0b11000000 >> 6);
+      byte r_fragment_len = (byte)(r_fragment_len_flag + (r_fragment_len_flag == 3 ? 1 : 0));
+      bool r_last_fragment = ((r_flags & 0b00100000) >> 5) != 0;
+      byte r_fragment_type = (byte)((r_flags & 0b00011000) >> 3);
+      ushort r_ack_id = BinaryPrimitives.ReverseEndianness(BitConverter.ToUInt16(receivedData, 9));
+      uint r_ack_bitfield = BinaryPrimitives.ReverseEndianness(BitConverter.ToUInt32(receivedData, 11));
+      uint r_fragment_id = BinaryPrimitives.ReverseEndianness(r_fragment_len == 0 ? 0 :
+        (r_fragment_len == 1 ? receivedData[15] :
+        (r_fragment_len == 2 ? BitConverter.ToUInt16(receivedData, 15) :
+        BitConverter.ToUInt32(receivedData, 15))));
+      string message = Encoding.UTF8.GetString(receivedData, 15 + r_fragment_len, receivedData.Length - (15 + r_fragment_len));
+
+      Debug.Log("Checksum reçu: " + sent_checksum + " vs " + received_checksum + (sent_checksum == received_checksum ? " OK" : " ERROR"));
+      Debug.Log("sequence_id " + sequence_id);
+      Debug.Log("message_id " + r_message_id);
+      Debug.Log("flag " + Convert.ToString(r_flags, 16));
+      Debug.Log("last_fragment " + (r_last_fragment ? " YES" : " NO"));
+      Debug.Log("fragment_type " + r_fragment_type);
+      Debug.Log("ack_id " + r_ack_id);
+      Debug.Log("ack_bitfield " + Convert.ToString(r_ack_bitfield, 2));
+      Debug.Log("fragment_id " + r_fragment_id);
+      Debug.Log("message " + message);
+
+      for (int a = 0; a < 31; a++) {
+        acks[a] = acks[a + 1];
+      }
+      if (received_once) {
+        acks[31] = last_ack;
+      }
+      received_once = true;
+      last_ack = sequence_id;
+    } catch (Exception e) {
       Debug.LogError("Erreur de réception: " + e.Message);
-    }
-    finally {
+      Debug.LogError(e.StackTrace);
+    } finally {
       // Continuer la réception en continu
       ReceiveAck();
     }
