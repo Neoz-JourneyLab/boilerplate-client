@@ -3,27 +3,45 @@ using System.Net;
 using UnityEngine;
 using System.Text;
 using System;
-using System.Security.Cryptography;
-using UnityEngine.Windows.Speech;
 using System.Collections.Generic;
 using System.Linq;
-using static Unity.IO.LowLevel.Unsafe.AsyncReadManagerMetrics;
 using System.Buffers.Binary;
+using UnityEngine.UI;
+using System.Xml.Linq;
 
 public class UdpManager : MonoBehaviour {
   UdpClient udpClient;
   IPEndPoint serverEndPoint;
+  [SerializeField] GameObject rows;
+  List<int> received = new List<int>();
   // Start is called before the first frame update
   void Start() {
     udpClient = new UdpClient();
     serverEndPoint = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 69);
     //InvokeRepeating(nameof(Test), 1, 1);
     ReceiveAck();
+    Send("hello server", 2);
+    InvokeRepeating(nameof(Ping), 1, 1);
+  }
+
+  void Ping() {
+    foreach (var element in received) {
+      int row = element / 30;
+      int col = element % 30;
+      rows.transform.GetChild(row).GetChild(col).GetComponent<Image>().color = new Color(0, 1, 0);
+    }
+    Send(((ulong)(DateTime.UtcNow - new DateTime(1970, 1, 1)).TotalMilliseconds).ToString(), 1);
   }
 
   void Update() {
     if (Input.GetKeyDown(KeyCode.Space))
       Send("BONJOUR SERVEUR COMMENT TU VAS ?");
+
+    if (Input.GetKeyDown(KeyCode.Q))
+      Send("Déco manuelle", 3);
+
+    if (Input.GetKeyDown(KeyCode.P))
+      Ping();
   }
 
   readonly int MTU = 1200;
@@ -32,7 +50,8 @@ public class UdpManager : MonoBehaviour {
   ushort last_ack = 65535;
   ushort sequence_id = 0;
   bool received_once = false;
-  void Send(string message) {
+  Dictionary<ushort, byte[]> packets_sent = new Dictionary<ushort, byte[]>();
+  void Send(string message, byte type = 0) {
     byte[] message_bin = Encoding.UTF8.GetBytes(message);
     uint fragments_count = (uint)Math.Ceiling(message_bin.Length / (float)MTU);
     /*
@@ -50,7 +69,7 @@ public class UdpManager : MonoBehaviour {
 2: connect
 3: disconnect
      */
-    ushort frag_type = (2 & 0b00000011) << 3;
+    ushort frag_type = (ushort) ((type & 0b00000011) << 3);
     if (mid == ushort.MaxValue) mid = 0;
     ushort message_id = mid++;
     for (uint f = 0; f < fragments_count; f++) {
@@ -67,14 +86,15 @@ public class UdpManager : MonoBehaviour {
       //11 - 14 : ack bitfield
       //15 - 18 : fragment id
       if (sequence_id == ushort.MaxValue) sequence_id = 0;
-      Buffer.BlockCopy(new ushort[1] { sequence_id++ }, 0, buffer, 4, 2);
+      ushort packet_id = sequence_id++;
+      Buffer.BlockCopy(new ushort[1] { packet_id }, 0, buffer, 4, 2);
       Buffer.BlockCopy(new ushort[1] { message_id }, 0, buffer, 6, 2);
       buffer[8] = flags;
       Buffer.BlockCopy(new ushort[1] { last_ack }, 0, buffer, 9, 2);
       uint olds_aks = 0;
       for (int i = 1; i <= 32; i++) {
         int old_ack = last_ack - i;
-        if (!acks.Contains((ushort)old_ack)) {
+        if (acks.Contains((ushort)old_ack)) {
           olds_aks |= (uint)(1 << (i - 1));
         }
       }
@@ -91,6 +111,7 @@ public class UdpManager : MonoBehaviour {
       uint checksum = Crc32.Compute(buffer);
       Buffer.BlockCopy(new uint[1] { checksum }, 0, buffer, 0, 4);
       udpClient.Send(buffer, buffer.Length, serverEndPoint);
+      packets_sent[packet_id] = fragment;
     }
   }
 
@@ -120,16 +141,50 @@ public class UdpManager : MonoBehaviour {
         BitConverter.ToUInt32(receivedData, 15))));
       string message = Encoding.UTF8.GetString(receivedData, 15 + r_fragment_len, receivedData.Length - (15 + r_fragment_len));
 
-      Debug.Log("Checksum reçu: " + sent_checksum + " vs " + received_checksum + (sent_checksum == received_checksum ? " OK" : " ERROR"));
-      Debug.Log("sequence_id " + sequence_id);
-      Debug.Log("message_id " + r_message_id);
-      Debug.Log("flag " + Convert.ToString(r_flags, 16));
-      Debug.Log("last_fragment " + (r_last_fragment ? " YES" : " NO"));
-      Debug.Log("fragment_type " + r_fragment_type);
-      Debug.Log("ack_id " + r_ack_id);
-      Debug.Log("ack_bitfield " + Convert.ToString(r_ack_bitfield, 2));
-      Debug.Log("fragment_id " + r_fragment_id);
-      Debug.Log("message " + message);
+      if (r_fragment_type == 1) {
+        //var date = new DateTime(1970, 1, 1).AddMilliseconds(ulong.Parse(message));
+        Debug.Log("Ping from server " + message + " (" + sequence_id + ")");
+        int element = int.Parse(message);
+        received.Add(element);
+        //Debug.Log("Ping from server " + sequence_id + " " + date.ToLongTimeString());
+      } else {
+        Debug.Log("Checksum reçu: " + sent_checksum + " vs " + received_checksum + (sent_checksum == received_checksum ? " OK" : " ERROR"));
+        Debug.Log("sequence_id " + sequence_id);
+        Debug.Log("message_id " + r_message_id);
+        Debug.Log("flag " + Convert.ToString(r_flags, 16));
+        Debug.Log("last_fragment " + (r_last_fragment ? " YES" : " NO"));
+        Debug.Log("fragment_type " + r_fragment_type);
+        Debug.Log("ack_id " + r_ack_id);
+        Debug.Log("ack_bitfield " + Convert.ToString(r_ack_bitfield, 2));
+        Debug.Log("fragment_id " + r_fragment_id);
+        Debug.Log("message " + message);
+      }
+
+      /*
+ *     console.log('ack bitfield:', abf)
+for (let a = 0; a <= 32; a++) {
+if ((ack_id - a) in client.packets_sent && (a === 0 || (a !== 0 && ((ack_bitfield >> a) & 0b00000001)) === 1)) {
+  delete client.packets_sent[ack_id - a]
+  if (a === 0) {
+    console.log(chalk.green('packet', ack_id - a, 'has been ack !'))
+  } else {
+    console.log(chalk.green('packet', ack_id - a, 'has been ack but ack packet was missed out ! a = ', a))
+  }
+}
+}
+ */
+      for (int a = 0; a <= 32; a++) {
+        ushort temp_ack_id = (ushort)(r_ack_id >= a ? (r_ack_id - a) : ((r_ack_id + 65536) - a));
+        if (packets_sent.ContainsKey(temp_ack_id)) {
+          if(a == 0) {
+            //Debug.Log("Direct ack : " + temp_ack_id);
+            packets_sent.Remove(temp_ack_id);
+          } else if(((r_ack_bitfield >> (a - 1)) & 0x00000001) == 1) {
+            //Debug.Log("ack but was missing main ack: " + temp_ack_id);
+            packets_sent.Remove(temp_ack_id);
+          }
+        }
+      }
 
       for (int a = 0; a < 31; a++) {
         acks[a] = acks[a + 1];
