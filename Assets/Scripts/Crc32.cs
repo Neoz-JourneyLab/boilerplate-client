@@ -1,8 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
-using System.Drawing.Printing;
-using UnityEngine;
-
 public static class Crc32
 {
   private static readonly uint[] Table;
